@@ -1,4 +1,4 @@
-# rtxrmq --> Parallel Batch RMQ
+# rtxrmq --> Batch Range Minimum Queries Accelerated by RTX
 
 ## Dependencies
 - CUDA 11 or later
