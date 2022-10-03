@@ -1,5 +1,4 @@
-# RTX-CUDA-template
-A simple RTX-CUDA interoperability test program based on the SAXPY example from NVIDIA's RTX Compute Samples https://github.com/NVIDIA/rtx_compute_samples
+# rtxrmq --> Parallel Batch RMQ
 
 ## Dependencies
 - CUDA 11 or later
@@ -10,5 +9,5 @@ A simple RTX-CUDA interoperability test program based on the SAXPY example from 
 mkdir build && cd build
 cmake ../ -DOPTIX_HOME=<PATH-TO-OPTIX-MAIN-DIR>
 make
-./rtx-cuda
+./rtxrmq
 ```
