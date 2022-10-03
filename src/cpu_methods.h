@@ -27,7 +27,7 @@ T* cpu_rmq(int n, int nq, T *A, int2 *Q, int nt) {
     T* out = new T[nq];
 
     omp_set_num_threads(nt);
-    printf("%sComputing Queries (%-11s, nt=%2i).......%s", AC_BOLDCYAN, algStr[ALG_CPU_BASE], nt, AC_RESET); fflush(stdout);
+    printf("%sComputing RMQs (%-11s, nt=%2i).......%s", AC_BOLDCYAN, algStr[ALG_CPU_BASE], nt, AC_RESET); fflush(stdout);
     timer.restart();
     #pragma omp parallel for shared(out, A, Q)
     for (int i = 0; i < nq; ++i) {
@@ -56,7 +56,7 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt) {
     printf("done: %f ms\n",timer.get_elapsed_ms());
 
     //printf("%sAnswering Querys [%2i threads]......", AC_BOLDCYAN, nt); fflush(stdout);
-    printf("%sComputing Queries (%-11s, nt=%2i).......%s", AC_BOLDCYAN, algStr[ALG_CPU_HRMQ], nt, AC_RESET); fflush(stdout);
+    printf("%sComputing RMQs (%-11s, nt=%2i).......%s", AC_BOLDCYAN, algStr[ALG_CPU_HRMQ], nt, AC_RESET); fflush(stdout);
     timer.restart();
     #pragma omp parallel for shared(rmq, out, A, Q)
     for (int i = 0; i < nq; ++i) {

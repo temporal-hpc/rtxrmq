@@ -6,7 +6,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     output = (float*)malloc(q*sizeof(float));
 
     // 1) Generate geometry from device data
-    printf("Generating geometry.................."); fflush(stdout);
+    printf("Generating geometry......................."); fflush(stdout);
     timer.restart();
     float3* devVertices = gen_vertices_dev(n, darray);
     uint3 *devTriangles = gen_triangles_dev(n, darray);
@@ -17,7 +17,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
 
 
     // 2) RTX OptiX Config (ONCE)
-    printf("RTX Config..........................."); fflush(stdout);
+    printf("RTX Config................................"); fflush(stdout);
     timer.restart();
     GASstate state;
     createOptixContext(state);
@@ -32,7 +32,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
 
 
     // 3) Build Acceleration Structure 
-    printf("%sBuild AS on GPU......................", AC_MAGENTA); fflush(stdout);
+    printf("%sBuild AS on GPU...........................", AC_MAGENTA); fflush(stdout);
     timer.restart();
     buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
     cudaDeviceSynchronize();
@@ -51,18 +51,15 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     params.output = d_output;
     params.query = dquery;
     Params *device_params;
-    printf("(%7.3f MB)....", (double)sizeof(Params)/1e3); fflush(stdout);
+    printf("(%7.3f MB).........", (double)sizeof(Params)/1e3); fflush(stdout);
     CUDA_CHECK(cudaMalloc(&device_params, sizeof(Params)));
     CUDA_CHECK(cudaMemcpy(device_params, &params, sizeof(Params), cudaMemcpyHostToDevice));
     timer.stop();
     printf("done: %f ms\n", timer.get_elapsed_ms());
 
 
-    // 5) Simulation
-    //printf("Simulating for %i steps\n", steps);
-    //print_vertices_dev(n, (float3*)state.d_temp_vertices);
-    //cpuMin = cpumin_vertex(3*n, devVertices);
-    printf("%sComputing Queries (%-11s)......%s", AC_BOLDCYAN, algStr[ALG_GPU_RTX], AC_RESET); fflush(stdout);
+    // 5) Computation
+    printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[ALG_GPU_RTX], AC_RESET); fflush(stdout);
     //printf("\n");
     timer.restart();
     OPTIX_CHECK(optixLaunch(state.pipeline, 0, reinterpret_cast<CUdeviceptr>(device_params), sizeof(Params), &state.sbt, q, 1, 1));
@@ -85,7 +82,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
         
     //printf("done\n");
     // 6) clean up
-    printf("cleaning up RTX environment.........."); fflush(stdout);
+    printf("cleaning up RTX environment..............."); fflush(stdout);
     OPTIX_CHECK(optixPipelineDestroy(state.pipeline));
     for (int i = 0; i < 3; ++i) {
         OPTIX_CHECK(optixProgramGroupDestroy(state.program_groups[i]));
