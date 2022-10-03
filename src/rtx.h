@@ -15,7 +15,6 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     timer.stop();
     printf("done: %f ms\n",timer.get_elapsed_ms());
 
-
     // 2) RTX OptiX Config (ONCE)
     printf("RTX Config................................"); fflush(stdout);
     timer.restart();
@@ -28,9 +27,6 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     timer.stop();
     printf("done: %f ms\n",timer.get_elapsed_ms());
 
-
-
-
     // 3) Build Acceleration Structure 
     printf("%sBuild AS on GPU...........................", AC_MAGENTA); fflush(stdout);
     timer.restart();
@@ -38,7 +34,6 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     cudaDeviceSynchronize();
     timer.stop();
     printf("done: %f ms%s\n", timer.get_elapsed_ms(), AC_RESET);
-
 
     // 4) Populate and move parameters to device (ONCE)
     printf("device params to GPU "); fflush(stdout);
@@ -56,7 +51,6 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     CUDA_CHECK(cudaMemcpy(device_params, &params, sizeof(Params), cudaMemcpyHostToDevice));
     timer.stop();
     printf("done: %f ms\n", timer.get_elapsed_ms());
-
 
     // 5) Computation
     printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[ALG_GPU_RTX], AC_RESET); fflush(stdout);
@@ -77,10 +71,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
             printf("%f  ", cpurmq_vertex(3*n, devVertices, q, dquery, i)); // TODO copy data only once
         printf("\n");
     }
-
-    
         
-    //printf("done\n");
     // 6) clean up
     printf("cleaning up RTX environment..............."); fflush(stdout);
     OPTIX_CHECK(optixPipelineDestroy(state.pipeline));
@@ -93,7 +84,5 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     CUDA_CHECK(cudaFree(device_params));
     CUDA_CHECK(cudaFree(reinterpret_cast<void *>(state.sbt.raygenRecord)));
     printf("done: %f ms\n", timer.get_elapsed_ms());
-    printf("-------------------------------------------------------------------------\n\n");
-
     return output;
 }
