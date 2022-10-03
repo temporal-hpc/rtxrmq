@@ -26,7 +26,7 @@
 const char *algStr[4] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX"}; 
 
 
-#define CHECK 0
+#define CHECK 1
 #include "common/common.h"
 #include "common/Timer.h"
 #include "src/rand.cuh"
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
     // 2) computation
     float *out;
-    int *outi = new int[q];
+    int *outi;
 
     switch(alg){
         case ALG_CPU_BASE:
@@ -95,8 +95,9 @@ int main(int argc, char *argv[]) {
             break;
     }
 
-    if (CHECK) {
-        check_result(n, q, hA, out);
+    if (CHECK && alg != ALG_CPU_HRMQ) {
+        float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
+        check_result(hA, hQ, q, expected, out);
     }
 
     printf("Benchmark Finished\n");

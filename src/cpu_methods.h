@@ -6,15 +6,8 @@
 template <typename T>
 T cpu_min(T *A, int l, int r) {
     T min = A[l];
-    /*
-    for (int i = 0; i <= r; ++i) {
-        if (min < A[i])
-            min = A[i];
-    }
-    */
-    // FIX ?? -> from A[l] --> A[r] ?
     for (int i = l; i <= r; ++i) {
-        if (min < A[i]){
+        if (A[i] < min){
             min = A[i];
         }
     }

@@ -1,4 +1,5 @@
 #pragma once
+
 #define NUM_REQUIRED_ARGS 6
 void print_help(){
     fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <dev> <n> <q> <nt> <alg>\n" AC_RESET
@@ -18,7 +19,39 @@ void print_help(){
                 );
 }
 
-bool check_result(int n, int q, float *x, float *out){
+bool is_equal(float a, float b) {
+    float epsilon = 1e-4f;
+    return abs(a - b) < epsilon;
+}
+
+bool check_result(float *hA, int2 *hQ, int q, float *expected, float *result){
+    for (int i = 0; i < q; ++i) {
+        //if (expected[i] != result[i]) { // RT-cores doesn't introduce floating point errors
+        if (!is_equal(expected[i], result[i])) {
+            printf("Error on %i-th query: got %f, expected %f\n", i, result[i], expected[i]);
+            //printf("[%i,%i]\n", hQ[i].x, hQ[i].y);
+            //for (int j = hQ[i].x; j <= hQ[i].y; ++j) {
+            //    printf("%f ", hA[j]);
+            //}
+            //printf("\n");
+            //return false;
+        }
+    }
+    return true;
+}
+
+bool check_result(float *hA, int2 *hQ, int q, int *expected, int *result){
+    for (int i = 0; i < q; ++i) {
+        if (expected[i] != result[i]) {
+            printf("Error on %i-th query: got %f, expected %f\n", i, result[i], expected[i]);
+            //printf("[%i,%i]\n", hQ[i].x, hQ[i].y);
+            //for (int j = hQ[i].x; j <= hQ[i].y; ++j) {
+            //    printf("%f ", hA[j]);
+            //}
+            //printf("\n");
+            //return false;
+        }
+    }
     return true;
 }
 

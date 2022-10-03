@@ -20,7 +20,7 @@ __global__ void kernel_rmq_basic(int n, int q, float *x, int2 *rmq, float *out){
     int r = rmq[tid].y;
     float min = x[l];
     float val;
-    for(int i=l; i<r; ++i){
+    for(int i=l; i<=r; ++i){
         val = x[i]; 
         if(val < min){
             min = val;
