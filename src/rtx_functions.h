@@ -17,6 +17,7 @@ struct Params {
   int2 *query;
   float min;
   float max;
+  float scale;
 };
 
 struct GASstate {

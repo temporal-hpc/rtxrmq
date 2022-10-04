@@ -51,10 +51,10 @@ __global__ void kernel_gen_vertices(int N, float *array, float3 *vertices){
         int k = 3*idx;
         float val = array[idx];
         // ray hits min on coord (val, l, r)
-        float margin = 0.1;
-        vertices[k+0] = make_float3(val, idx+margin, idx-margin);
-        vertices[k+1] = make_float3(val, idx+margin, 2*N);
-        vertices[k+2] = make_float3(val, -N, idx-margin);
+        float margin = 0.8;
+        vertices[k+0] = make_float3(val, (idx+margin)/SCALE, (idx-margin)/SCALE);
+        vertices[k+1] = make_float3(val, (idx+margin)/SCALE, 2*N/SCALE);
+        vertices[k+2] = make_float3(val, -N/SCALE, (idx-margin)/SCALE);
     }
 }
 
