@@ -6,9 +6,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <thrust/device_vector.h>
-#include <cub/util_allocator.cuh>
-#include <cub/device/device_reduce.cuh>
 #include <cuda.h>
 #include <optix.h>
 #include <optix_function_table_definition.h>

@@ -35,19 +35,6 @@ include_directories(${OptiX7_INCLUDE_DIRS})
 
 
 # ==============================================================================
-# Find Thrust Library
-# ==============================================================================
-find_package(Thrust REQUIRED)
-
-
-# ==============================================================================
-# Find CUB Library
-# ==============================================================================
-find_package(CUB REQUIRED)
-
-
-
-# ==============================================================================
 # Find OpenMP Library
 # ==============================================================================
 find_package(OpenMP REQUIRED)
@@ -62,10 +49,9 @@ ENDIF()
 # ==============================================================================
 find_library(RMQRMM rmqrmmBP.a hrmq/)
 
-thrust_create_target(Thrust)
 add_compile_options(-fopenmp)
 add_executable(rtxrmq src/main.cu common/common.cpp)
-target_link_libraries(rtxrmq PRIVATE CUDA::cudart OptiX7 Thrust OpenMP::OpenMP_CXX ${RMQRMM})
+target_link_libraries(rtxrmq PRIVATE CUDA::cudart OptiX7 OpenMP::OpenMP_CXX ${RMQRMM})
 set_target_properties(rtxrmq PROPERTIES CUDA_ARCHITECTURES native)
 
 # ==============================================================================
