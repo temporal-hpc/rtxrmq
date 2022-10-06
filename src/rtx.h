@@ -43,7 +43,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     params.handle = state.gas_handle;
     params.min = 0;
     params.max = 100000000;
-    params.scale = SCALE;
+    params.scale = n;
     params.output = d_output;
     params.query = dquery;
     Params *device_params;

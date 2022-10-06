@@ -23,8 +23,7 @@
 const char *algStr[4] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX"}; 
 
 
-#define SCALE (1<<27)
-#define CHECK 0
+#define CHECK 1
 #include "common/common.h"
 #include "common/Timer.h"
 #include "src/rand.cuh"
