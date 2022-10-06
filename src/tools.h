@@ -1,8 +1,9 @@
 #pragma once
 
-#define NUM_REQUIRED_ARGS 6
+#define NUM_REQUIRED_ARGS 7
 void print_help(){
-    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <dev> <n> <q> <nt> <alg>\n" AC_RESET
+    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <seed> <dev> <n> <q> <nt> <alg>\n" AC_RESET
+                    "seed = seed for PRNG\n"
                     "dev = device ID\n"
                     "n   = num elements\n"
                     "q   = num RMQ querys\n"

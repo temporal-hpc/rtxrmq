@@ -43,11 +43,12 @@ int main(int argc, char *argv[]) {
     if(!check_parameters(argc)){
         exit(EXIT_FAILURE);
     }
-    int dev = atoi(argv[1]);
-    int n = atoi(argv[2]);
-    int q = atoi(argv[3]);
-    int nt = atoi(argv[4]);
-    int alg = atoi(argv[5]);
+    int seed = atoi(argv[1]);
+    int dev = atoi(argv[2]);
+    int n = atoi(argv[3]);
+    int q = atoi(argv[4]);
+    int nt = atoi(argv[5]);
+    int alg = atoi(argv[6]);
     printf( "Params:\n"
             "   dev = %i\n"
             AC_GREEN "   n   = %i (~%f GB, float)\n" AC_RESET
@@ -58,8 +59,8 @@ int main(int argc, char *argv[]) {
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
-    std::pair<float*, curandState*> p = create_random_array_dev(n, 1123);
-    std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, 1009); //TODO use previous states
+    std::pair<float*, curandState*> p = create_random_array_dev(n, seed);
+    std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, seed+7); //TODO use previous states
 
     // 1.5 data on CPU
     float *hA;
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (CHECK && alg != ALG_CPU_HRMQ) {
-        float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
+        float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
         check_result(hA, hQ, q, expected, out);
     }
 
