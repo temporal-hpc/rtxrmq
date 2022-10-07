@@ -50,12 +50,13 @@ int main(int argc, char *argv[]) {
     int nt = atoi(argv[5]);
     int alg = atoi(argv[6]);
     printf( "Params:\n"
+            "   seed = %i\n"
             "   dev = %i\n"
             AC_GREEN "   n   = %i (~%f GB, float)\n" AC_RESET
             AC_GREEN "   q   = %i (~%f GB, int2)\n" AC_RESET
             "   nt  = %i CPU threads\n"
             "   alg = %i (%s)\n\n",
-            dev, n, sizeof(float)*n/1e9, q, sizeof(int2)*n/1e9, nt, alg, algStr[alg]);
+            seed, dev, n, sizeof(float)*n/1e9, q, sizeof(int2)*n/1e9, nt, alg, algStr[alg]);
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]) {
 
     // 1.5 data on CPU
     float *hA;
+    int *hAi;
     int2 *hQ;
     if (CHECK || alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ) {
         hA = new float[n];
@@ -83,7 +85,9 @@ int main(int argc, char *argv[]) {
             out = cpu_rmq<float>(n, q, hA, hQ, nt);
             break;
         case ALG_CPU_HRMQ:
-            outi = rmq_rmm_par(n, q, (int*)hA, hQ, nt);
+            hAi = reinterpret_cast<int*>(hA);
+            outi = rmq_rmm_par(n, q, hAi, hQ, nt);
+            out = reinterpret_cast<float*>(outi);
             break;
         case ALG_GPU_BASE:
             out = gpu_rmq_basic(n, q, p.first, qs.first);
@@ -93,8 +97,11 @@ int main(int argc, char *argv[]) {
             break;
     }
 
-    if (CHECK && alg != ALG_CPU_HRMQ) {
-        float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+    if (CHECK) {
+        //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+        hAi = reinterpret_cast<int*>(hA);
+        outi = rmq_rmm_par(n, q, hAi, hQ, nt);
+        float *expected = reinterpret_cast<float*>(outi);
         check_result(hA, hQ, q, expected, out);
     }
 
