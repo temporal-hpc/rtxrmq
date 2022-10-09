@@ -42,11 +42,12 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt) {
     int* out = new int[nq];
 
     // create rmq struct
-    printf("Generating Structure.................."); fflush(stdout);
+    printf("Creating MinMaxTree......................."); fflush(stdout);
     timer.restart();
     rmq = new RMQRMM64(A, (unsigned long)n);
+    uint size = rmq->getSize();
     timer.stop();
-    printf("done: %f ms\n",timer.get_elapsed_ms());
+    printf("done: %f ms (%f MB)\n",timer.get_elapsed_ms(), (double)size/1e9);
 
     //printf("%sAnswering Querys [%2i threads]......", AC_BOLDCYAN, nt); fflush(stdout);
     printf("%sComputing RMQs (%-11s, nt=%2i).......%s", AC_BOLDCYAN, algStr[ALG_CPU_HRMQ], nt, AC_RESET); fflush(stdout);

@@ -97,12 +97,15 @@ int main(int argc, char *argv[]) {
             break;
     }
 
-    if (CHECK) {
+    if (CHECK){
+        printf("\nCHECKING RESULT WITH HRMQ:\n");
         //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
         hAi = reinterpret_cast<int*>(hA);
         outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         float *expected = reinterpret_cast<float*>(outi);
-        check_result(hA, hQ, q, expected, out);
+        printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
+        int pass = check_result(hA, hQ, q, expected, out);
+        printf(AC_YELLOW "%s\n" AC_RESET, pass ? "pass" : "failed");
     }
 
     printf("Benchmark Finished\n");

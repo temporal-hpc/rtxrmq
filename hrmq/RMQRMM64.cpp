@@ -519,9 +519,10 @@ void RMQRMM64::createMinMaxTree(){
 	}else
 		lgBkM=sizeDS=0;
 
-	if (TRACE || SHOW_SIZE)
+	if (TRACE || SHOW_SIZE){
 		cout << " ** size of BkM[] " << sizeDS << " Bytes" << endl;
-	cout << " ** Total RMQRMM64 size: " << sizeRMM << " Bytes = " << (float)sizeRMM/(1024.0*1024.0) << " MB." << endl;
+	    cout << " ** Total RMQRMM64 size: " << sizeRMM << " Bytes = " << (float)sizeRMM/(1024.0*1024.0) << " MB." << endl;
+    }
 	
 	if (TRACE){
 		cout << "MIN_BCK " << MIN_BCK << ", lgBkM " << lgBkM << endl;
