@@ -49,7 +49,7 @@ bool check_result(float *hA, int2 *hQ, int q, float *expected, float *result){
 bool check_result(float *hA, int2 *hQ, int q, int *expected, int *result){
     for (int i = 0; i < q; ++i) {
         if (expected[i] != result[i]) {
-            printf("Error on %i-th query: got %f, expected %f\n", i, result[i], expected[i]);
+            printf("Error on %i-th query: got %i, expected %i\n", i, result[i], expected[i]);
             //printf("[%i,%i]\n", hQ[i].x, hQ[i].y);
             //for (int j = hQ[i].x; j <= hQ[i].y; ++j) {
             //    printf("%f ", hA[j]);
