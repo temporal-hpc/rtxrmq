@@ -36,7 +36,7 @@ float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq){
     CUDA_CHECK(cudaDeviceSynchronize());
     timer.stop();
     float timems = timer.get_elapsed_ms();
-    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %.3f usec/RMQ]\n" AC_RESET, timems/1000.0, (double)q/(timems/1000.0), (double)timems*1000.0/q);
+    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, (double)q/(timems/1000.0), (double)timems*1e6/q);
     printf("Copying result to host...................."); fflush(stdout);
     timer.restart();
     CUDA_CHECK(cudaMemcpy(hout, dout, sizeof(float)*q, cudaMemcpyDeviceToHost));

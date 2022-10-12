@@ -23,7 +23,12 @@
 const char *algStr[4] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX"}; 
 
 
-#define CHECK 1
+#ifdef CHECK
+     #define CHECK 1
+#else
+     #define CHECK 0
+#endif
+
 #include "common/common.h"
 #include "common/Timer.h"
 #include "src/rand.cuh"

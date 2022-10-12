@@ -28,7 +28,7 @@ T* cpu_rmq(int n, int nq, T *A, int2 *Q, int nt) {
     }
     timer.stop();
     float timems = timer.get_elapsed_ms();
-    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %.3f usec/RMQ]\n" AC_RESET, timems/1000.0, (double)nq/(timems/1000.0), (double)timems*1000.0/nq);
+    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, (double)nq/(timems/1000.0), (double)timems*1e6/nq);
 
     return out;
 }
@@ -58,8 +58,7 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt) {
         out[i] = A[idx];
     }
     timer.stop();
-    float timems = timer.get_elapsed_ms();
-    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %.3f usec/RMQ]\n" AC_RESET, timems/1000.0, (double)nq/(timems/1000.0), (double)timems*1000.0/nq);
-
+    double timems = timer.get_elapsed_ms();
+    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, (double)nq/(timems/1000.0), (double)timems*1e6/nq);
     return out;
 }

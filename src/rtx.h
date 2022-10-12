@@ -62,7 +62,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     timer.stop();
     float timems = timer.get_elapsed_ms();
     CUDA_CHECK( cudaMemcpy(output, d_output, q*sizeof(float), cudaMemcpyDeviceToHost) );
-    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %.3f usec/RMQ]\n" AC_RESET, timems/1000.0, (double)q/(timems/1000.0), (double)timems*1000.0/q);
+    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, (double)q/(timems/1000.0), (double)timems*1e6/q);
     if (q < 50) {
         printf("rtx:  ");
         for (int i = 0; i < q; ++i)
