@@ -88,6 +88,8 @@ void write_results(int dev, int alg, int n, int q, int lr) {
     cudaDeviceProp prop;
     cudaGetDeviceProperties(&prop, dev);
     const char *device = prop.name;
+    if (alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ)
+        device = "CPU";
 
     FILE *fp;
     fp = fopen(SAVE_FILE, "a");
