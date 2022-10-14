@@ -1,12 +1,13 @@
 #pragma once
 
-#define NUM_REQUIRED_ARGS 7
+#define NUM_REQUIRED_ARGS 8
 void print_help(){
-    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <seed> <dev> <n> <q> <nt> <alg>\n" AC_RESET
+    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <seed> <dev> <n> <q> <lr> <nt> <alg>\n" AC_RESET
                     "seed = seed for PRNG\n"
                     "dev = device ID\n"
                     "n   = num elements\n"
                     "q   = num RMQ querys\n"
+                    "lr  = size of range (-1: randomized)\n"
                     "nt  = num CPU threads\n"
                     "alg = algorithm\n"
                     "   0 -> %s\n"
@@ -80,4 +81,34 @@ void print_gpu_specs(int dev){
     printf("  Memory Clock Rate (MHz):      %d\n", prop.memoryClockRate);
     printf("  Memory Bus Width (bits):      %d\n", prop.memoryBusWidth);
     printf("  Peak Memory Bandwidth (GB/s): %f\n\n", 2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
+}
+
+void write_results(int dev, int alg, int n, int q, int lr) {
+    if (!SAVE) return;
+    cudaDeviceProp prop;
+    cudaGetDeviceProperties(&prop, dev);
+    const char *device = prop.name;
+
+    FILE *fp;
+    fp = fopen(SAVE_FILE, "a");
+    fprintf(fp, "%s,%s,%i,%i,%i,%i",
+            device,
+            algStr[alg],
+            REPS,
+            n,
+            q,
+            lr);
+    fclose(fp);
+}
+
+void write_results(float time_ms, int q) {
+    if (!SAVE) return;
+    float time_it = time_ms/REPS;
+    FILE *fp;
+    fp = fopen(SAVE_FILE, "a");
+    fprintf(fp, ",%f,%f,%f\n",
+            time_ms/1000.0,
+            (double)q/(time_it/1000.0),
+            (double)time_it*1e6/q);
+    fclose(fp);
 }

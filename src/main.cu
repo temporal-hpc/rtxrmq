@@ -23,6 +23,9 @@
 const char *algStr[4] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX"}; 
 
 
+#define REPS 5
+#define SAVE 1
+#define SAVE_FILE "../data/data.csv"
 #ifdef CHECK
      #define CHECK 1
 #else
@@ -52,21 +55,28 @@ int main(int argc, char *argv[]) {
     int dev = atoi(argv[2]);
     int n = atoi(argv[3]);
     int q = atoi(argv[4]);
-    int nt = atoi(argv[5]);
-    int alg = atoi(argv[6]);
+    int lr = atoi(argv[5]);
+    int nt = atoi(argv[6]);
+    int alg = atoi(argv[7]);
+    if (lr >= n) {
+        fprintf(stderr, "Error: lr can not be bigger than n\n");
+        return -1;
+    }
+
     printf( "Params:\n"
             "   seed = %i\n"
             "   dev = %i\n"
             AC_GREEN "   n   = %i (~%f GB, float)\n" AC_RESET
             AC_GREEN "   q   = %i (~%f GB, int2)\n" AC_RESET
+            "   lr  = %i\n"
             "   nt  = %i CPU threads\n"
             "   alg = %i (%s)\n\n",
-            seed, dev, n, sizeof(float)*n/1e9, q, sizeof(int2)*n/1e9, nt, alg, algStr[alg]);
+            seed, dev, n, sizeof(float)*n/1e9, q, sizeof(int2)*n/1e9, lr, nt, alg, algStr[alg]);
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
     std::pair<float*, curandState*> p = create_random_array_dev(n, seed);
-    std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, seed+7); //TODO use previous states
+    std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
 
     // 1.5 data on CPU
     float *hA;
@@ -80,7 +90,7 @@ int main(int argc, char *argv[]) {
     }
 
     
-
+    write_results(dev, alg, n, q, lr);
     // 2) computation
     float *out;
     int *outi;

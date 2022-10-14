@@ -57,21 +57,16 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[ALG_GPU_RTX], AC_RESET); fflush(stdout);
     //printf("\n");
     timer.restart();
-    OPTIX_CHECK(optixLaunch(state.pipeline, 0, reinterpret_cast<CUdeviceptr>(device_params), sizeof(Params), &state.sbt, q, 1, 1));
+    for (int i = 0; i < REPS; ++i) {
+        OPTIX_CHECK(optixLaunch(state.pipeline, 0, reinterpret_cast<CUdeviceptr>(device_params), sizeof(Params), &state.sbt, q, 1, 1));
+    }
     CUDA_CHECK(cudaDeviceSynchronize());
     timer.stop();
     float timems = timer.get_elapsed_ms();
     CUDA_CHECK( cudaMemcpy(output, d_output, q*sizeof(float), cudaMemcpyDeviceToHost) );
-    printf(AC_BOLDCYAN "done: %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, (double)q/(timems/1000.0), (double)timems*1e6/q);
-    if (q < 50) {
-        printf("rtx:  ");
-        for (int i = 0; i < q; ++i)
-            printf("%f  ", output[i]);
-        printf("\ncpu:  ");
-        for (int i = 0; i < q; ++i)
-            printf("%f  ", cpurmq_vertex(3*n, devVertices, q, dquery, i)); // TODO copy data only once
-        printf("\n");
-    }
+    float time_it = timems/REPS;
+    printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)q/(time_it/1000.0), (double)time_it*1e6/q);
+    write_results(timems, q);
         
     // 6) clean up
     printf("cleaning up RTX environment..............."); fflush(stdout);
