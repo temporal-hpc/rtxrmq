@@ -24,8 +24,8 @@ const char *algStr[4] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX"}
 
 
 #define REPS 5
-#define SAVE 0
-#define SAVE_FILE "../data/data.csv"
+#define SAVE 1
+#define SAVE_FILE "../results/data.csv"
 #ifdef CHECK
      #define CHECK 1
 #else

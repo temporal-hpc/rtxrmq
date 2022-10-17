@@ -1,4 +1,5 @@
 #pragma once
+#include <unistd.h>
 
 #define NUM_REQUIRED_ARGS 8
 void print_help(){
@@ -87,9 +88,13 @@ void write_results(int dev, int alg, int n, int q, int lr) {
     if (!SAVE) return;
     cudaDeviceProp prop;
     cudaGetDeviceProperties(&prop, dev);
-    const char *device = prop.name;
-    if (alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ)
-        device = "CPU";
+    char *device = prop.name;
+    if (alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ) {
+        strcpy(device, "CPU ");
+        char hostname[50];
+        gethostname(hostname, 50);
+        strcat(device, hostname);
+    }
 
     FILE *fp;
     fp = fopen(SAVE_FILE, "a");
