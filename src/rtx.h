@@ -45,7 +45,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     params.max = 100000000;
     params.scale = n;
     params.output = d_output;
-    params.query = dquery;
+    params.query = transform_querys(dquery, q, n);
     Params *device_params;
     printf("(%7.3f MB).........", (double)sizeof(Params)/1e3); fflush(stdout);
     CUDA_CHECK(cudaMalloc(&device_params, sizeof(Params)));

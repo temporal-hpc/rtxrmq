@@ -23,13 +23,13 @@
 const char *algStr[4] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX"}; 
 
 
-#define REPS 5
+#define REPS 1
 #define SAVE 0
 #define SAVE_FILE "../results/data.csv"
 #ifdef CHECK
      #define CHECK 1
 #else
-     #define CHECK 0
+     #define CHECK 1
 #endif
 
 #include "common/common.h"
@@ -114,13 +114,15 @@ int main(int argc, char *argv[]) {
 
     if (CHECK){
         printf("\nCHECKING RESULT WITH HRMQ:\n");
-        //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
-        hAi = reinterpret_cast<int*>(hA);
-        outi = rmq_rmm_par(n, q, hAi, hQ, nt);
-        float *expected = reinterpret_cast<float*>(outi);
+        float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+        //hAi = reinterpret_cast<int*>(hA);
+        //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
+        //float *expected = reinterpret_cast<float*>(outi);
         printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
         int pass = check_result(hA, hQ, q, expected, out);
         printf(AC_YELLOW "%s\n" AC_RESET, pass ? "pass" : "failed");
+        //for (int i = 1339219; i <= 1344639; ++i)
+            //printf("%f\n", hA[i]);
     }
 
     printf("Benchmark Finished\n");

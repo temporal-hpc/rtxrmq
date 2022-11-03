@@ -4,7 +4,7 @@
 struct Params {
   OptixTraversableHandle handle;
   float *output;
-  int2 *query;
+  float2 *query;
   float min;
   float max;
   float scale;
@@ -17,8 +17,8 @@ extern "C" __global__ void __raygen__rmq() {
   float &min = params.min;
   float &max = params.max;
 
-  int2 q = params.query[idx.x];
-  float3 ray_origin = make_float3(min, (float)q.x/params.scale, (float)q.y/params.scale);
+  float2 q = params.query[idx.x];
+  float3 ray_origin = make_float3(min, q.x, q.y);
   float3 ray_direction = make_float3(1.0, 0.0, 0.0);
   //printf("ray %i,  (l,r)=(%f, %f)\n", idx.x, (float)q.x, (float)q.y);
 

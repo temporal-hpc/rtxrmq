@@ -45,17 +45,47 @@ void print_vertices_dev(int ntris, float3 *devVertices){
     cudaDeviceSynchronize();
 }
 
+__device__ float transformLR(int x, int N) {
+    int E = x / (1<<23);
+    int M = x % (1<<23);
+    float m = (float)(M + (1<<23)) / (1<<24);
+    float f = m * (1 << E);
+
+    return f;
+}
+
 __global__ void kernel_gen_vertices(int N, float *array, float3 *vertices){
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
     if(idx < N){
         int k = 3*idx;
         float val = array[idx];
         // ray hits min on coord (val, l, r)
-        float margin = 0.8;
-        vertices[k+0] = make_float3(val, (idx+margin)/N, (idx-margin)/N);
-        vertices[k+1] = make_float3(val, (idx+margin)/N, 2);
-        vertices[k+2] = make_float3(val, -1, (idx-margin)/N);
+        float l = transformLR(idx+1, N);
+        float r = transformLR(idx-1, N);
+        float n = transformLR(N, N);
+
+        vertices[k+0] = make_float3(val, l, r);
+        vertices[k+1] = make_float3(val, l, 2*n);
+        vertices[k+2] = make_float3(val, -1*n, r);
     }
+}
+
+__global__ void kernel_transform_querys(float2 *Qf, int2 *Qi, int q, int N) {
+    int tid = blockIdx.x*blockDim.x + threadIdx.x;
+    if (tid >= q) return;
+    float l = transformLR(Qi[tid].x, N);
+    float r = transformLR(Qi[tid].y, N);
+    Qf[tid] = make_float2(l,r);
+}
+
+float2 *transform_querys(int2 *Q, int q, int N) {
+    float2 *querys;
+    cudaMalloc(&querys, sizeof(float2)*q);
+    dim3 block(BSIZE, 1, 1);
+    dim3 grid((q+BSIZE-1)/BSIZE, 1, 1);
+    kernel_transform_querys<<<grid, block>>>(querys, Q, q, N);
+    cudaDeviceSynchronize();
+    return querys;
 }
 
 __global__ void kernel_gen_triangles(int ntris, float *array, uint3 *triangles){

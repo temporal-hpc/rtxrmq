@@ -14,7 +14,7 @@ std::string loadPtx(std::string filename) {
 struct Params {
   OptixTraversableHandle handle;
   float *output;
-  int2 *query;
+  float2 *query;
   float min;
   float max;
   float scale;
