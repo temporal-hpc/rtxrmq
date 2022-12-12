@@ -14,13 +14,16 @@
 #define BSIZE 1024
 #define WARPSIZE 32
 #define RTX_REPEATS 1
+#define RTX_BLOCK_SIZE (1<<17)
 #define ALG_CPU_BASE        0
 #define ALG_CPU_HRMQ        1
 #define ALG_GPU_BASE        2
-#define ALG_GPU_RTX         3
+#define ALG_GPU_RTX_CAST    3
+#define ALG_GPU_RTX_TRANS   4
+#define ALG_GPU_RTX_BLOCKS  5
 
 // TODO add other state-of-the-art GPU rmq algs
-const char *algStr[4] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX"}; 
+const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks"}; 
 
 
 #define REPS 1
@@ -107,22 +110,32 @@ int main(int argc, char *argv[]) {
         case ALG_GPU_BASE:
             out = gpu_rmq_basic(n, q, p.first, qs.first);
             break;
-        case ALG_GPU_RTX:
-            out = rtx_rmq(n, q, p.first, qs.first, p.second);
+        case ALG_GPU_RTX_CAST:
+            out = rtx_rmq(alg, n, q, p.first, qs.first, p.second);
+            break;
+        case ALG_GPU_RTX_TRANS:
+            out = rtx_rmq(alg, n, q, p.first, qs.first, p.second);
+            break;
+        case ALG_GPU_RTX_BLOCKS:
+            out = rtx_rmq(alg, n, q, p.first, qs.first, p.second);
             break;
     }
 
     if (CHECK){
         printf("\nCHECKING RESULT WITH HRMQ:\n");
-        float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+        //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+        float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         //float *expected = reinterpret_cast<float*>(outi);
         printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
         int pass = check_result(hA, hQ, q, expected, out);
         printf(AC_YELLOW "%s\n" AC_RESET, pass ? "pass" : "failed");
-        //for (int i = 1339219; i <= 1344639; ++i)
-            //printf("%f\n", hA[i]);
+        //for (int i = 0; i < n; ++i) {
+            //printf("%f ", hA[i]);
+            //if (i%16==15) printf("\n");
+        //}
+        //printf("\n");
     }
 
     printf("Benchmark Finished\n");

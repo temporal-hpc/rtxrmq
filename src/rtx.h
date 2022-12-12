@@ -1,5 +1,5 @@
 #pragma once
-float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates) {
+float* rtx_rmq(int alg, int n, int q, float *darray, int2 *dquery, curandState *devStates) {
     Timer timer;
     float *output, *d_output;
     //float cpuMin=-1.0f;
@@ -8,7 +8,14 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     // 1) Generate geometry from device data
     printf("Generating geometry......................."); fflush(stdout);
     timer.restart();
-    float3* devVertices = gen_vertices_dev(n, darray);
+    float3 *devVertices;
+    if (alg != ALG_GPU_RTX_BLOCKS) {
+        devVertices = gen_vertices_dev(alg, n, darray);
+    } else {
+        devVertices = gen_vertices_blocks_dev(n, darray); // TODO implement
+        int num_blocks = (n+RTX_BLOCK_SIZE-1) / RTX_BLOCK_SIZE;
+        n += num_blocks;
+    }
     uint3 *devTriangles = gen_triangles_dev(n, darray);
     //print_array_dev(n, darray);
     //print_vertices_dev(n, devVertices);
@@ -21,7 +28,10 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     GASstate state;
     createOptixContext(state);
     loadAppModule(state);
-    createGroupsClosestHit(state);
+    if (alg != ALG_GPU_RTX_BLOCKS)
+        createGroupsClosestHit(state);
+    else
+        createGroupsClosestHit_Blocks(state);
     createPipeline(state);
     populateSBT(state);
     timer.stop();
@@ -40,13 +50,21 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     CUDA_CHECK( cudaMalloc(&d_output, q*sizeof(float)) );
     timer.restart();
     Params params;
+    Params *device_params;
+
     params.handle = state.gas_handle;
     params.min = 0;
     params.max = 100000000;
-    params.scale = n;
     params.output = d_output;
-    params.query = transform_querys(dquery, q, n);
-    Params *device_params;
+    if (alg != ALG_GPU_RTX_BLOCKS) {
+        params.query = transform_querys(alg, dquery, q, n);
+        params.iquery = nullptr;
+    } else {
+        params.query = nullptr;
+        params.iquery = dquery;
+        params.num_blocks = (n+RTX_BLOCK_SIZE-1) / RTX_BLOCK_SIZE;
+        params.block_size = RTX_BLOCK_SIZE;
+    }
     printf("(%7.3f MB).........", (double)sizeof(Params)/1e3); fflush(stdout);
     CUDA_CHECK(cudaMalloc(&device_params, sizeof(Params)));
     CUDA_CHECK(cudaMemcpy(device_params, &params, sizeof(Params), cudaMemcpyHostToDevice));
@@ -54,7 +72,7 @@ float* rtx_rmq(int n, int q, float *darray, int2 *dquery, curandState *devStates
     printf("done: %f ms\n", timer.get_elapsed_ms());
 
     // 5) Computation
-    printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[ALG_GPU_RTX], AC_RESET); fflush(stdout);
+    printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[alg], AC_RESET); fflush(stdout);
     //printf("\n");
     timer.restart();
     for (int i = 0; i < REPS; ++i) {

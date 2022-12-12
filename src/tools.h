@@ -14,11 +14,15 @@ void print_help(){
                     "   0 -> %s\n"
                     "   1 -> %s\n"
                     "   2 -> %s\n"
-                    "   3 -> %s\n",
+                    "   3 -> %s\n"
+                    "   4 -> %s\n"
+                    "   5 -> %s\n",
                     algStr[0],
                     algStr[1],
                     algStr[2],
-                    algStr[3]
+                    algStr[3],
+                    algStr[4],
+                    algStr[5]
                 );
 }
 
