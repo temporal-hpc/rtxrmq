@@ -76,12 +76,13 @@ __global__ void kernel_gen_vertices(int alg, int N, float *array, float3 *vertic
 
 __global__ void kernel_gen_vertices_blocks(int num_blocks, int N, float *min_blocks, float *array, float3 *vertices){
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    int n_blocks = ceil(sqrt((double)num_blocks));
     int k = 3*idx;
     if(idx < num_blocks){
         float val = min_blocks[idx];
         // ray hits min on coord (val, l, r)
-        float l = (float)(idx+1)/num_blocks;
-        float r = (float)(idx-1)/num_blocks;
+        float l = (float)(idx+1)/(1<<23);
+        float r = (float)(idx-1)/(1<<23);
         float n = 1;
 
         vertices[k+0] = make_float3(val, l, r);
@@ -93,12 +94,14 @@ __global__ void kernel_gen_vertices_blocks(int num_blocks, int N, float *min_blo
         int lid = sub_idx % RTX_BLOCK_SIZE;
         float val = array[sub_idx];
 
-        float l = (float)(lid+1)/RTX_BLOCK_SIZE + 2*(bid+1);
-        float r = (float)(lid-1)/RTX_BLOCK_SIZE;
+        int x = (bid + 1) % n_blocks;
+        int y = (bid + 1) / n_blocks;
+        float l = (float)(lid+1)/RTX_BLOCK_SIZE + 2*x;
+        float r = (float)(lid-1)/RTX_BLOCK_SIZE + 2*y;
 
         vertices[k+0] = make_float3(val, l, r);
-        vertices[k+1] = make_float3(val, l, 2);
-        vertices[k+2] = make_float3(val, 2*bid+1, r);
+        vertices[k+1] = make_float3(val, l, 2*y+2);
+        vertices[k+2] = make_float3(val, 2*x-1, r);
         //printf("%i-th element %f  at  %f,  %f\n", sub_idx, val, l, r);
     }
 }
@@ -146,12 +149,21 @@ __global__ void kernel_min_blocks(float *min_blocks, float *darray, int num_bloc
     int tid = blockIdx.x*blockDim.x + threadIdx.x;
     if (tid >= num_blocks) return;
     int first = tid * RTX_BLOCK_SIZE;
-    int min = darray[first];
+    float min = darray[first];
     for (int i = 1; i < RTX_BLOCK_SIZE && i < N - first; ++i) {
         if (darray[i+first] < min)
             min = darray[i+first];
     }
     min_blocks[tid] = min;
+}
+
+__global__ void print_darray(float* A, int n) {
+    if (threadIdx.x != 0) return;
+    for (int i = 0; i < n; ++i) {
+        printf("%f ", A[i]);
+        if (i % 10 == 9)
+            printf("\n[%2i] ", i+1);
+    }
 }
 
 float3* gen_vertices_blocks_dev(int N, float *darray){
@@ -165,6 +177,7 @@ float3* gen_vertices_blocks_dev(int N, float *darray){
     dim3 grid_mins((num_blocks+BSIZE-1)/BSIZE,1,1);
     kernel_min_blocks<<<grid_mins, block>>>(min_blocks, darray, num_blocks, N);
     CUDA_CHECK( cudaDeviceSynchronize() );
+    //print_darray<<<1,1>>>(min_blocks, num_blocks);
 
     // vertices data
     float3 *devVertices;

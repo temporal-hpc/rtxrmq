@@ -1,6 +1,8 @@
 #include <optix.h>
 #include <math.h>
 
+#define DBG_RAY 885
+
 struct Params {
   OptixTraversableHandle handle;
   float *output;
@@ -67,6 +69,8 @@ extern "C" __global__ void __raygen__rmq_blocks() {
   const uint3 idx = optixGetLaunchIndex();
   float &min = params.min;
   float &max = params.max;
+  int num_blocks = params.num_blocks;
+  int block_size = params.block_size;
 
 
   float tmin = 0;
@@ -80,17 +84,25 @@ extern "C" __global__ void __raygen__rmq_blocks() {
   unsigned int payload = __float_as_uint(max);
 
   int2 q = params.iquery[idx.x];
-  int lB = q.x / params.block_size;
-  int rB = q.y / params.block_size;
+  int lB = q.x / block_size;
+  int rB = q.y / block_size;
 
   //printf("Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n", idx.x, q.x, q.y, lB, rB);
+  int bx, by;
+  float x, y;
+  float3 ray_origin, ray_direction;
   
   if (lB == rB) {
-    float x = 2*(lB+1) + (float)(q.x%params.block_size)/params.block_size;
-    float y = (float)(q.y%params.block_size) / params.block_size;
-    //printf("1B Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n", idx.x, q.x, q.y, lB, rB, x, y);
-    float3 ray_origin = make_float3(min, x, y);
-    float3 ray_direction = make_float3(1.0, 0.0, 0.0);
+    bx = (lB+1) % num_blocks;
+    by = (rB+1) / num_blocks;
+    int mx = q.x % block_size;
+    int my = q.y % block_size;
+    x = 2*bx + ((float)mx / block_size);
+    y = 2*by + ((float)my / block_size);
+    //if (idx.x == DBG_RAY)
+      //printf("1B Ray %i, query (%i,%i)\n    bx %i    by %i   mx %i   my %i \n    lB = %i,  rB = %i  nb = %i\n    x = %f,  y = %f\n", idx.x, q.x, q.y, bx, by, mx, my, lB, rB, num_blocks, x, y);
+    ray_origin = make_float3(min, x, y);
+    ray_direction = make_float3(1.0, 0.0, 0.0);
     optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
         visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
 
@@ -99,33 +111,43 @@ extern "C" __global__ void __raygen__rmq_blocks() {
   }
 
   // search min in fully contained blocks
-  float x = (float)(lB+1) / params.num_blocks;
-  float y = (float)(rB-1) / params.num_blocks;
-  float3 ray_origin = make_float3(min, x, y);
-  float3 ray_direction = make_float3(1.0, 0.0, 0.0);
-  //printf("ray %i,  (l,r)=(%f, %f)\n", idx.x, (float)q.x, (float)q.y);
-  optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
-      visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+  if (lB < rB-1) {
+    x = (float)(lB+1) / (1<<23);
+    y = (float)(rB-1) / (1<<23);
+    ray_origin = make_float3(min, x, y);
+    ray_direction = make_float3(1.0, 0.0, 0.0);
+    optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
+        visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+    //if (idx.x == DBG_RAY)
+      //printf("\nray %i,  (l,r)=(%i, %i)\n    bs = %i    nb = %i\n    x = %.15f,  y = %.15f\n    payload %f\n", idx.x, q.x, q.y, block_size, num_blocks, x, y, __uint_as_float(payload));
+  }
 
   // search min in first partial block
-  int mod = q.x % params.block_size;
+  int mod = q.x % block_size;
   if (mod) {
-    x = 2*(lB+1) + ((float)mod / params.block_size);
-    y = 1.0;
+    bx = (lB+1) % num_blocks;
+    by = (lB+1) / num_blocks;
+    x = 2*bx + ((float)mod / block_size);
+    y = 2*by+1;
     ray_origin = make_float3(min, x, y);
     optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
         visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+    //if (idx.x == DBG_RAY)
+      //printf("3R Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n    payload %f\n", idx.x, q.x, q.y, lB, rB, x, y, __uint_as_float(payload));
   }
 
   // search min in last partial block
-  mod = q.y % params.block_size;
-  if (mod != params.block_size-1) {
-    x = 2*(rB+1);
-    y = (float)mod / params.block_size;
-    //printf("3R Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n", idx.x, q.x, q.y, lB, rB, x, y);
+  mod = q.y % block_size;
+  if (mod != block_size-1) {
+    bx = (rB+1) % num_blocks;
+    by = (rB+1) / num_blocks;
+    x = 2*bx;
+    y = 2*by + (float)mod / block_size;
     ray_origin = make_float3(min, x, y);
     optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
         visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+    //if (idx.x == DBG_RAY)
+      //printf("3R Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n    payload %f\n", idx.x, q.x, q.y, lB, rB, x, y, __uint_as_float(payload));
   }
 
   params.output[idx.x] = __uint_as_float(payload) + min;

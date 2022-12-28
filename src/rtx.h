@@ -62,7 +62,7 @@ float* rtx_rmq(int alg, int n, int q, float *darray, int2 *dquery, curandState *
     } else {
         params.query = nullptr;
         params.iquery = dquery;
-        params.num_blocks = (n+RTX_BLOCK_SIZE-1) / RTX_BLOCK_SIZE;
+        params.num_blocks = ceil(sqrt((n+RTX_BLOCK_SIZE-1) / RTX_BLOCK_SIZE));
         params.block_size = RTX_BLOCK_SIZE;
     }
     printf("(%7.3f MB).........", (double)sizeof(Params)/1e3); fflush(stdout);

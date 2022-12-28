@@ -14,7 +14,7 @@
 #define BSIZE 1024
 #define WARPSIZE 32
 #define RTX_REPEATS 1
-#define RTX_BLOCK_SIZE (1<<17)
+#define RTX_BLOCK_SIZE (1<<16)
 #define ALG_CPU_BASE        0
 #define ALG_CPU_HRMQ        1
 #define ALG_GPU_BASE        2
@@ -131,9 +131,9 @@ int main(int argc, char *argv[]) {
         printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
         int pass = check_result(hA, hQ, q, expected, out);
         printf(AC_YELLOW "%s\n" AC_RESET, pass ? "pass" : "failed");
-        //for (int i = 0; i < n; ++i) {
-            //printf("%f ", hA[i]);
-            //if (i%16==15) printf("\n");
+        //for (int i = 0; i < 33; ++i) {
+            //printf("%f ", hA[i+23147012]);
+            //if (i%11==10) printf("\n");
         //}
         //printf("\n");
     }
