@@ -76,7 +76,7 @@ __global__ void kernel_gen_vertices(int alg, int N, float *array, float3 *vertic
 
 __global__ void kernel_gen_vertices_blocks(int num_blocks, int N, float *min_blocks, float *array, float3 *vertices){
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
-    int n_blocks = ceil(sqrt((double)num_blocks));
+    int n_blocks = ceil(sqrt((double)num_blocks+1));
     int k = 3*idx;
     if(idx < num_blocks){
         float val = min_blocks[idx];

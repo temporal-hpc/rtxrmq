@@ -9,11 +9,13 @@ float* rtx_rmq(int alg, int n, int q, float *darray, int2 *dquery, curandState *
     printf("Generating geometry......................."); fflush(stdout);
     timer.restart();
     float3 *devVertices;
+    int orig_n;
     if (alg != ALG_GPU_RTX_BLOCKS) {
         devVertices = gen_vertices_dev(alg, n, darray);
     } else {
         devVertices = gen_vertices_blocks_dev(n, darray); // TODO implement
         int num_blocks = (n+RTX_BLOCK_SIZE-1) / RTX_BLOCK_SIZE;
+        orig_n = n;
         n += num_blocks;
     }
     uint3 *devTriangles = gen_triangles_dev(n, darray);
@@ -62,7 +64,8 @@ float* rtx_rmq(int alg, int n, int q, float *darray, int2 *dquery, curandState *
     } else {
         params.query = nullptr;
         params.iquery = dquery;
-        params.num_blocks = ceil(sqrt((n+RTX_BLOCK_SIZE-1) / RTX_BLOCK_SIZE));
+        int num_blocks = (orig_n + RTX_BLOCK_SIZE - 1) / RTX_BLOCK_SIZE;
+        params.num_blocks = ceil(sqrt(num_blocks + 1));
         params.block_size = RTX_BLOCK_SIZE;
     }
     printf("(%7.3f MB).........", (double)sizeof(Params)/1e3); fflush(stdout);
