@@ -1,7 +1,7 @@
 #include <optix.h>
 #include <math.h>
 
-#define DBG_RAY 885
+//#define DBG_RAY 17780
 
 struct Params {
   OptixTraversableHandle handle;
@@ -87,7 +87,7 @@ extern "C" __global__ void __raygen__rmq_blocks() {
   int lB = q.x / block_size;
   int rB = q.y / block_size;
 
-  //printf("Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n", idx.x, q.x, q.y, lB, rB);
+    //printf("Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n", idx.x, q.x, q.y, lB, rB);
   int bx, by;
   float x, y;
   float3 ray_origin, ray_direction;
@@ -99,8 +99,10 @@ extern "C" __global__ void __raygen__rmq_blocks() {
     int my = q.y % block_size;
     x = 2*bx + ((float)mx / block_size);
     y = 2*by + ((float)my / block_size);
-    //if (idx.x == DBG_RAY)
-      //printf("1B Ray %i, query (%i,%i)\n    bx %i    by %i   mx %i   my %i \n    lB = %i,  rB = %i  nb = %i\n    x = %f,  y = %f\n", idx.x, q.x, q.y, bx, by, mx, my, lB, rB, num_blocks, x, y);
+#ifdef DBG_RAY
+    if (idx.x == DBG_RAY)
+      printf("1B Ray %i, query (%i,%i)\n    bx %i    by %i   mx %i   my %i \n    lB = %i,  rB = %i  nb = %i\n    x = %f,  y = %f\n", idx.x, q.x, q.y, bx, by, mx, my, lB, rB, num_blocks, x, y);
+#endif
     ray_origin = make_float3(min, x, y);
     ray_direction = make_float3(1.0, 0.0, 0.0);
     optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
@@ -118,37 +120,39 @@ extern "C" __global__ void __raygen__rmq_blocks() {
     ray_direction = make_float3(1.0, 0.0, 0.0);
     optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
         visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
-    //if (idx.x == DBG_RAY)
-      //printf("\nray %i,  (l,r)=(%i, %i)\n    bs = %i    nb = %i\n    x = %.15f,  y = %.15f\n    payload %f\n", idx.x, q.x, q.y, block_size, num_blocks, x, y, __uint_as_float(payload));
+#ifdef DBG_RAY
+    if (idx.x == DBG_RAY)
+      printf("\nray %i,  (l,r)=(%i, %i)\n    bs = %i    nb = %i\n    x = %.15f,  y = %.15f\n    payload %f\n", idx.x, q.x, q.y, block_size, num_blocks, x, y, __uint_as_float(payload));
+#endif
   }
 
   // search min in first partial block
   int mod = q.x % block_size;
-  if (mod) {
-    bx = (lB+1) % num_blocks;
-    by = (lB+1) / num_blocks;
-    x = 2*bx + ((float)mod / block_size);
-    y = 2*by+1;
-    ray_origin = make_float3(min, x, y);
-    optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
-        visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
-    //if (idx.x == DBG_RAY)
-      //printf("3R Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n    payload %f\n", idx.x, q.x, q.y, lB, rB, x, y, __uint_as_float(payload));
-  }
+  bx = (lB+1) % num_blocks;
+  by = (lB+1) / num_blocks;
+  x = 2*bx + ((float)mod / block_size);
+  y = 2*by+1;
+  ray_origin = make_float3(min, x, y);
+  optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
+      visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+#ifdef DBG_RAY
+  if (idx.x == DBG_RAY)
+    printf("3R left Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n    payload %f\n", idx.x, q.x, q.y, lB, rB, x, y, __uint_as_float(payload));
+#endif
 
   // search min in last partial block
   mod = q.y % block_size;
-  if (mod != block_size-1) {
-    bx = (rB+1) % num_blocks;
-    by = (rB+1) / num_blocks;
-    x = 2*bx;
-    y = 2*by + (float)mod / block_size;
-    ray_origin = make_float3(min, x, y);
-    optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
-        visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
-    //if (idx.x == DBG_RAY)
-      //printf("3R Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n    payload %f\n", idx.x, q.x, q.y, lB, rB, x, y, __uint_as_float(payload));
-  }
+  bx = (rB+1) % num_blocks;
+  by = (rB+1) / num_blocks;
+  x = 2*bx;
+  y = 2*by + (float)mod / block_size;
+  ray_origin = make_float3(min, x, y);
+  optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
+      visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+#ifdef DBG_RAY
+  if (idx.x == DBG_RAY)
+    printf("3R Ray right %i, query (%i,%i)\n    lB = %i,  rB = %i\n    x = %f,  y = %f\n    payload %f\n", idx.x, q.x, q.y, lB, rB, x, y, __uint_as_float(payload));
+#endif
 
   params.output[idx.x] = __uint_as_float(payload) + min;
 }

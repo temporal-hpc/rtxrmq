@@ -43,7 +43,7 @@ __global__ void kernel_random_array(int n, int max, int lr, curandState *state, 
     int id = threadIdx.x + blockIdx.x * blockDim.x;
     if(id >= n){ return; }
     int y = lr > 0 ? lr : curand_uniform(&state[id]) * (max/100);
-    int x = curand_uniform(&state[id]) * (max-y-1);
+    int x = curand_uniform_double(&state[id]) * (max-y-1);
     array[id].x = x;
     array[id].y = x+y;
 }

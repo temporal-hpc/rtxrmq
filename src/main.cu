@@ -14,7 +14,7 @@
 #define BSIZE 1024
 #define WARPSIZE 32
 #define RTX_REPEATS 1
-#define RTX_BLOCK_SIZE (1<<16)
+#define RTX_BLOCK_SIZE (1<<10)
 #define ALG_CPU_BASE        0
 #define ALG_CPU_HRMQ        1
 #define ALG_GPU_BASE        2
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (CHECK){
-        printf("\nCHECKING RESULT WITH HRMQ:\n");
+        printf("\nCHECKING RESULT:\n");
         //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
         float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
         //hAi = reinterpret_cast<int*>(hA);
@@ -131,9 +131,9 @@ int main(int argc, char *argv[]) {
         printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
         int pass = check_result(hA, hQ, q, expected, out);
         printf(AC_YELLOW "%s\n" AC_RESET, pass ? "pass" : "failed");
-        //for (int i = 0; i < 33; ++i) {
-            //printf("%f ", hA[i+23147012]);
-            //if (i%11==10) printf("\n");
+        //for (int i = 0; i < 101; ++i) {
+            //printf("%f ", hA[i+33554332]);
+            //if (i%10==9) printf("\n");
         //}
         //printf("\n");
     }
