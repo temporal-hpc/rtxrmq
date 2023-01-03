@@ -1,5 +1,5 @@
 #pragma once
-float* rtx_rmq(int alg, int n, int q, float *darray, int2 *dquery, curandState *devStates) {
+float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates) {
     Timer timer;
     float *output, *d_output;
     //float cpuMin=-1.0f;
@@ -13,8 +13,8 @@ float* rtx_rmq(int alg, int n, int q, float *darray, int2 *dquery, curandState *
     if (alg != ALG_GPU_RTX_BLOCKS) {
         devVertices = gen_vertices_dev(alg, n, darray);
     } else {
-        devVertices = gen_vertices_blocks_dev(n, darray); // TODO implement
-        int num_blocks = (n+RTX_BLOCK_SIZE-1) / RTX_BLOCK_SIZE;
+        devVertices = gen_vertices_blocks_dev(n, bs, darray); // TODO implement
+        int num_blocks = (n+bs-1) / bs;
         orig_n = n;
         n += num_blocks;
     }
@@ -64,9 +64,9 @@ float* rtx_rmq(int alg, int n, int q, float *darray, int2 *dquery, curandState *
     } else {
         params.query = nullptr;
         params.iquery = dquery;
-        int num_blocks = (orig_n + RTX_BLOCK_SIZE - 1) / RTX_BLOCK_SIZE;
+        int num_blocks = (orig_n + bs - 1) / bs;
         params.num_blocks = ceil(sqrt(num_blocks + 1));
-        params.block_size = RTX_BLOCK_SIZE;
+        params.block_size = bs;
     }
     printf("(%7.3f MB).........", (double)sizeof(Params)/1e3); fflush(stdout);
     CUDA_CHECK(cudaMalloc(&device_params, sizeof(Params)));

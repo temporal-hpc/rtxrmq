@@ -14,7 +14,7 @@
 #define BSIZE 1024
 #define WARPSIZE 32
 #define RTX_REPEATS 1
-#define RTX_BLOCK_SIZE (1<<10)
+//#define RTX_BLOCK_SIZE (1<<10)
 #define ALG_CPU_BASE        0
 #define ALG_CPU_HRMQ        1
 #define ALG_GPU_BASE        2
@@ -57,10 +57,11 @@ int main(int argc, char *argv[]) {
     int seed = atoi(argv[1]);
     int dev = atoi(argv[2]);
     int n = atoi(argv[3]);
-    int q = atoi(argv[4]);
-    int lr = atoi(argv[5]);
-    int nt = atoi(argv[6]);
-    int alg = atoi(argv[7]);
+    int bs = atoi(argv[4]);
+    int q = atoi(argv[5]);
+    int lr = atoi(argv[6]);
+    int nt = atoi(argv[7]);
+    int alg = atoi(argv[8]);
     if (lr >= n) {
         fprintf(stderr, "Error: lr can not be bigger than n\n");
         return -1;
@@ -70,11 +71,12 @@ int main(int argc, char *argv[]) {
             "   seed = %i\n"
             "   dev = %i\n"
             AC_GREEN "   n   = %i (~%f GB, float)\n" AC_RESET
+            "   bs = %i\n"
             AC_GREEN "   q   = %i (~%f GB, int2)\n" AC_RESET
             "   lr  = %i\n"
             "   nt  = %i CPU threads\n"
             "   alg = %i (%s)\n\n",
-            seed, dev, n, sizeof(float)*n/1e9, q, sizeof(int2)*n/1e9, lr, nt, alg, algStr[alg]);
+            seed, dev, n, sizeof(float)*n/1e9, bs, q, sizeof(int2)*n/1e9, lr, nt, alg, algStr[alg]);
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
@@ -111,13 +113,13 @@ int main(int argc, char *argv[]) {
             out = gpu_rmq_basic(n, q, p.first, qs.first);
             break;
         case ALG_GPU_RTX_CAST:
-            out = rtx_rmq(alg, n, q, p.first, qs.first, p.second);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
             break;
         case ALG_GPU_RTX_TRANS:
-            out = rtx_rmq(alg, n, q, p.first, qs.first, p.second);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
             break;
         case ALG_GPU_RTX_BLOCKS:
-            out = rtx_rmq(alg, n, q, p.first, qs.first, p.second);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
             break;
     }
 

@@ -1,12 +1,13 @@
 #pragma once
 #include <unistd.h>
 
-#define NUM_REQUIRED_ARGS 8
+#define NUM_REQUIRED_ARGS 9
 void print_help(){
     fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <seed> <dev> <n> <q> <lr> <nt> <alg>\n" AC_RESET
                     "seed = seed for PRNG\n"
                     "dev = device ID\n"
                     "n   = num elements\n"
+                    "bs  = block size for RTX_blocks\n"
                     "q   = num RMQ querys\n"
                     "lr  = size of range (-1: randomized)\n"
                     "nt  = num CPU threads\n"
