@@ -3,7 +3,7 @@
 
 #define NUM_REQUIRED_ARGS 9
 void print_help(){
-    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <seed> <dev> <n> <q> <lr> <nt> <alg>\n" AC_RESET
+    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <seed> <dev> <n> <bs> <q> <lr> <nt> <alg>\n" AC_RESET
                     "seed = seed for PRNG\n"
                     "dev = device ID\n"
                     "n   = num elements\n"
