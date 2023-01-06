@@ -90,7 +90,7 @@ void print_gpu_specs(int dev){
     printf("  Peak Memory Bandwidth:        %f GB/s\n\n", 2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
 }
 
-void write_results(int dev, int alg, int n, int q, int lr) {
+void write_results(int dev, int alg, int n, int bs, int q, int lr) {
     if (!SAVE) return;
     cudaDeviceProp prop;
     cudaGetDeviceProperties(&prop, dev);
@@ -104,11 +104,12 @@ void write_results(int dev, int alg, int n, int q, int lr) {
 
     FILE *fp;
     fp = fopen(SAVE_FILE, "a");
-    fprintf(fp, "%s,%s,%i,%i,%i,%i",
+    fprintf(fp, "%s,%s,%i,%i,%i,%i,%i",
             device,
             algStr[alg],
             REPS,
             n,
+            bs,
             q,
             lr);
     fclose(fp);

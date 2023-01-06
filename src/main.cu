@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
             "   lr  = %i\n"
             "   nt  = %i CPU threads\n"
             "   alg = %i (%s)\n\n",
-            seed, dev, n, sizeof(float)*n/1e9, bs, q, sizeof(int2)*n/1e9, lr, nt, alg, algStr[alg]);
+            seed, dev, n, sizeof(float)*n/1e9, bs, q, sizeof(int2)*q/1e9, lr, nt, alg, algStr[alg]);
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
     }
 
     
-    write_results(dev, alg, n, q, lr);
+    write_results(dev, alg, n, bs, q, lr);
     // 2) computation
     float *out;
     int *outi;
