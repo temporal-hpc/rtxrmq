@@ -80,8 +80,14 @@ int main(int argc, char *argv[]) {
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
+    Timer timer;
+    printf(AC_YELLOW "Generating n=%i values..............", n); fflush(stdout);
     std::pair<float*, curandState*> p = create_random_array_dev(n, seed);
+    printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
+    timer.restart();
+    printf(AC_YELLOW "Generating q=%i queries.............", q); fflush(stdout);
     std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
+    printf("done: %f secs\n" AC_RESET, timer.get_elapsed_ms()/1000.0f);
 
     // 1.5 data on CPU
     float *hA;
