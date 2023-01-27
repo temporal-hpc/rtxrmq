@@ -26,6 +26,7 @@ include(PTXUtilities)
 # To link against CUDA::cudart and/or CUDA::cuda_driver
 # ==============================================================================
 find_package(CUDAToolkit REQUIRED)
+SET(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -march=native -Xcompiler=-Ofast")
 
 # ==============================================================================
 # Find Optix7
@@ -39,7 +40,7 @@ include_directories(${OptiX7_INCLUDE_DIRS})
 # ==============================================================================
 find_package(OpenMP REQUIRED)
 IF (OPENMP_FOUND)
-    SET(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler=${OpenMP_CXX_FLAGS}")
+    SET(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -march=native -Xcompiler=-Ofast,${OpenMP_CXX_FLAGS}")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
 ENDIF()
 

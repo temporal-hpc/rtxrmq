@@ -13,7 +13,7 @@
 
 #define BSIZE 1024
 #define WARPSIZE 32
-#define RTX_REPEATS 1
+#define RTX_REPEATS 10
 //#define RTX_BLOCK_SIZE (1<<10)
 #define ALG_CPU_BASE        0
 #define ALG_CPU_HRMQ        1
