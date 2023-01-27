@@ -26,7 +26,7 @@
 const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks"}; 
 
 
-#define REPS 1
+#define REPS 10
 #define SAVE 0
 #define SAVE_FILE "../results/data.csv"
 #ifdef CHECK
