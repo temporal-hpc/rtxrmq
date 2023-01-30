@@ -1,6 +1,6 @@
 dev=0
 nt=8
-bs=1024
+bs=$((2**15))
 
 [ -e "resuslts/data.csv" ] || echo "dev,alg,reps,n,bs,q,lr,t,q/s,ns/q" > results/data.csv
 
@@ -11,7 +11,7 @@ do
 	do
 		for q in {10..25..3}
 		do
-			for lr in {5..25..5}
+			for lr in {5..25..4}
 			do
 				if [ $lr -lt $n ]
 				then
