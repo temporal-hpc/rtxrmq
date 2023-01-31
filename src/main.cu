@@ -14,7 +14,6 @@
 #define BSIZE 1024
 #define WARPSIZE 32
 #define RTX_REPEATS 10
-//#define RTX_BLOCK_SIZE (1<<10)
 #define ALG_CPU_BASE        0
 #define ALG_CPU_HRMQ        1
 #define ALG_GPU_BASE        2
@@ -26,7 +25,6 @@
 const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks"}; 
 
 
-#define REPS 10
 #define SAVE 0
 #define SAVE_FILE "../results/data.csv"
 #ifdef CHECK
@@ -34,9 +32,17 @@ const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_c
 #else
      #define CHECK 1
 #endif
+#define MEASURE_POWER 1
+#if MEASURE_POWER == 1
+    #define REPS 100
+#else
+    #define REPS 10
+#endif
+
 
 #include "common/common.h"
 #include "common/Timer.h"
+#include "common/nvmlPower.hpp"
 #include "src/rand.cuh"
 #include "src/tools.h"
 #include "src/device_tools.cuh"

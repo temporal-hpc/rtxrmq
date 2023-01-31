@@ -77,12 +77,16 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     // 5) Computation
     printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[alg], AC_RESET); fflush(stdout);
     //printf("\n");
+    if (MEASURE_POWER)
+        GPUPowerBegin(algStr[alg], 100);
     timer.restart();
     for (int i = 0; i < REPS; ++i) {
         OPTIX_CHECK(optixLaunch(state.pipeline, 0, reinterpret_cast<CUdeviceptr>(device_params), sizeof(Params), &state.sbt, q, 1, 1));
     }
     CUDA_CHECK(cudaDeviceSynchronize());
     timer.stop();
+    if (MEASURE_POWER)
+        GPUPowerEnd();
     float timems = timer.get_elapsed_ms();
     CUDA_CHECK( cudaMemcpy(output, d_output, q*sizeof(float), cudaMemcpyDeviceToHost) );
     float time_it = timems/REPS;
