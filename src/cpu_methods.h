@@ -32,7 +32,7 @@ T* cpu_rmq(int n, int nq, T *A, int2 *Q, int nt) {
     float timems = timer.get_elapsed_ms();
     float time_it = timems/REPS;
     printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
-    write_results(timems, nq);
+    write_results(timems, nq, 0);
 
     return out;
 }
@@ -51,7 +51,8 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt) {
     rmq = new RMQRMM64(A, (unsigned long)n);
     uint size = rmq->getSize();
     timer.stop();
-    printf("done: %f ms (%f MB)\n",timer.get_elapsed_ms(), (double)size/1e9);
+    float struct_time = timer.get_elapsed_ms();
+    printf("done: %f ms (%f MB)\n", struct_time, (double)size/1e9);
 
     //printf("%sAnswering Querys [%2i threads]......", AC_BOLDCYAN, nt); fflush(stdout);
     printf("%sComputing RMQs (%-11s, nt=%2i).......%s", AC_BOLDCYAN, algStr[ALG_CPU_HRMQ], nt, AC_RESET); fflush(stdout);
@@ -71,6 +72,6 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt) {
     double timems = timer.get_elapsed_ms();
     float time_it = timems/REPS;
     printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
-    write_results(timems, nq);
+    write_results(timems, nq, struct_time);
     return out;
 }

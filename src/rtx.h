@@ -22,7 +22,8 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     //print_array_dev(n, darray);
     //print_vertices_dev(n, devVertices);
     timer.stop();
-    printf("done: %f ms\n",timer.get_elapsed_ms());
+    float geom_time = timer.get_elapsed_ms();
+    printf("done: %f ms\n",geom_time);
 
     // 2) RTX OptiX Config (ONCE)
     printf("RTX Config................................"); fflush(stdout);
@@ -45,7 +46,8 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
     cudaDeviceSynchronize();
     timer.stop();
-    printf("done: %f ms%s\n", timer.get_elapsed_ms(), AC_RESET);
+    float AS_time = timer.get_elapsed_ms();
+    printf("done: %f ms%s\n", AS_time, AC_RESET);
 
     // 4) Populate and move parameters to device (ONCE)
     printf("device params to GPU "); fflush(stdout);
@@ -91,7 +93,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     CUDA_CHECK( cudaMemcpy(output, d_output, q*sizeof(float), cudaMemcpyDeviceToHost) );
     float time_it = timems/REPS;
     printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)q/(time_it/1000.0), (double)time_it*1e6/q);
-    write_results(timems, q);
+    write_results(timems, q, geom_time + AS_time);
         
     // 6) clean up
     printf("cleaning up RTX environment..............."); fflush(stdout);

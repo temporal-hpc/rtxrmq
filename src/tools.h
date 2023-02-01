@@ -115,14 +115,15 @@ void write_results(int dev, int alg, int n, int bs, int q, int lr) {
     fclose(fp);
 }
 
-void write_results(float time_ms, int q) {
+void write_results(float time_ms, int q, float construction_time) {
     if (!SAVE) return;
     float time_it = time_ms/REPS;
     FILE *fp;
     fp = fopen(SAVE_FILE, "a");
-    fprintf(fp, ",%f,%f,%f\n",
+    fprintf(fp, ",%f,%f,%f,%f\n",
             time_ms/1000.0,
             (double)q/(time_it/1000.0),
-            (double)time_it*1e6/q);
+            (double)time_it*1e6/q,
+            construction_time);
     fclose(fp);
 }

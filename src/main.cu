@@ -30,13 +30,13 @@ const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_c
 #ifdef CHECK
      #define CHECK 1
 #else
-     #define CHECK 1
+     #define CHECK 0
 #endif
 #define MEASURE_POWER 0
 #if MEASURE_POWER == 1
     #define REPS 100
 #else
-    #define REPS 1
+    #define REPS 10
 #endif
 
 
