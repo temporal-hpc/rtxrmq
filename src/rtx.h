@@ -55,8 +55,8 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     Params *device_params;
 
     params.handle = state.gas_handle;
-    params.min = 0;
-    params.max = 100000000;
+    params.min = -1.0f;
+    params.max = 2.0f;
     params.output = d_output;
     if (alg != ALG_GPU_RTX_BLOCKS) {
         params.query = transform_querys(alg, dquery, q, n);

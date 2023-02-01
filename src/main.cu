@@ -32,11 +32,11 @@ const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_c
 #else
      #define CHECK 1
 #endif
-#define MEASURE_POWER 1
+#define MEASURE_POWER 0
 #if MEASURE_POWER == 1
     #define REPS 100
 #else
-    #define REPS 10
+    #define REPS 1
 #endif
 
 
@@ -131,8 +131,8 @@ int main(int argc, char *argv[]) {
 
     if (CHECK){
         printf("\nCHECKING RESULT:\n");
-        //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
-        float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
+        float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+        //float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         //float *expected = reinterpret_cast<float*>(outi);

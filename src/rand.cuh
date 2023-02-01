@@ -13,8 +13,8 @@ __global__ void kernel_random_array(int n, curandState *state, float *array){
     int id = threadIdx.x + blockIdx.x * blockDim.x;
     if(id >= n){ return; }
     float x = curand_uniform(&state[id]);
-    //array[id] = x*100.0f+1.0f;
-    array[id] = x + 0.0001;
+    //array[id] = x*1000.0f;
+    array[id] = x;
 }
 
 std::pair<float*, curandState*> create_random_array_dev(int n, int seed){
