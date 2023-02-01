@@ -124,14 +124,8 @@ int main(int argc, char *argv[]) {
         case ALG_GPU_BASE:
             out = gpu_rmq_basic(n, q, p.first, qs.first);
             break;
-        case ALG_GPU_RTX_CAST:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
-            break;
-        case ALG_GPU_RTX_TRANS:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
-            break;
-        case ALG_GPU_RTX_BLOCKS:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
+        default: // RTX algs
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, dev);
             break;
     }
 

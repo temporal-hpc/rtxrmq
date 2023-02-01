@@ -1,5 +1,5 @@
 #pragma once
-float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates) {
+float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates, int dev) {
     Timer timer;
     float *output, *d_output;
     //float cpuMin=-1.0f;
@@ -78,7 +78,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[alg], AC_RESET); fflush(stdout);
     //printf("\n");
     if (MEASURE_POWER)
-        GPUPowerBegin(algStr[alg], 100);
+        GPUPowerBegin(algStr[alg], 100, dev);
     timer.restart();
     for (int i = 0; i < REPS; ++i) {
         OPTIX_CHECK(optixLaunch(state.pipeline, 0, reinterpret_cast<CUdeviceptr>(device_params), sizeof(Params), &state.sbt, q, 1, 1));
