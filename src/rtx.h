@@ -10,13 +10,16 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     timer.restart();
     float3 *devVertices;
     int orig_n;
-    if (alg != ALG_GPU_RTX_BLOCKS) {
-        devVertices = gen_vertices_dev(alg, n, darray);
-    } else {
+    float *LUP = nullptr;
+    if (alg == ALG_GPU_RTX_BLOCKS) {
         devVertices = gen_vertices_blocks_dev(n, bs, darray); // TODO implement
         int num_blocks = (n+bs-1) / bs;
         orig_n = n;
         n += num_blocks;
+    } else if (alg == ALG_GPU_RTX_LUP) {
+        devVertices = gen_vertices_lup_dev(n, bs, darray, LUP); // TODO implement
+    } else {
+        devVertices = gen_vertices_dev(alg, n, darray);
     }
     uint3 *devTriangles = gen_triangles_dev(n, darray);
     //print_array_dev(n, darray);
@@ -31,10 +34,12 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     GASstate state;
     createOptixContext(state);
     loadAppModule(state);
-    if (alg != ALG_GPU_RTX_BLOCKS)
-        createGroupsClosestHit(state);
-    else
+    if (alg == ALG_GPU_RTX_BLOCKS)
         createGroupsClosestHit_Blocks(state);
+    else if (alg == ALG_GPU_RTX_LUP)
+        createGroupsClosestHit_LUP(state);
+    else
+        createGroupsClosestHit(state);
     createPipeline(state);
     populateSBT(state);
     timer.stop();
@@ -60,15 +65,23 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     params.min = -1.0f;
     params.max = 2.0f;
     params.output = d_output;
-    if (alg != ALG_GPU_RTX_BLOCKS) {
-        params.query = transform_querys(alg, dquery, q, n);
-        params.iquery = nullptr;
-    } else {
+    if (alg == ALG_GPU_RTX_BLOCKS) {
         params.query = nullptr;
         params.iquery = dquery;
         int num_blocks = (orig_n + bs - 1) / bs;
         params.num_blocks = ceil(sqrt(num_blocks + 1));
         params.block_size = bs;
+    } else if (alg == ALG_GPU_RTX_LUP) {
+        params.query = nullptr;
+        params.iquery = dquery;
+        int num_blocks = (n + bs - 1) / bs;
+        params.num_blocks = ceil(sqrt(num_blocks));
+        params.nb = num_blocks;
+        params.block_size = bs;
+        params.LUP = LUP;
+    } else {
+        params.query = transform_querys(alg, dquery, q, n);
+        params.iquery = nullptr;
     }
     printf("(%7.3f MB).........", (double)sizeof(Params)/1e3); fflush(stdout);
     CUDA_CHECK(cudaMalloc(&device_params, sizeof(Params)));

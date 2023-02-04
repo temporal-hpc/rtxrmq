@@ -20,9 +20,10 @@
 #define ALG_GPU_RTX_CAST    3
 #define ALG_GPU_RTX_TRANS   4
 #define ALG_GPU_RTX_BLOCKS  5
+#define ALG_GPU_RTX_LUP     6
 
 // TODO add other state-of-the-art GPU rmq algs
-const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks"}; 
+const char *algStr[7] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks", "[GPU] RTX_lup"}; 
 
 
 #define SAVE 0
@@ -30,7 +31,7 @@ const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_c
 #ifdef CHECK
      #define CHECK 1
 #else
-     #define CHECK 0
+     #define CHECK 1
 #endif
 #define MEASURE_POWER 0
 #if MEASURE_POWER == 1
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]) {
     printf(AC_YELLOW "Generating q=%i queries.............", q); fflush(stdout);
     std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
     printf("done: %f secs\n" AC_RESET, timer.get_elapsed_ms()/1000.0f);
+
 
     // 1.5 data on CPU
     float *hA;
