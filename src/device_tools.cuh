@@ -190,6 +190,70 @@ float3* gen_vertices_blocks_dev(int N, int bs, float *darray){
     return devVertices;
 }
 
+__global__ void kernel_gen_lup(float *LUP, float *min_blocks, int N) {
+    int tx = blockIdx.x*blockDim.x + threadIdx.x;
+    int ty = blockIdx.y*blockDim.y + threadIdx.y;
+
+    if (tx >= N || ty >= N || tx > ty) return;
+
+    float min = min_blocks[tx];
+    for (int i = tx+1; i <= ty; ++i) {
+        if (min_blocks[i] < min) {
+            min = min_blocks[i];
+        }
+    }
+    LUP[tx*N + ty] = min; 
+}
+
+__global__ void kernel_gen_vertices_lup(int num_blocks, int N, int bs, float *min_blocks, float *array, float3 *vertices){
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    int n_blocks = ceil(sqrt((double)num_blocks));
+    int k = 3*idx;
+
+    int bid = idx / bs;
+    int lid = idx % bs;
+    float val = array[idx];
+
+    int x = bid % n_blocks;
+    int y = bid / n_blocks;
+    float l = (float)(lid+1)/bs + 2*x;
+    float r = (float)(lid-1)/bs + 2*y;
+
+    vertices[k+0] = make_float3(val, l, r);
+    vertices[k+1] = make_float3(val, l, 2*y+2);
+    vertices[k+2] = make_float3(val, 2*x-1, r);
+    //printf("%i-th element %f  at  %f,  %f\n", sub_idx, val, l, r);
+}
+
+float3* gen_vertices_lup_dev(int N, int bs, float *darray, float* LUP){
+    // create array with mins of each block
+    int num_blocks = (N+bs-1) / bs;
+    int ntris = N;
+
+    float *min_blocks;
+    cudaMalloc(&min_blocks, sizeof(float)*num_blocks);
+    dim3 block(BSIZE, 1, 1);
+    dim3 grid_mins((num_blocks+BSIZE-1)/BSIZE,1,1);
+    kernel_min_blocks<<<grid_mins, block>>>(min_blocks, darray, num_blocks, N, bs);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+    //print_darray<<<1,1>>>(min_blocks, num_blocks);
+    
+    dim3 grid_lup((num_blocks+BSIZE-1)/BSIZE,(num_blocks+BSIZE-1)/BSIZE,1);
+    cudaMalloc(&LUP, sizeof(float)*num_blocks*num_blocks);
+    kernel_gen_lup<<<grid_lup, block>>>(LUP, min_blocks, num_blocks);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+
+    // vertices data
+    float3 *devVertices;
+    cudaMalloc(&devVertices, sizeof(float3)*3*ntris);
+
+    // setup states
+    dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 
+    kernel_gen_vertices_lup<<<grid, block>>>(num_blocks, ntris, bs, min_blocks, darray, devVertices);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+    return devVertices;
+}
+
 uint3* gen_triangles_dev(int ntris, float *darray){
     // data array
     uint3 *devTriangles;

@@ -26,7 +26,7 @@ include(PTXUtilities)
 # To link against CUDA::cudart and/or CUDA::cuda_driver
 # ==============================================================================
 find_package(CUDAToolkit REQUIRED)
-SET(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -march=native -Xcompiler=-Ofast")
+SET(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -march=native -Xcompiler=-O3")
 
 # ==============================================================================
 # Find Optix7
@@ -40,7 +40,7 @@ include_directories(${OptiX7_INCLUDE_DIRS})
 # ==============================================================================
 find_package(OpenMP REQUIRED)
 IF (OPENMP_FOUND)
-    SET(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -march=native -Xcompiler=-Ofast,${OpenMP_CXX_FLAGS}")
+    SET(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -march=native -Xcompiler=-O3,${OpenMP_CXX_FLAGS}")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
 ENDIF()
 
@@ -50,9 +50,8 @@ ENDIF()
 # ==============================================================================
 find_library(RMQRMM rmqrmmBP.a hrmq/)
 
-add_compile_options(-fopenmp)
-add_executable(rtxrmq src/main.cu common/common.cpp)
-target_link_libraries(rtxrmq PRIVATE CUDA::cudart OptiX7 OpenMP::OpenMP_CXX ${RMQRMM})
+add_executable(rtxrmq src/main.cu common/common.cpp common/Rapl.cpp common/nvmlPower.cpp)
+target_link_libraries(rtxrmq PRIVATE CUDA::cudart CUDA::nvml OptiX7 OpenMP::OpenMP_CXX ${RMQRMM})
 set_target_properties(rtxrmq PROPERTIES CUDA_ARCHITECTURES native)
 
 # ==============================================================================

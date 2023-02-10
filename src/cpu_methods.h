@@ -30,9 +30,15 @@ T* cpu_rmq(int n, int nq, T *A, int2 *Q, int nt, int reps) {
     }
     timer.stop();
     float timems = timer.get_elapsed_ms();
+<<<<<<< HEAD
     float time_it = timems/reps;
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, timems/(1000.0*reps), (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
     write_results(timems, nq, reps);
+=======
+    float time_it = timems/REPS;
+    printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
+    write_results(timems, nq, 0);
+>>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
 
     return out;
 }
@@ -51,10 +57,17 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, int reps) {
     rmq = new RMQRMM64(A, (unsigned long)n);
     uint size = rmq->getSize();
     timer.stop();
-    printf("done: %f ms (%f MB)\n",timer.get_elapsed_ms(), (double)size/1e9);
+    float struct_time = timer.get_elapsed_ms();
+    printf("done: %f ms (%f MB)\n", struct_time, (double)size/1e9);
 
     //printf("%sAnswering Querys [%2i threads]......", AC_BOLDCYAN, nt); fflush(stdout);
+<<<<<<< HEAD
     printf(AC_BOLDCYAN "Computing RMQs (%-11s,nt=%2i,r=%-3i).." AC_RESET, algStr[ALG_CPU_HRMQ], nt, reps); fflush(stdout);
+=======
+    printf("%sComputing RMQs (%-11s, nt=%2i).......%s", AC_BOLDCYAN, algStr[ALG_CPU_HRMQ], nt, AC_RESET); fflush(stdout);
+    if (MEASURE_POWER)
+        CPUPowerBegin("HRMQ", 100);
+>>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
     timer.restart();
     for (int i = 0; i < reps; ++i) {
         #pragma omp parallel for shared(rmq, out, A, Q)
@@ -64,9 +77,17 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, int reps) {
         }
     }
     timer.stop();
+    if (MEASURE_POWER)
+        GPUPowerEnd();
     double timems = timer.get_elapsed_ms();
+<<<<<<< HEAD
     float time_it = timems/reps;
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, timems/(1000.0*reps), (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
     write_results(timems, nq, reps);
+=======
+    float time_it = timems/REPS;
+    printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
+    write_results(timems, nq, struct_time);
+>>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
     return out;
 }

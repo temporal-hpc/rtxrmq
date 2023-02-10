@@ -45,6 +45,10 @@ float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, int reps){
     CUDA_CHECK(cudaMemcpy(hout, dout, sizeof(float)*q, cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaFree(dout));
     printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
+<<<<<<< HEAD
     write_results(timems, q, reps);
+=======
+    write_results(timems, q, 0);
+>>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
     return hout;
 }

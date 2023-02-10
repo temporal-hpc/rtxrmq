@@ -116,14 +116,19 @@ void write_results(int dev, int alg, int n, int bs, int q, int lr, int reps) {
     fclose(fp);
 }
 
+<<<<<<< HEAD
 void write_results(float time_ms, int q, int reps) {
+=======
+void write_results(float time_ms, int q, float construction_time) {
+>>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
     if (!SAVE) return;
     float time_it = time_ms/reps;
     FILE *fp;
     fp = fopen(SAVE_FILE, "a");
-    fprintf(fp, ",%f,%f,%f\n",
+    fprintf(fp, ",%f,%f,%f,%f\n",
             time_ms/1000.0,
             (double)q/(time_it/1000.0),
-            (double)time_it*1e6/q);
+            (double)time_it*1e6/q,
+            construction_time);
     fclose(fp);
 }

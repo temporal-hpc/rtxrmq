@@ -16,10 +16,12 @@ struct Params {
   float *output;
   float2 *query;
   int2 *iquery;
+  float *LUP;
   float min;
   float max;
   int num_blocks;
   int block_size;
+  int nb;
 };
 
 struct GASstate {
@@ -118,6 +120,31 @@ void createGroupsClosestHit_Blocks(GASstate &state) {
   prog_group_desc[0].kind = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
   prog_group_desc[0].raygen.module = state.ptx_module;
   prog_group_desc[0].raygen.entryFunctionName = "__raygen__rmq_blocks";
+
+  // we need to create these but the entryFunctionNames are null
+  prog_group_desc[1].kind = OPTIX_PROGRAM_GROUP_KIND_MISS;
+  prog_group_desc[1].miss.module = state.ptx_module;
+  prog_group_desc[1].miss.entryFunctionName = "__miss__rmq";
+
+
+  // closest hit
+  prog_group_desc[2].kind = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
+  prog_group_desc[2].hitgroup.moduleCH = state.ptx_module;
+  prog_group_desc[2].hitgroup.entryFunctionNameCH = "__closesthit__rmq_blocks";
+  prog_group_desc[2].hitgroup.moduleAH = nullptr;
+  prog_group_desc[2].hitgroup.entryFunctionNameAH = nullptr;
+
+  OPTIX_CHECK(optixProgramGroupCreate(state.context, prog_group_desc, 3, &program_group_options, nullptr, nullptr, state.program_groups));
+}
+
+void createGroupsClosestHit_LUP(GASstate &state) {
+  OptixProgramGroupOptions program_group_options = {}; // Initialize to zeros
+  OptixProgramGroupDesc prog_group_desc[3] = {};
+
+  // raygen
+  prog_group_desc[0].kind = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
+  prog_group_desc[0].raygen.module = state.ptx_module;
+  prog_group_desc[0].raygen.entryFunctionName = "__raygen__rmq_lup";
 
   // we need to create these but the entryFunctionNames are null
   prog_group_desc[1].kind = OPTIX_PROGRAM_GROUP_KIND_MISS;

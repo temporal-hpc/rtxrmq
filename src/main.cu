@@ -14,16 +14,16 @@
 #define BSIZE 1024
 #define WARPSIZE 32
 #define RTX_REPEATS 10
-//#define RTX_BLOCK_SIZE (1<<10)
 #define ALG_CPU_BASE        0
 #define ALG_CPU_HRMQ        1
 #define ALG_GPU_BASE        2
 #define ALG_GPU_RTX_CAST    3
 #define ALG_GPU_RTX_TRANS   4
 #define ALG_GPU_RTX_BLOCKS  5
+#define ALG_GPU_RTX_LUP     6
 
 // TODO add other state-of-the-art GPU rmq algs
-const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks"}; 
+const char *algStr[7] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks", "[GPU] RTX_lup"}; 
 
 
 #define SAVE 0
@@ -33,9 +33,17 @@ const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_c
 #else
      #define CHECK 1
 #endif
+#define MEASURE_POWER 0
+#if MEASURE_POWER == 1
+    #define REPS 100
+#else
+    #define REPS 10
+#endif
+
 
 #include "common/common.h"
 #include "common/Timer.h"
+#include "common/nvmlPower.hpp"
 #include "src/rand.cuh"
 #include "src/tools.h"
 #include "src/device_tools.cuh"
@@ -90,6 +98,7 @@ int main(int argc, char *argv[]) {
     std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
     printf("done: %f secs\n" AC_RESET, timer.get_elapsed_ms()/1000.0f);
 
+
     // 1.5 data on CPU
     float *hA;
     int *hAi;
@@ -119,6 +128,7 @@ int main(int argc, char *argv[]) {
         case ALG_GPU_BASE:
             out = gpu_rmq_basic(n, q, p.first, qs.first, reps);
             break;
+<<<<<<< HEAD
         case ALG_GPU_RTX_CAST:
             out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
             break;
@@ -127,13 +137,22 @@ int main(int argc, char *argv[]) {
             break;
         case ALG_GPU_RTX_BLOCKS:
             out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
+=======
+        default: // RTX algs
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, dev);
+>>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
             break;
     }
 
     if (CHECK){
         printf("\nCHECKING RESULT:\n");
+<<<<<<< HEAD
         //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
         float *expected = cpu_rmq<float>(n, q, hA, hQ, nt, 1);
+=======
+        float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+        //float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
+>>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         //float *expected = reinterpret_cast<float*>(outi);
