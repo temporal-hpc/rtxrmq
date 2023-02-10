@@ -26,7 +26,6 @@
 const char *algStr[6] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks"}; 
 
 
-#define REPS 1
 #define SAVE 0
 #define SAVE_FILE "../results/data.csv"
 #ifdef CHECK
@@ -54,29 +53,31 @@ int main(int argc, char *argv[]) {
     if(!check_parameters(argc)){
         exit(EXIT_FAILURE);
     }
-    int seed = atoi(argv[1]);
-    int dev = atoi(argv[2]);
-    int n = atoi(argv[3]);
-    int bs = atoi(argv[4]);
-    int q = atoi(argv[5]);
-    int lr = atoi(argv[6]);
-    int nt = atoi(argv[7]);
-    int alg = atoi(argv[8]);
+    int reps = atoi(argv[1]);
+    int seed = atoi(argv[2]);
+    int dev = atoi(argv[3]);
+    int n = atoi(argv[4]);
+    int bs = atoi(argv[5]);
+    int q = atoi(argv[6]);
+    int lr = atoi(argv[7]);
+    int nt = atoi(argv[8]);
+    int alg = atoi(argv[9]);
     if (lr >= n) {
         fprintf(stderr, "Error: lr can not be bigger than n\n");
         return -1;
     }
 
     printf( "Params:\n"
+            "   reps = %i\n"
             "   seed = %i\n"
-            "   dev = %i\n"
-            AC_GREEN "   n   = %i (~%f GB, float)\n" AC_RESET
-            "   bs = %i\n"
-            AC_GREEN "   q   = %i (~%f GB, int2)\n" AC_RESET
-            "   lr  = %i\n"
-            "   nt  = %i CPU threads\n"
-            "   alg = %i (%s)\n\n",
-            seed, dev, n, sizeof(float)*n/1e9, bs, q, sizeof(int2)*q/1e9, lr, nt, alg, algStr[alg]);
+            "   dev  = %i\n"
+            AC_GREEN "   n    = %i (~%f GB, float)\n" AC_RESET
+            "   bs   = %i\n"
+            AC_GREEN "   q    = %i (~%f GB, int2)\n" AC_RESET
+            "   lr   = %i\n"
+            "   nt   = %i CPU threads\n"
+            "   alg  = %i (%s)\n\n",
+            reps, seed, dev, n, sizeof(float)*n/1e9, bs, q, sizeof(int2)*q/1e9, lr, nt, alg, algStr[alg]);
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
@@ -101,38 +102,38 @@ int main(int argc, char *argv[]) {
     }
 
     
-    write_results(dev, alg, n, bs, q, lr);
+    write_results(dev, alg, n, bs, q, lr, reps);
     // 2) computation
     float *out;
     int *outi;
 
     switch(alg){
         case ALG_CPU_BASE:
-            out = cpu_rmq<float>(n, q, hA, hQ, nt);
+            out = cpu_rmq<float>(n, q, hA, hQ, nt, reps);
             break;
         case ALG_CPU_HRMQ:
             hAi = reinterpret_cast<int*>(hA);
-            outi = rmq_rmm_par(n, q, hAi, hQ, nt);
+            outi = rmq_rmm_par(n, q, hAi, hQ, nt, reps);
             out = reinterpret_cast<float*>(outi);
             break;
         case ALG_GPU_BASE:
-            out = gpu_rmq_basic(n, q, p.first, qs.first);
+            out = gpu_rmq_basic(n, q, p.first, qs.first, reps);
             break;
         case ALG_GPU_RTX_CAST:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
             break;
         case ALG_GPU_RTX_TRANS:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
             break;
         case ALG_GPU_RTX_BLOCKS:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
             break;
     }
 
     if (CHECK){
         printf("\nCHECKING RESULT:\n");
         //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
-        float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
+        float *expected = cpu_rmq<float>(n, q, hA, hQ, nt, 1);
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         //float *expected = reinterpret_cast<float*>(outi);

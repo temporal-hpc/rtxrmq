@@ -1,9 +1,10 @@
 #pragma once
 #include <unistd.h>
 
-#define NUM_REQUIRED_ARGS 9
+#define NUM_REQUIRED_ARGS 10
 void print_help(){
-    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <seed> <dev> <n> <bs> <q> <lr> <nt> <alg>\n" AC_RESET
+    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <reps> <seed> <dev> <n> <bs> <q> <lr> <nt> <alg>\n" AC_RESET
+                    "reps = RMQ repeats for the avg time\n"
                     "seed = seed for PRNG\n"
                     "dev = device ID\n"
                     "n   = num elements\n"
@@ -90,7 +91,7 @@ void print_gpu_specs(int dev){
     printf("  Peak Memory Bandwidth:        %f GB/s\n\n", 2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
 }
 
-void write_results(int dev, int alg, int n, int bs, int q, int lr) {
+void write_results(int dev, int alg, int n, int bs, int q, int lr, int reps) {
     if (!SAVE) return;
     cudaDeviceProp prop;
     cudaGetDeviceProperties(&prop, dev);
@@ -107,7 +108,7 @@ void write_results(int dev, int alg, int n, int bs, int q, int lr) {
     fprintf(fp, "%s,%s,%i,%i,%i,%i,%i",
             device,
             algStr[alg],
-            REPS,
+            reps,
             n,
             bs,
             q,
@@ -115,9 +116,9 @@ void write_results(int dev, int alg, int n, int bs, int q, int lr) {
     fclose(fp);
 }
 
-void write_results(float time_ms, int q) {
+void write_results(float time_ms, int q, int reps) {
     if (!SAVE) return;
-    float time_it = time_ms/REPS;
+    float time_it = time_ms/reps;
     FILE *fp;
     fp = fopen(SAVE_FILE, "a");
     fprintf(fp, ",%f,%f,%f\n",

@@ -1,5 +1,5 @@
 #pragma once
-float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates) {
+float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates, int reps) {
     Timer timer;
     float *output, *d_output;
     //float cpuMin=-1.0f;
@@ -75,19 +75,19 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
     printf("done: %f ms\n", timer.get_elapsed_ms());
 
     // 5) Computation
-    printf("%sComputing RMQs (%-11s)..............%s", AC_BOLDCYAN, algStr[alg], AC_RESET); fflush(stdout);
+    printf(AC_BOLDCYAN "Computing RMQs (%-16s,r=%-3i)..." AC_RESET, algStr[alg], reps); fflush(stdout);
     //printf("\n");
     timer.restart();
-    for (int i = 0; i < REPS; ++i) {
+    for (int i = 0; i < reps; ++i) {
         OPTIX_CHECK(optixLaunch(state.pipeline, 0, reinterpret_cast<CUdeviceptr>(device_params), sizeof(Params), &state.sbt, q, 1, 1));
     }
     CUDA_CHECK(cudaDeviceSynchronize());
     timer.stop();
     float timems = timer.get_elapsed_ms();
     CUDA_CHECK( cudaMemcpy(output, d_output, q*sizeof(float), cudaMemcpyDeviceToHost) );
-    float time_it = timems/REPS;
-    printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)q/(time_it/1000.0), (double)time_it*1e6/q);
-    write_results(timems, q);
+    float avg_time = timems/(1000.0*reps);
+    printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, avg_time, (double)q/avg_time, (double)avg_time*1e9/q);
+    write_results(timems, q, reps);
         
     // 6) clean up
     printf("cleaning up RTX environment..............."); fflush(stdout);
