@@ -3,7 +3,7 @@
 
 #define NUM_REQUIRED_ARGS 10
 void print_help(){
-    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <reps> <seed> <dev> <n> <bs> <q> <lr> <nt> <alg>\n" AC_RESET
+    fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <reps> <seed> <dev> <n> <bs> <q> <lr> <nt> <alg>\n\n" AC_RESET
                     "reps = RMQ repeats for the avg time\n"
                     "seed = seed for PRNG\n"
                     "dev = device ID\n"
