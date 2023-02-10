@@ -128,31 +128,21 @@ int main(int argc, char *argv[]) {
         case ALG_GPU_BASE:
             out = gpu_rmq_basic(n, q, p.first, qs.first, reps);
             break;
-<<<<<<< HEAD
         case ALG_GPU_RTX_CAST:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, dev, reps);
             break;
         case ALG_GPU_RTX_TRANS:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, dev, reps);
             break;
         case ALG_GPU_RTX_BLOCKS:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, reps);
-=======
-        default: // RTX algs
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, dev);
->>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
+            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, dev, reps);
             break;
     }
 
     if (CHECK){
         printf("\nCHECKING RESULT:\n");
-<<<<<<< HEAD
-        //float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
-        float *expected = cpu_rmq<float>(n, q, hA, hQ, nt, 1);
-=======
-        float *expected = gpu_rmq_basic(n, q, p.first, qs.first);
+        float *expected = gpu_rmq_basic(n, q, p.first, qs.first, 1);
         //float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
->>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         //float *expected = reinterpret_cast<float*>(outi);

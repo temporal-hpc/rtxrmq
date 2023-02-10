@@ -1,9 +1,5 @@
 #pragma once
-<<<<<<< HEAD
-float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates, int reps) {
-=======
-float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates, int dev) {
->>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
+float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates, int dev, int reps) {
     Timer timer;
     float *output, *d_output;
     //float cpuMin=-1.0f;
@@ -108,15 +104,9 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curan
         GPUPowerEnd();
     float timems = timer.get_elapsed_ms();
     CUDA_CHECK( cudaMemcpy(output, d_output, q*sizeof(float), cudaMemcpyDeviceToHost) );
-<<<<<<< HEAD
     float avg_time = timems/(1000.0*reps);
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, avg_time, (double)q/avg_time, (double)avg_time*1e9/q);
-    write_results(timems, q, reps);
-=======
-    float time_it = timems/REPS;
-    printf(AC_BOLDCYAN "done (%i reps): %f secs: [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, REPS, timems/1000.0, (double)q/(time_it/1000.0), (double)time_it*1e6/q);
-    write_results(timems, q, geom_time + AS_time);
->>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
+    write_results(timems, q, geom_time + AS_time, reps);
         
     // 6) clean up
     printf("cleaning up RTX environment..............."); fflush(stdout);

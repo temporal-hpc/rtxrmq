@@ -116,11 +116,7 @@ void write_results(int dev, int alg, int n, int bs, int q, int lr, int reps) {
     fclose(fp);
 }
 
-<<<<<<< HEAD
-void write_results(float time_ms, int q, int reps) {
-=======
-void write_results(float time_ms, int q, float construction_time) {
->>>>>>> c7c2366780389d999a9e3891bfd610de007d156c
+void write_results(float time_ms, int q, float construction_time, int reps) {
     if (!SAVE) return;
     float time_it = time_ms/reps;
     FILE *fp;
