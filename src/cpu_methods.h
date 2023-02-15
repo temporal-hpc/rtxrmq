@@ -14,7 +14,8 @@ T cpu_min(T *A, int l, int r) {
 }
 
 template <typename T>
-T* cpu_rmq(int n, int nq, T *A, int2 *Q, int nt, int reps) {
+T* cpu_rmq(int n, int nq, T *A, int2 *Q, int nt, CmdArgs args) {
+    int reps = args.reps;
     Timer timer;
     T* out = new T[nq];
 
@@ -31,14 +32,15 @@ T* cpu_rmq(int n, int nq, T *A, int2 *Q, int nt, int reps) {
     float timems = timer.get_elapsed_ms();
     float time_it = timems/reps;
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, timems/(1000.0*reps), (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
-    write_results(timems, nq, 0, reps);
+    write_results(timems, nq, 0, reps, args);
     return out;
 }
 
-int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, int reps) {
+int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, CmdArgs args) {
     using namespace rmqrmm;
     omp_set_num_threads(nt);
 
+    int reps = args.reps;
     Timer timer;
     RMQRMM64 *rmq = NULL;
     int* out = new int[nq];
@@ -54,8 +56,8 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, int reps) {
 
     //printf("%sAnswering Querys [%2i threads]......", AC_BOLDCYAN, nt); fflush(stdout);
     printf(AC_BOLDCYAN "Computing RMQs (%-11s,nt=%2i,r=%-3i).." AC_RESET, algStr[ALG_CPU_HRMQ], nt, reps); fflush(stdout);
-    if (MEASURE_POWER)
-        CPUPowerBegin("HRMQ", 100);
+    if (args.save_power)
+        CPUPowerBegin("HRMQ", 100, args.time_file);
     timer.restart();
     for (int i = 0; i < reps; ++i) {
         #pragma omp parallel for shared(rmq, out, A, Q)
@@ -65,11 +67,11 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, int reps) {
         }
     }
     timer.stop();
-    if (MEASURE_POWER)
+    if (args.save_power)
         GPUPowerEnd();
     double timems = timer.get_elapsed_ms();
     float time_it = timems/reps;
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, timems/(1000.0*reps), (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
-    write_results(timems, nq, struct_time, reps);
+    write_results(timems, nq, struct_time, reps, args);
     return out;
 }

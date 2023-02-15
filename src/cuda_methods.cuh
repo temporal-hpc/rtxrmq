@@ -21,7 +21,8 @@ __global__ void kernel_rmq_basic(int n, int q, float *x, int2 *rmq, float *out){
 }
 
 // GPU RMQ basic approach
-float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, int reps){
+float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, CmdArgs args){
+    int reps = args.reps;
     dim3 block(BSIZE, 1, 1);
     dim3 grid((q+BSIZE-1)/BSIZE, 1, 1);
     float *hout, *dout;
@@ -45,6 +46,6 @@ float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, int reps){
     CUDA_CHECK(cudaMemcpy(hout, dout, sizeof(float)*q, cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaFree(dout));
     printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
-    write_results(timems, q, 0, reps);
+    write_results(timems, q, 0, reps, args);
     return hout;
 }

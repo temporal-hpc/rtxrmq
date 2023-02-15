@@ -88,7 +88,7 @@ void *GPUpowerPollingFunc(void *ptr){
 Start power measurement by spawning a pthread that polls the GPU.
 Function needs to be modified as per usage to handle errors as seen fit.
 */
-void GPUPowerBegin(const char *alg, int ms, int dev){
+void GPUPowerBegin(const char *alg, int ms, int dev, std::string filename){
     GPU_SAMPLE_MS = ms;
 	int i;
 	// Initialize nvml.
@@ -140,7 +140,10 @@ void GPUPowerBegin(const char *alg, int ms, int dev){
 	// Test thoroughly and ensure the correct device ID is being used.
 	nvmlResult = nvmlDeviceGetHandleByIndex(dev, &nvmlDeviceID);
 	GPUpollThreadStatus = true;
-    GPUfilename = std::string("../results/") + std::string("power-") + std::string(alg) + std::string(".dat");
+	if (filename.empty())
+    		GPUfilename = std::string("../results/") + std::string("power-") + std::string(alg) + std::string(".dat");
+	else
+		GPUfilename = filename;
 	const char *message = "GPU-power";
 	int iret = pthread_create(&GPUpowerPollThread, NULL, GPUpowerPollingFunc, (void*) message);
 	if (iret){
@@ -209,11 +212,15 @@ int getNVMLError(nvmlReturn_t resultToCheck)
 
 
 // Begin measuring CPU power
-void CPUPowerBegin(const char *alg, int ms){
-    CPU_SAMPLE_MS = ms;
-    CPUpollThreadStatus = true;
-    CPUfilename = std::string("../results/") + std::string("power-") + std::string(alg) + std::string(".dat");
-    rapl = new Rapl();
+void CPUPowerBegin(const char *alg, int ms, std::string filename){
+	CPU_SAMPLE_MS = ms;
+	CPUpollThreadStatus = true;
+	if (filename.empty())
+		CPUfilename = std::string("../results/") + std::string("power-") + std::string(alg) + std::string(".dat");
+	else
+		CPUfilename = filename;
+
+	rapl = new Rapl();
 	int code = pthread_create(&CPUpowerPollThread, NULL, CPUpowerPollingFunc, (void*)NULL);
 	if (code){
 		fprintf(stderr,"Error - pthread_create() return code: %d\n", code);
@@ -224,48 +231,48 @@ void CPUPowerBegin(const char *alg, int ms){
 
 // Stop measuring CPU power
 void CPUPowerEnd(){
-    double ckWh = 3600000.0;
+	double ckWh = 3600000.0;
 	usleep(1000*COOLDOWN_MS);
 	CPUpollThreadStatus = false;
 	pthread_join(CPUpowerPollThread, 0);
-    //printf("\n\tTotal Energy: %f J\n\tAverage Power: %f W\n\tTime: %f\n\n", rapl->pkg_total_energy(), rapl->pkg_average_power(), rapl->total_time());
-    printf("\n\nSummary:\nCPU Avg. Power:       %f W\n", rapl->pkg_average_power());
-    printf("CPU Total Energy:     %f J = %f kWh\n", rapl->pkg_total_energy(), rapl->pkg_total_energy()/ckWh);
-    printf("CPU Total Time:       %f secs\n", rapl->total_time());
-    printf("\n");
-    printf("DRAM Avg. Power:      %f W\n", rapl->dram_average_power());
-    printf("DRAM Total Energy:    %f J = %f kWh\n", rapl->dram_total_energy(), rapl->dram_total_energy()/ckWh);
-    printf("\n");
-    printf("GPU Avg. Power:       %f W\n", gpuAveragePower);
-    printf("GPU Total Energy:     %f J = %f kWh\n", gpuTotalEnergy, gpuTotalEnergy/ckWh);
-    printf("GPU Total Time:       %f secs\n", gpuTotalTime);
+	//printf("\n\tTotal Energy: %f J\n\tAverage Power: %f W\n\tTime: %f\n\n", rapl->pkg_total_energy(), rapl->pkg_average_power(), rapl->total_time());
+	printf("\n\nSummary:\nCPU Avg. Power:       %f W\n", rapl->pkg_average_power());
+	printf("CPU Total Energy:     %f J = %f kWh\n", rapl->pkg_total_energy(), rapl->pkg_total_energy()/ckWh);
+	printf("CPU Total Time:       %f secs\n", rapl->total_time());
+	printf("\n");
+	printf("DRAM Avg. Power:      %f W\n", rapl->dram_average_power());
+	printf("DRAM Total Energy:    %f J = %f kWh\n", rapl->dram_total_energy(), rapl->dram_total_energy()/ckWh);
+	printf("\n");
+	printf("GPU Avg. Power:       %f W\n", gpuAveragePower);
+	printf("GPU Total Energy:     %f J = %f kWh\n", gpuTotalEnergy, gpuTotalEnergy/ckWh);
+	printf("GPU Total Time:       %f secs\n", gpuTotalTime);
 }
 
 
 
 // CPU power measure thread
 void* CPUpowerPollingFunc(void *ptr){
-    int timestep = 0;
-    double dt = 0.0, acctime = 0.0, accenergy = 0.0, power = 0.0;
+	int timestep = 0;
+	double dt = 0.0, acctime = 0.0, accenergy = 0.0, power = 0.0;
 	FILE *fp = fopen(CPUfilename.c_str(), "w+");
 	//fprintf(fp, "%-15s %-15s %-15s %-15s %-15s %-15s\n", "#timestep", "power", "acc-energy", "avg-power", "dt", "acc-time");
 	while(CPUpollThreadStatus){
-        timestep++;
+		timestep++;
 		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
 		usleep(1000 * CPU_SAMPLE_MS);
 
-        // sample values
+		// sample values
 		rapl->sample();
 
 		// Write current value of CPU PKG
-        fprintf(fp, "%-15i %-15f %-15f %-15f %-15f %-15f\n", timestep, rapl->pkg_current_power(), rapl->pkg_total_energy(), rapl->pkg_average_power(), rapl->current_time(), rapl->total_time());
-        printf("\r [CPU = %-10.5f (W)  DRAM = %-10.5f (W)]   [GPU = %-10.5f (W)]",
-                rapl->pkg_current_power(), 
-                rapl->dram_current_power(), 
-                gpuCurrentPower);
-        fflush(stdout);
+		fprintf(fp, "%-15i %-15f %-15f %-15f %-15f %-15f\n", timestep, rapl->pkg_current_power(), rapl->pkg_total_energy(), rapl->pkg_average_power(), rapl->current_time(), rapl->total_time());
+		printf("\r [CPU = %-10.5f (W)  DRAM = %-10.5f (W)]   [GPU = %-10.5f (W)]",
+				rapl->pkg_current_power(), 
+				rapl->dram_current_power(), 
+				gpuCurrentPower);
+		fflush(stdout);
 		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
 	}
-    fclose(fp);
+	fclose(fp);
 	pthread_exit(0);
 }

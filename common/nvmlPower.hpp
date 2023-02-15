@@ -25,11 +25,11 @@ Header file including necessary nvml headers.
 
 
 // GPU power measure functions
-void GPUPowerBegin(const char *alg, int ms, int dev);
+void GPUPowerBegin(const char *alg, int ms, int dev, std::string filename);
 void GPUPowerEnd();
 
 // CPU power measure functions
-void CPUPowerBegin(const char *alg, int ms);
+void CPUPowerBegin(const char *alg, int ms, std::string filename);
 void CPUPowerEnd();
 
 // pthread functions
