@@ -39,8 +39,8 @@ void print_help(){
                     "   --nt  <thread num>        number of CPU threads\n"
                     "   --seed <seed>             seed for PRNG\n"
                     "   --check                   check correctness\n"
-                    "   --save-time <file>        \n"
-                    "   --save-power <file>       \n",
+                    "   --save-time=<file>        \n"
+                    "   --save-power=<file>       \n",
                     algStr[0],
                     algStr[1],
                     algStr[2],

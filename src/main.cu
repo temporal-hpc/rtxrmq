@@ -106,6 +106,8 @@ int main(int argc, char *argv[]) {
     if (args.check){
         printf("\nCHECKING RESULT:\n");
         args.reps = 1;
+        args.save_time = 0;
+        args.save_power = 0;
         float *expected = gpu_rmq_basic(n, q, p.first, qs.first, args);
         //float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
         //hAi = reinterpret_cast<int*>(hA);
