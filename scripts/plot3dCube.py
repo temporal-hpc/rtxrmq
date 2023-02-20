@@ -35,7 +35,7 @@ for i, time in enumerate(full[:,-1]):
 ## Transform data from 1D -> 3D
 times = times.reshape(len(z),  len(y), len(x))
 for i in range(times.shape[0]):
-    slice = times[i,:,:]
+    slice = times[i,:,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
     times[i, :,:,] = slice_normalized
 
@@ -53,24 +53,36 @@ import pyqtgraph.opengl as gl
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-
-## Extracts a color map function using the specified list of colors.
-def extract_color_map(colors, cmap_name='custom_cmap'):
-    cmap = mcolors.ListedColormap(colors, name=cmap_name)
-    return cmap
-
-## Define a list of RGB tuples representing the color list
-## a value will fall into, ordered linearly
-colors = [(0.0, 0.0, 1.0), (0.0, 1.0, 0.0), (1.0, 0.0, 0.0)]
-
 # Extract the color map function
-cmap = extract_color_map(colors)
+import matplotlib
+cmap = matplotlib.cm.get_cmap('viridis')
 
 
 data = times
-
-## Color
+## Color array
 d2 = np.empty(data.shape + (4,), dtype=np.ubyte)
+## Alpha
+# Option 1: Fixed alpha
+#d2[..., 3] = 4
+
+# Option 2: Data dependent
+#strength = 10  # <-- Filters out lower values, a larger value is a more agressive filter
+
+# polinomio
+#d2[..., 3] = np.power(1 - data/data.max(), strength) * (255.)
+# sigmoid
+d2[..., 3] = sigmoid(1 - data, s=0.999, k=0.002) * (200.)
+
+## Color values
+# Filter helps to distribute the color map values among the values that are shown
+# (with significant alpha)
+
+filter = np.percentile(data, 10) # Divide the cmap among the 10th percentile of values 
+print(filter)
+data[data > filter] = filter # Filter the rest
+
+# Renormalize filtered values to [0, 1] (the 10th percentile)
+data = (data- np.min(data)) / (np.max(data) - np.min(data))
 # Option 1: Scale
 d2[..., 0] = cmap(data)[...,0] * 255#0#255
 d2[..., 1] = cmap(data)[...,1] * 255#0#255
@@ -81,18 +93,6 @@ d2[..., 2] = cmap(data)[...,2] * 255#0#255
 #d2[..., 1] = 0x99
 #d2[..., 2] = 0xff
 
-
-## Alpha
-# Option 1: Fixed alpha
-#d2[..., 3] = 4
-
-# Option 2: Data dependent
-strength = 10  # <-- Filters out lower values, a larger value is a more agressive filter
-
-# polinomio
-#d2[..., 3] = np.power(1 - data/data.max(), strength) * (255.)
-# sigmoid
-d2[..., 3] = sigmoid(1 - data/data.max(), s=0.999, k=0.002) * (255.)
 
 
 ## Uncomment to paint the axes
