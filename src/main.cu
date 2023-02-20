@@ -58,29 +58,36 @@ int main(int argc, char *argv[]) {
     cudaSetDevice(dev);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
+    float *hA, *dA;
+    int *hAi;
+    int2 *hQ, *dQ;
+
+
     Timer timer;
     printf(AC_YELLOW "Generating n=%i values..............", n); fflush(stdout);
     std::pair<float*, curandState*> p = create_random_array_dev(n, seed);
+    dA = p.first;
     printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
     timer.restart();
     printf(AC_YELLOW "Generating q=%i queries.............", q); fflush(stdout);
-    std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
+    //std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
+    //dQ = qs.first;
+    hQ = random_queries(q, lr, n, seed);
+    cudaMalloc(&dQ, sizeof(int2)*q);
+    cudaMemcpy(dQ, hQ, sizeof(int2)*q, cudaMemcpyHostToDevice);
     printf("done: %f secs\n" AC_RESET, timer.get_elapsed_ms()/1000.0f);
 
 
     // 1.5 data on CPU
-    float *hA;
-    int *hAi;
-    int2 *hQ;
     if (args.check || alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ) {
         hA = new float[n];
-        hQ = new int2[q];
+        //hQ = new int2[q];
         cudaMemcpy(hA, p.first, sizeof(float)*n, cudaMemcpyDeviceToHost);
-        cudaMemcpy(hQ, qs.first, sizeof(int2)*q, cudaMemcpyDeviceToHost);
+        //cudaMemcpy(hQ, qs.first, sizeof(int2)*q, cudaMemcpyDeviceToHost);
     }
 
-    
-    printf("bewfor write results\n");
+    cudaDeviceSynchronize();
+
     write_results(dev, alg, n, bs, q, lr, reps, args);
     // 2) computation
     float *out;
@@ -96,19 +103,20 @@ int main(int argc, char *argv[]) {
             out = reinterpret_cast<float*>(outi);
             break;
         case ALG_GPU_BASE:
-            out = gpu_rmq_basic(n, q, p.first, qs.first, args);
+            out = gpu_rmq_basic(n, q, dA, dQ, args);
             break;
         default:
-            out = rtx_rmq(alg, n, bs, q, p.first, qs.first, p.second, args);
+            out = rtx_rmq(alg, n, bs, q, dA, dQ, args);
             break;
     }
+
 
     if (args.check){
         printf("\nCHECKING RESULT:\n");
         args.reps = 1;
         args.save_time = 0;
         args.save_power = 0;
-        float *expected = gpu_rmq_basic(n, q, p.first, qs.first, args);
+        float *expected = gpu_rmq_basic(n, q, dA, dQ, args);
         //float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);

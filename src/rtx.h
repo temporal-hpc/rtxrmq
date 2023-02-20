@@ -1,5 +1,5 @@
 #pragma once
-float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, curandState *devStates, CmdArgs args) {
+float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs args) {
     int dev = args.dev;
     int reps = args.reps;
     Timer timer;
