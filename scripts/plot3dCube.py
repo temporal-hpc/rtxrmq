@@ -34,10 +34,17 @@ for i, time in enumerate(full[:,-1]):
 
 ## Transform data from 1D -> 3D
 times = times.reshape(len(z),  len(y), len(x))
+print(times.shape)
+print("---")
+times = times.transpose(2,0,1)
+print(times.shape)
+
 for i in range(times.shape[0]):
     slice = times[i,:,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
     times[i, :,:,] = slice_normalized
+    #print(times[i, :,:,].min())
+
 
 ## Repeat each data point <rep> times to make each pixel larger
 ## Trick to improve visualization
@@ -47,7 +54,6 @@ times = np.repeat(times, rep, axis=1)
 times = np.repeat(times, rep, axis=2)
 
 ## Actual plot
-
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 import matplotlib.pyplot as plt
@@ -70,23 +76,29 @@ d2 = np.empty(data.shape + (4,), dtype=np.ubyte)
 
 # polinomio
 #d2[..., 3] = np.power(1 - data/data.max(), strength) * (255.)
-# sigmoid
-d2[..., 3] = sigmoid(1 - data, s=0.999, k=0.002) * (200.)
 
 ## Color values
 # Filter helps to distribute the color map values among the values that are shown
 # (with significant alpha)
 
-filter = np.percentile(data, 10) # Divide the cmap among the 10th percentile of values 
-print(filter)
-data[data > filter] = filter # Filter the rest
 
 # Renormalize filtered values to [0, 1] (the 10th percentile)
-data = (data- np.min(data)) / (np.max(data) - np.min(data))
+#data = (data- np.min(data)) / (np.max(data) - np.min(data))
+print(data.shape)
+for i in range(data.shape[0]):
+    filter = np.percentile(data[i], 10) # Divide the cmap among the 10th percentile of values
+    print(filter)
+    data[i][data[i] > filter] = filter # Filter the rest
+    slice = data[i,:,:].copy()
+    slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
+    data[i, :,:,] = slice_normalized
+    #print(data[i, :,:,].min())
+
 # Option 1: Scale
 d2[..., 0] = cmap(data)[...,0] * 255#0#255
 d2[..., 1] = cmap(data)[...,1] * 255#0#255
 d2[..., 2] = cmap(data)[...,2] * 255#0#255
+d2[..., 3] = sigmoid(1 - data, s=0.5, k=0.01) * (255.)
 
 # Option 2: Fixed color
 #d2[..., 0] = 0x00
@@ -108,7 +120,7 @@ Demonstrates GLVolumeItem for displaying volumetric data.
 from pyqtgraph.Qt import QtCore, QtGui,QtWidgets
 
 ## Background color
-pg.setConfigOption('background', (200,200,200,255))
+pg.setConfigOption('background', (255,255,255,255))
 
 
 app = QtWidgets.QApplication([])
@@ -117,16 +129,15 @@ w = gl.GLViewWidget()
 w.opts['distance'] = 2000
 w.opts['fov'] = 1
 w.show()
-w.setWindowTitle('pyqtgraph example: GLVolumeItem')
+w.setWindowTitle('RTXRMQ Heat Cube')
 
 
 ## Bottom grid
-g = gl.GLGridItem(glOptions='opaque', color=(0,0,0,255))
+g = gl.GLGridItem(glOptions='opaque', color=(0,0,0,64))
 g.translate(50,50,0)
 g.scale(10, 10, 1)
 g.setDepthValue(2)
 w.addItem(g)
-
 
 ## Volume data
 v = gl.GLVolumeItem(d2)
@@ -142,9 +153,9 @@ def genText(pos, color, text):
     t.scale(10,10,10)
     return t
 #                  x, y, z
-w.addItem(genText((2, 0, 0), (255, 0, 0, 255), "X"))
-w.addItem(genText((0, 2, 0), (0, 255, 0, 255), "Y"))
-w.addItem(genText((0, 0, 2), (0, 0, 255, 255), "Z"))
+w.addItem(genText((2, 0, 0), (255, 0, 0, 255), "# blocks"))
+w.addItem(genText((0, 2, 0), (0, 255, 0, 255), "n"))
+w.addItem(genText((0, 0, 2), (0, 0, 255, 255), "lr"))
 
 
 ## Axis lines, not very visible
