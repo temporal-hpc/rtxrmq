@@ -1,6 +1,12 @@
 import numpy as np
 import sys
 
+def sigmoid(x, s=0.8, k=0.1):
+    # sigmoid function
+    # use k to adjust the slope
+    s = 1 / (1 + np.exp( (-x + s) / k))
+    return s
+
 if len(sys.argv) != 2:
     print("Run with arguments <csv_path>")
     exit()
@@ -28,6 +34,10 @@ for i, time in enumerate(full[:,-1]):
 
 ## Transform data from 1D -> 3D
 times = times.reshape(len(z),  len(y), len(x))
+for i in range(times.shape[0]):
+    slice = times[i,:,:]
+    slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
+    times[i, :,:,] = slice_normalized
 
 ## Repeat each data point <rep> times to make each pixel larger
 ## Trick to improve visualization
@@ -62,14 +72,14 @@ data = times
 ## Color
 d2 = np.empty(data.shape + (4,), dtype=np.ubyte)
 # Option 1: Scale
-#d2[..., 0] = cmap(data)[...,0] * 255#0#255
-#d2[..., 1] = cmap(data)[...,1] * 255#0#255
-#d2[..., 2] = cmap(data)[...,2] * 255#0#255
+d2[..., 0] = cmap(data)[...,0] * 255#0#255
+d2[..., 1] = cmap(data)[...,1] * 255#0#255
+d2[..., 2] = cmap(data)[...,2] * 255#0#255
 
 # Option 2: Fixed color
-d2[..., 0] = 0x00
-d2[..., 1] = 0x99
-d2[..., 2] = 0xff
+#d2[..., 0] = 0x00
+#d2[..., 1] = 0x99
+#d2[..., 2] = 0xff
 
 
 ## Alpha
@@ -77,8 +87,13 @@ d2[..., 2] = 0xff
 #d2[..., 3] = 4
 
 # Option 2: Data dependent
-strength = 1.75  # <-- Filters out lower values, a larger value is a more agressive filter
-d2[..., 3] = np.power(data/data.max(), strength) * (255.)
+strength = 10  # <-- Filters out lower values, a larger value is a more agressive filter
+
+# polinomio
+#d2[..., 3] = np.power(1 - data/data.max(), strength) * (255.)
+# sigmoid
+d2[..., 3] = sigmoid(1 - data/data.max(), s=0.999, k=0.002) * (255.)
+
 
 ## Uncomment to paint the axes
 #d2[:, 0, 0] = [255,0,0,255]
