@@ -34,17 +34,12 @@ for i, time in enumerate(full[:,-1]):
 
 ## Transform data from 1D -> 3D
 times = times.reshape(len(z),  len(y), len(x))
-print(times.shape)
-print("---")
 times = times.transpose(2,0,1)
-print(times.shape)
 
-for i in range(times.shape[0]):
-    slice = times[i,:,:].copy()
+for i in range(times.shape[1]):
+    slice = times[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
-    times[i, :,:,] = slice_normalized
-    #print(times[i, :,:,].min())
-
+    times[:, i, :] = slice_normalized
 
 ## Repeat each data point <rep> times to make each pixel larger
 ## Trick to improve visualization
@@ -72,39 +67,32 @@ d2 = np.empty(data.shape + (4,), dtype=np.ubyte)
 #d2[..., 3] = 4
 
 # Option 2: Data dependent
-#strength = 10  # <-- Filters out lower values, a larger value is a more agressive filter
+strength = 500  # <-- Filters out lower values, a larger value is a more agressive filter
 
 # polinomio
-#d2[..., 3] = np.power(1 - data/data.max(), strength) * (255.)
+d2[..., 3] = np.power(1 - data, strength) * (255.)
+#d2[..., 3] = sigmoid(1 - data, s=0.5, k=0.01) * (255.)
 
 ## Color values
 # Filter helps to distribute the color map values among the values that are shown
 # (with significant alpha)
-
-
 # Renormalize filtered values to [0, 1] (the 10th percentile)
-#data = (data- np.min(data)) / (np.max(data) - np.min(data))
-print(data.shape)
-for i in range(data.shape[0]):
-    filter = np.percentile(data[i], 10) # Divide the cmap among the 10th percentile of values
-    print(filter)
-    data[i][data[i] > filter] = filter # Filter the rest
-    slice = data[i,:,:].copy()
+for i in range(data.shape[1]):
+    filter = np.percentile(data[:,i,:], 30) # Divide the cmap among the 10th percentile of values
+    data[:,i,:][data[:,i,:] > filter] = filter # Filter the rest
+    slice = data[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
-    data[i, :,:,] = slice_normalized
-    #print(data[i, :,:,].min())
+    data[:, i, :,] = slice_normalized
 
 # Option 1: Scale
 d2[..., 0] = cmap(data)[...,0] * 255#0#255
 d2[..., 1] = cmap(data)[...,1] * 255#0#255
 d2[..., 2] = cmap(data)[...,2] * 255#0#255
-d2[..., 3] = sigmoid(1 - data, s=0.5, k=0.01) * (255.)
 
 # Option 2: Fixed color
 #d2[..., 0] = 0x00
 #d2[..., 1] = 0x99
 #d2[..., 2] = 0xff
-
 
 
 ## Uncomment to paint the axes
