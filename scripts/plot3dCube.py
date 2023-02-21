@@ -34,12 +34,14 @@ for i, time in enumerate(full[:,-1]):
 
 ## Transform data from 1D -> 3D
 times = times.reshape(len(z),  len(y), len(x))
-times = times.transpose(2,0,1)
+times = times.transpose(1,0,2)
 
 for i in range(times.shape[1]):
     slice = times[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
     times[:, i, :] = slice_normalized
+
+times = np.flip(times, axis=2)
 
 ## Repeat each data point <rep> times to make each pixel larger
 ## Trick to improve visualization
