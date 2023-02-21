@@ -34,12 +34,14 @@ for i, time in enumerate(full[:,-1]):
 
 ## Transform data from 1D -> 3D
 times = times.reshape(len(z),  len(y), len(x))
-times = times.transpose(2,0,1)
+times = times.transpose(1,0,2)
 
 for i in range(times.shape[1]):
     slice = times[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
     times[:, i, :] = slice_normalized
+
+times = np.flip(times, axis=2)
 
 ## Repeat each data point <rep> times to make each pixel larger
 ## Trick to improve visualization
@@ -67,18 +69,18 @@ d2 = np.empty(data.shape + (4,), dtype=np.ubyte)
 #d2[..., 3] = 4
 
 # Option 2: Data dependent
-strength = 500  # <-- Filters out lower values, a larger value is a more agressive filter
+strength = 30  # <-- Filters out lower values, a larger value is a more agressive filter
 
 # polinomio
-d2[..., 3] = np.power(1 - data, strength) * (255.)
-#d2[..., 3] = sigmoid(1 - data, s=0.5, k=0.01) * (255.)
+#d2[..., 3] = np.power(1 - data, strength) * (255.)
+d2[..., 3] = np.maximum(0.03,sigmoid(1 - data, s=0.98, k=0.01)) * (255.)
 
 ## Color values
 # Filter helps to distribute the color map values among the values that are shown
 # (with significant alpha)
 # Renormalize filtered values to [0, 1] (the 10th percentile)
 for i in range(data.shape[1]):
-    filter = np.percentile(data[:,i,:], 30) # Divide the cmap among the 10th percentile of values
+    filter = np.percentile(data[:,i,:], 85) # Divide the cmap among the 10th percentile of values
     data[:,i,:][data[:,i,:] > filter] = filter # Filter the rest
     slice = data[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
