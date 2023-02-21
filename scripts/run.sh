@@ -5,7 +5,7 @@ reps=10
 
 [ -e "results/data.csv" ] || echo "dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction" > results/data.csv
 
-cd build/
+cd ../build/
 for alg in {1,3}
 do
 	for n in {16..26..2}
@@ -16,10 +16,10 @@ do
 			do
 				if [ $lr -lt $n ]
 				then
-					./rtxrmq $reps $RANDOM $dev $((2**$n)) $bs $((2**$q)) $((2**$lr)) $nt $alg
+					./rtxrmq $((2**$n)) $((2**$q)) $((2**$lr)) $alg --bs $bs --nt $nt --reps $reps --dev $dev
 				fi
 			done
-			./rtxrmq $reps $RANDOM $dev $((2**$n)) $((2**$q)) -1 $nt $alg
+			./rtxrmq $((2**$n)) $((2**$q)) -1 $alg --bs $bs --nt $nt --reps $reps --dev $dev
 		done
 	done
 done
