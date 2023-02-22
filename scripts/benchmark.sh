@@ -28,8 +28,6 @@ reps=10
 
 # change to bin directory
 cd ../build
-# recompile
-make
 
 for(( n=$n1; n<=$n2; n++ ))
 do
