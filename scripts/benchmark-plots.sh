@@ -16,7 +16,6 @@ nb2=${7}
 lr1=${8}
 lr2=${9}
 outfile_path=../data/time-${10}-ALG${alg}.csv
-outfile_path_power=../data/power-${10}-ALG${alg}.csv
 binary=./rtxrmq
 
 printf "args:\nalg=${alg}  dev=${dev}   n=${n1}-${n2}     nb=${nb1}-${nb2}     lr=${lr1}-${lr2}   outfile_path=${outfile_path}\n\n"
@@ -43,8 +42,8 @@ do
             do
                 printf "\n\n\n\n\n\n\n\n"
                 SEED=${RANDOM}
-                printf "REALIZATION $R\n:\n./rtxrmq $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --save-power=${outfile_path_power} --seed ${SEED}\n"
-                ${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --save-power=${outfile_path_power} --seed ${SEED}
+                printf "REALIZATION $R\n:\n./rtxrmq $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
+                ${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}
             done
         done
     done
