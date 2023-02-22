@@ -1,33 +1,30 @@
 #!/bin/bash
-if [ "$#" -ne 10 ]; then
+if [ "$#" -ne 13 ]; then
     echo "Run as"
-    printf "     ${0} <dev> <alg> <rea> <n1> <n2>  <nb1> <nb2>  <lr1> <lr2>   <filename>\n\n"
-    printf "e.g: ${0}  0     5      9    16   26      1   12       1   15     results-RTX3090Ti\n"
+    printf "     ${0} <dev> <nt> <alg> <rea> <reps>   <n1> <n2>  <q>  <nb1> <nb2>   <lr1> <lr2>   <filename>\n\n"
+    printf "e.g: ${0}  0     8     5     8     10     16   26   26      1   12        1   15     results-RTX3090Ti\n"
     printf "note:\n  - the *.csv extension will be placed automatically\n  - n,nb,lr values are exponents of 2^x\n\n"
     exit
 fi
 dev=${1}
-alg=${2}
-rea=${3}
-n1=${4}
-n2=${5}
-nb1=${6}
-nb2=${7}
+nt=${2}
+alg=${3}
+rea=${4}
+reps=${5}
+n1=${6}
+n2=${7}
+q=$((2**${8}))
+nb1=${9}
+nb2=${10}
 if [ "$alg" -le 4 ]; then
     nb2=${nb1}
 fi
-lr1=${8}
-lr2=${9}
-outfile_path=../data/time-${10}-ALG${alg}.csv
+lr1=${11}
+lr2=${12}
+outfile_path=../data/time-${13}-ALG${alg}.csv
 binary=./rtxrmq
 
-printf "args:\nalg=${alg}  dev=${dev}   n=${n1}-${n2}     nb=${nb1}-${nb2}     lr=${lr1}-${lr2}   outfile_path=${outfile_path}\n\n"
-dev=0
-#n=$((2**26))
-q=$((2**20))
-#lr=-1
-nt=8
-reps=10
+printf "args:\nalg=${alg}  dev=${dev}  nt=${nt} rea=${rea} reps=${reps}  n=${n1}-${n2} q=${q}  nb=${nb1}-${nb2}     lr=${lr1}-${lr2}   outfile_path=${outfile_path}\n\n"
 [ ! -f ${outfile_path} ] && echo "dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction" > ${outfile_path}
 #DATE=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 #echo "#DATE = ${DATE}" >> ${outfile_path}
