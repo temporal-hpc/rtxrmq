@@ -40,7 +40,7 @@ if __name__ == "__main__":
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
     hc['lr-ratio'] = np.log2(hc['lr'] / hc['n'])
-    
+
     print("n:", hc['n-exp'].unique())
     print("nb:", hc['nb'].unique())
     print("lr:", hc['lr-ratio'].unique())
