@@ -99,7 +99,7 @@ CmdArgs get_args(int argc, char *argv[]) {
         {"save-power", optional_argument, 0, 8},
     };
     int opt, opt_idx;
-    while ((opt = getopt_long(argc, argv, "", long_option, &opt_idx)) != -1) {
+    while ((opt = getopt_long(argc, argv, "123", long_option, &opt_idx)) != -1) {
         if (isdigit(opt))
                 continue;
         switch (opt) {
@@ -130,6 +130,8 @@ CmdArgs get_args(int argc, char *argv[]) {
                 args.save_power = 1;
                 if (optarg != NULL)
                     args.power_file = optarg;
+                break;
+            default:
                 break;
         }
     }
