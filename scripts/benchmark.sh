@@ -33,8 +33,8 @@ do
         for(( lr=$lr1; lr<=$lr2; lr++ ))
         do
             printf "\n\n\n\n\n\n\n"
-            printf "***EXECUTING***:\n\t${binPath} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time ${outfile_path}\n"
-            ${binPath} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time ${outfile_path}
+            printf "***EXECUTING***:\n\t${binPath} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path}\n"
+            ${binPath} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path}
         done
     done
 done
