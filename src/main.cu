@@ -64,12 +64,12 @@ int main(int argc, char *argv[]) {
 
 
     Timer timer;
-    printf(AC_YELLOW "Generating n=%i values..............", n); fflush(stdout);
+    printf(AC_YELLOW "Generating n=%-10i values............", n); fflush(stdout);
     std::pair<float*, curandState*> p = create_random_array_dev(n, seed);
     dA = p.first;
     printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
     timer.restart();
-    printf(AC_YELLOW "Generating q=%i queries.............", q); fflush(stdout);
+    printf(AC_YELLOW "Generating q=%-10i queries...........", q); fflush(stdout);
     //std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
     //dQ = qs.first;
     hQ = random_queries(q, lr, n, seed);
