@@ -3,7 +3,10 @@ if [ "$#" -ne 12 ]; then
     echo "Run as"
     printf "     ${0} <dev> <nt> <alg> <rea> <reps>   <n1> <n2>  <q1> <q2>  <bsize> <lr> <filename>\n\n"
     printf "e.g: ${0}  0     8     5     8     10      16   26    10   26     15     10   RTX3090Ti\n"
-    printf "note:\n  - the *.csv extension will be placed automatically\n  - n,q,bsize,lr values are exponents of 2^x\n\n"
+    printf "\nnote:\n"
+    printf "  - the *.csv extension will be placed automatically\n"
+    printf "  - prefix (perf) and suffix (alg) will be added to filename\n"
+    printf "  - n,q,bsize,lr values are exponents of 2^x\n\n"
     exit
 fi
 dev=${1}
@@ -37,7 +40,7 @@ do
             printf "\n\n\n\n\n\n\n\n"
             SEED=${RANDOM}
             printf "REALIZATION $R\n:\n${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs ${bsize} --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
-            ${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs ${bsize} --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n
+                                       ${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs ${bsize} --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n
         done
     done
 done

@@ -3,7 +3,10 @@ if [ "$#" -ne 13 ]; then
     echo "Run as"
     printf "     ${0} <dev> <nt> <alg> <rea> <reps>   <n1> <n2>  <q>  <nb1> <nb2>   <lr1> <lr2>   <filename>\n\n"
     printf "e.g: ${0}  0     8     5     8     10     16   26   26      1   12        1   15     results-RTX3090Ti\n"
-    printf "note:\n  - the *.csv extension will be placed automatically\n  - n,nb,lr values are exponents of 2^x\n\n"
+    printf "\nnote:\n"
+    printf "  - the *.csv extension will be placed automatically\n"
+    printf "  - prefix (perf) and suffix (alg) will be added to filename\n"
+    printf "  - n,q,bsize,lr values are exponents of 2^x\n\n"
     exit
 fi
 dev=${1}
