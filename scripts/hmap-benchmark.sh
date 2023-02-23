@@ -42,13 +42,21 @@ do
     do
         for(( lr=$lr1; lr<=$n && lr<=$lr2; lr++ ))
         do
+            nv=$((2**$n))
+            nbv=$((2**$nb))
+            bs=$(($nv/$nbv))
+            lrdiv=$((2**$lr))
+            lrv=$(( ($nv/$lrdiv) - 1 ))
+            if [ "$lrv" -eq $nv ]; then
+                lrv=$(($lrv-1))
+            fi
             for(( R=1; R<=$rea; R++ ))
             do
-                printf "\n\n\n\n\n\n\n\n"
                 SEED=${RANDOM}
-                printf "REALIZATION $R -> n=$((2**$n)) nb=$((2**$nb)) lr=$((2**$lr))\n"
-                printf "${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
-                        ${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}
+                printf "\n\n\n\n\n\n"
+                printf "REALIZATION $R -> n=$nv nb=$nbv lr=$lrdiv\n"
+                printf "${binary} $nv $q $lrv $alg --bs $bs --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
+                        ${binary} $nv $q $lrv $alg --bs $bs --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}
             done
         done
     done
