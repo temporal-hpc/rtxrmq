@@ -39,8 +39,9 @@ do
         do
             printf "\n\n\n\n\n\n\n\n"
             SEED=${RANDOM}
-            printf "REALIZATION $R\n:\n${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs ${bsize} --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
-                                       ${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs ${bsize} --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n
+            printf "REALIZATION $R -> n=$((2**$n)) q=$((2**$q))\n"
+            printf "${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs ${bsize} --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
+                    ${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs ${bsize} --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n
         done
     done
 done

@@ -45,8 +45,9 @@ do
             do
                 printf "\n\n\n\n\n\n\n\n"
                 SEED=${RANDOM}
-                printf "REALIZATION $R\n:\n${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
-                ${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}
+                printf "REALIZATION $R -> n=$((2**$n)) nb=$((2**$nb)) lr=$((2**$lr))\n"
+                printf "${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
+                        ${binary} $((2**$n)) $q $((2**$n / 2**$lr)) $alg --bs $((2**$n / 2**$nb)) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}
             done
         done
     done
