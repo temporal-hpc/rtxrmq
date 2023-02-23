@@ -46,7 +46,7 @@ do
             nbv=$((2**$nb))
             bs=$(($nv/$nbv))
             lrdiv=$((2**$lr))
-            lrv=$(( ($nv/$lrdiv) - 1 ))
+            lrv=$(( ($nv/$lrdiv) ))
             if [ "$lrv" -eq $nv ]; then
                 lrv=$(($lrv-1))
             fi
