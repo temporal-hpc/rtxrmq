@@ -25,8 +25,8 @@ binary=./rtxrmq
 
 printf "args:\ndev=${dev} nt=${nt} alg=${alg} rea=${rea} reps=${reps} n=${n1}-${n2} q=${q1}-${q2} bsize=${bsize} lr=${lr}   outfile_path=${outfile_path}\n\n"
 [ ! -f ${outfile_path} ] && echo "dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction" > ${outfile_path}
-#DATE=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
-#echo "#DATE = ${DATE}" >> ${outfile_path}
+DATE=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
+echo "START #DATE = ${DATE}"
 
 # change to bin directory
 cd ../build
@@ -47,3 +47,5 @@ do
 done
 # come back to scripts directory
 cd ../scripts
+DATE=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
+echo "FINISH #DATE = ${DATE}"
