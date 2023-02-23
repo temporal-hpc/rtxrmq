@@ -38,9 +38,9 @@ cd ../build
 
 for(( n=$n1; n<=$n2; n++ ))
 do
-    for(( nb=$nb1; nb<=$nb2; nb++ ))
+    for(( nb=$nb1; nb<=$n && nb<=$nb2; nb++ ))
     do
-        for(( lr=$lr1; lr<=$lr2; lr++ ))
+        for(( lr=$lr1; lr<=$n && lr<=$lr2; lr++ ))
         do
             for(( R=1; R<=$rea; R++ ))
             do
