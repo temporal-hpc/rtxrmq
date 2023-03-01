@@ -2,20 +2,28 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+
+def get3Ddata(file):
+    hc = pd.read_csv(file)
+    hc['n-exp'] = np.log2(hc['n'])
+    hc['nb'] = np.log2(hc['n'] / hc['bs'])
+    hc['lr-ratio'] = np.log2(hc['lr'] / hc['n'])
+    return hc
 
 def heat_map(x, y, plane, df, vmax=100):
     col = ""
-    for c in ['n', 'nb', 'lr']:
+    for c in ['n-exp', 'nb', 'lr-ratio']:
         if c not in {x, y}:
             col = c
     df_nb = df[df[col] == plane]
 
-    ax_labels = {'n': "Array size (2^x)",
+    ax_labels = {'n-exp': "Array size (2^x)",
                  'nb' : "Number of blocks (2^x)",
-                 'lr' : "Segment size fraction (2^x)"}
-    ax_ticks = {'n' : [x for x in range(16, 27)],
+                 'lr-ratio' : "Segment size fraction (2^x)"}
+    ax_ticks = {'n-exp' : [x for x in range(16, 27)],
                 'nb' : [x for x in range(1,13)],
-                'lr' : [x for x in range(-15, 0)]}
+                'lr-ratio' : [x for x in range(-15, 0)]}
 
     pl = df_nb.pivot(values = 'ns/q', index = y, columns = x)
 
@@ -34,10 +42,11 @@ def heat_map(x, y, plane, df, vmax=100):
     plt.close()
 
 if __name__ == "__main__":
-    df_3d = pd.read_csv("../data/heat_cube.csv", names=['n','nb','lr','ns/q'])
+    data_path = sys.argv[1]
+    df_3d = get3Ddata(data_path)
 
-    print("n:", df_3d['n'].unique())
+    print("n:", df_3d['n-exp'].unique())
     print("nb:", df_3d['nb'].unique())
-    print("lr:", df_3d['lr'].unique())
+    print("lr:", df_3d['lr-ratio'].unique())
 
-    heat_map('nb', 'lr', 24, df_3d, vmax=15)
+    heat_map('nb', 'lr-ratio', 24, df_3d, vmax=15)

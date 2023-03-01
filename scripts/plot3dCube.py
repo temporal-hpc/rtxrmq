@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import sys
 
 def sigmoid(x, s=0.8, k=0.1):
@@ -11,10 +12,19 @@ if len(sys.argv) != 2:
     print("Run with arguments <csv_path>")
     exit()
 
+def get3Ddata(file):
+    hc = pd.read_csv(file)
+    hc['n-exp'] = np.log2(hc['n'])
+    hc['nb'] = np.log2(hc['n'] / hc['bs'])
+    hc['lr-ratio'] = np.log2(hc['lr'] / hc['n'])
+    return hc[['n-exp', 'nb', 'lr-ratio', 'ns/q']].to_numpy()
+
+
 data_path = sys.argv[1]
 
-## Load data using numpy
-full = np.genfromtxt(data_path, delimiter=",")
+## Load data using pandas
+#full = np.genfromtxt(data_path, delimiter=",")
+full = get3Ddata(data_path)
 
 ## Get the axis span
 z = np.unique(full[:, 0])
