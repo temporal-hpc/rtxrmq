@@ -6,9 +6,11 @@ import sys
 
 def get3Ddata(file):
     hc = pd.read_csv(file)
+    hc = hc.groupby(['dev', 'alg','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
-    hc['lr-ratio'] = np.log2(hc['lr'] / hc['n'])
+    hc['lr-ratio'] = np.round(np.log2(hc['lr'] / hc['n']))
+    hc['mean_ns/q'] = hc['ns/q','mean']
     return hc
 
 def heat_map(x, y, plane, df, vmax=100):
@@ -21,11 +23,11 @@ def heat_map(x, y, plane, df, vmax=100):
     ax_labels = {'n-exp': "Array size (2^x)",
                  'nb' : "Number of blocks (2^x)",
                  'lr-ratio' : "Segment size fraction (2^x)"}
-    ax_ticks = {'n-exp' : [x for x in range(16, 27)],
-                'nb' : [x for x in range(1,13)],
-                'lr-ratio' : [x for x in range(-15, 0)]}
+    ax_ticks = {'n-exp' : sorted(df['n-exp'].unique()),
+                'nb' : sorted(df['nb'].unique()),
+                'lr-ratio' : sorted(df['lr-ratio'].unique())}
 
-    pl = df_nb.pivot(values = 'ns/q', index = y, columns = x)
+    pl = df_nb.pivot(values = 'mean_ns/q', index = y, columns = x)
 
     fig = plt.figure()
     fig.set_figwidth(11)
@@ -45,8 +47,8 @@ if __name__ == "__main__":
     data_path = sys.argv[1]
     df_3d = get3Ddata(data_path)
 
-    print("n:", df_3d['n-exp'].unique())
-    print("nb:", df_3d['nb'].unique())
-    print("lr:", df_3d['lr-ratio'].unique())
+    print("n:", sorted(df_3d['n-exp'].unique()))
+    print("nb:", sorted(df_3d['nb'].unique()))
+    print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('nb', 'lr-ratio', 24, df_3d, vmax=15)
+    heat_map('nb', 'lr-ratio', 24, df_3d, vmax=30)

@@ -14,10 +14,12 @@ if len(sys.argv) != 2:
 
 def get3Ddata(file):
     hc = pd.read_csv(file)
+    hc = hc.groupby(['dev', 'alg','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
-    hc['lr-ratio'] = np.log2(hc['lr'] / hc['n'])
-    return hc[['n-exp', 'nb', 'lr-ratio', 'ns/q']].to_numpy()
+    hc['lr-ratio'] = np.round(np.log2(hc['lr'] / hc['n']))
+    hc['mean_ns/q'] = hc['ns/q','mean']
+    return hc[['n-exp', 'nb', 'lr-ratio', 'mean_ns/q']].to_numpy()
 
 
 data_path = sys.argv[1]
