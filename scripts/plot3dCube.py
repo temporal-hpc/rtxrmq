@@ -14,9 +14,12 @@ if len(sys.argv) != 2:
 
 def get3Ddata(file):
     hc = pd.read_csv(file)
-    hc = hc.groupby(['dev', 'alg','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
+    #hc = hc.groupby(['dev', 'alg','reps','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
+    hc = hc.groupby(['dev', 'alg','reps','n','bs','q','lr'],sort=False).agg([np.mean, np.std]).reset_index();
+    #print("HC",hc['n'].min())
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
+    print("nb",hc['nb'])
     hc['lr-ratio'] = np.round(np.log2(hc['lr'] / hc['n']))
     hc['mean_ns/q'] = hc['ns/q','mean']
     return hc[['n-exp', 'nb', 'lr-ratio', 'mean_ns/q']].to_numpy()
@@ -27,33 +30,70 @@ data_path = sys.argv[1]
 ## Load data using pandas
 #full = np.genfromtxt(data_path, delimiter=",")
 full = get3Ddata(data_path)
+#print(full[:,0])
 
 ## Get the axis span
-z = np.unique(full[:, 0])
-y = np.unique(full[:, 1])
-x = np.unique(full[:, 2])
+x = np.unique(full[:, 1])
+y = np.unique(full[:, 0])
+z = np.unique(full[:, 2])
 
 print("X:", x)
 print("Y:", y)
 print("Z:", z)
 
+# ANTIGUO LINEAL
 ## Create the data matrix for easier data handling
-times = np.zeros((len(x)* len(y)* len(z)))
+#times = np.zeros((len(x)* len(y)* len(z)))
+#times = np.ones((len(x)* len(y)* len(z)))*100000
 
 ## Load the actual times
-for i, time in enumerate(full[:,-1]):
-    times[i] = time
+#for i, time in enumerate(full[:,-1]):
+#    times[i] = time
 
 ## Transform data from 1D -> 3D
-times = times.reshape(len(z),  len(y), len(x))
-times = times.transpose(1,0,2)
+#times = times.reshape(len(z),  len(y), len(x))
+#times = times.transpose(1,0,2)
 
+
+# NUEVO 3D
+## Create the data matrix for easier data handling
+#times = np.zeros((len(x)* len(y)* len(z)))
+times = np.ones((len(x)* len(y)* len(z)))*np.max(full[:,-1])
+#times = np.ones((len(x)* len(y)* len(z)))*np.nan
+times = times.reshape(len(z),  len(y), len(x))
+#print(times.shape)
+
+## Load the actual times
+for i, tup in enumerate(full):
+    # num blocks
+    ax_nb = int(tup[1])
+    # n
+    ax_n = int(tup[0]) - 10
+    #print(tup[0],yv)
+    #input()
+    # lr
+    ax_lr = int(tup[2]) + 24
+    t = tup[3]
+    times[ax_lr,ax_n,ax_nb] = t
+
+#print("listo")
+## Transform data from 1D -> 3D
+#times = times.transpose(1,0,2)
+
+
+
+
+
+
+#normalizar por 'n'
 for i in range(times.shape[1]):
     slice = times[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
     times[:, i, :] = slice_normalized
 
-times = np.flip(times, axis=2)
+# REVISAR
+#times = np.flip(times, axis=1)
+#times = np.flip(times, axis=0)
 
 ## Repeat each data point <rep> times to make each pixel larger
 ## Trick to improve visualization
@@ -85,14 +125,14 @@ strength = 30  # <-- Filters out lower values, a larger value is a more agressiv
 
 # polinomio
 #d2[..., 3] = np.power(1 - data, strength) * (255.)
-d2[..., 3] = np.maximum(0.03,sigmoid(1 - data, s=0.98, k=0.01)) * (255.)
+d2[..., 3] = np.maximum(0.00,sigmoid(1 - data, s=0.99, k=0.01)) * (16.)
 
 ## Color values
 # Filter helps to distribute the color map values among the values that are shown
 # (with significant alpha)
 # Renormalize filtered values to [0, 1] (the 10th percentile)
 for i in range(data.shape[1]):
-    filter = np.percentile(data[:,i,:], 85) # Divide the cmap among the 10th percentile of values
+    filter = np.percentile(data[:,i,:], 10.0) # Divide the cmap among the 10th percentile of values
     data[:,i,:][data[:,i,:] > filter] = filter # Filter the rest
     slice = data[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
