@@ -108,8 +108,7 @@ int2* random_queries(int q, int lr, int n, int seed) {
         int l = lrand(gen);
         query[i].x = l;
         query[i].y = l + (qsize - 1);
-        printf("(l,r) -> (%i, %i)\n\n", query[i].x, query[i].y);
+        //printf("(l,r) -> (%i, %i)\n\n", query[i].x, query[i].y);
     }
     return query;
 }
-

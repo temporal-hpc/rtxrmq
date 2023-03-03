@@ -47,9 +47,6 @@ do
             bs=$(($nv/$nbv))
             lrdiv=$((2**$lr))
             lrv=$(( ($nv/$lrdiv) ))
-            if [ "$lrv" -eq $nv ]; then
-                lrv=$(($lrv-1))
-            fi
             for(( R=1; R<=$rea; R++ ))
             do
                 SEED=${RANDOM}

@@ -53,7 +53,14 @@ if __name__ == "__main__":
         exit()
     data_path = sys.argv[1]
     nexp = int(sys.argv[2])
+    print(f"ARGS:\n\t{data_path=}\n\t{nexp=}")
     df_3d = get3Ddata(data_path)
+    nmin = int(df_3d['n-exp'].min())
+    nmax = int(df_3d['n-exp'].max())
+    #print(f"{nmin=}  {nmax=}")
+    if nexp > nmax or nexp < nmin:
+        print(f"Error:\n\t'n-exp' must be between the file's range: {nmin}..{nmax}\n")
+        exit()
 
     print("n:", sorted(df_3d['n-exp'].unique()))
     print("nb:", sorted(df_3d['nb'].unique()))
