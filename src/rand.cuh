@@ -104,10 +104,11 @@ int2* random_queries(int q, int lr, int n, int seed) {
     for (int i = 0; i < q; ++i) {
         int qsize = gen_lr(n, lr, gen);
         //printf("qsize  %i\n", qsize); fflush(stdout);
-        std::uniform_int_distribution<int> lrand(0, n - qsize-1);
+        std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
         int l = lrand(gen);
         query[i].x = l;
-        query[i].y = l + qsize;
+        query[i].y = l + (qsize - 1);
+        printf("(l,r) -> (%i, %i)\n\n", query[i].x, query[i].y);
     }
     return query;
 }

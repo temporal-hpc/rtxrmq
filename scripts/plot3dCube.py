@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import sys
 
+# FUNCTIONS
 def sigmoid(x, s=0.8, k=0.1):
     # sigmoid function
     # use k to adjust the slope
@@ -15,7 +16,7 @@ if len(sys.argv) != 2:
 def get3Ddata(file):
     hc = pd.read_csv(file)
     #hc = hc.groupby(['dev', 'alg','reps','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
-    hc = hc.groupby(['dev', 'alg','reps','n','bs','q','lr'],sort=False).agg([np.mean, np.std]).reset_index();
+    hc = hc.groupby(['dev', 'alg','n','bs','q','lr'],sort=False).agg([np.mean, np.std]).reset_index();
     #print("HC",hc['n'].min())
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
@@ -25,13 +26,15 @@ def get3Ddata(file):
     return hc[['n-exp', 'nb', 'lr-ratio', 'mean_ns/q']].to_numpy()
 
 
-data_path = sys.argv[1]
 
+
+# SCRIPT
+
+data_path = sys.argv[1]
 ## Load data using pandas
 #full = np.genfromtxt(data_path, delimiter=",")
 full = get3Ddata(data_path)
 #print(full[:,0])
-
 ## Get the axis span
 x = np.unique(full[:, 1])
 y = np.unique(full[:, 0])
@@ -55,26 +58,33 @@ print("Z:", z)
 #times = times.transpose(1,0,2)
 
 
+
 # NUEVO 3D
 ## Create the data matrix for easier data handling
 #times = np.zeros((len(x)* len(y)* len(z)))
 times = np.ones((len(x)* len(y)* len(z)))*np.max(full[:,-1])
 #times = np.ones((len(x)* len(y)* len(z)))*np.nan
-times = times.reshape(len(z),  len(y), len(x))
+times = times.reshape(len(z),len(y),len(x))
 #print(times.shape)
 
 ## Load the actual times
 for i, tup in enumerate(full):
     # num blocks
     ax_nb = int(tup[1])
+
     # n
-    ax_n = int(tup[0]) - 10
+    ax_n = int(tup[0]) - 1
+
     #print(tup[0],yv)
     #input()
     # lr
     ax_lr = int(tup[2]) + 24
+
     t = tup[3]
-    times[ax_lr,ax_n,ax_nb] = t
+    #print(f"{tup=}")
+    #print(f"nb={2**(ax_n+1)/2**(ax_nb)}  n={2**int(tup[0])}  lr={2**(ax_n+1) * 2**int(tup[2])}  --> {t=}")
+    #input()
+    times[ax_nb,ax_n,ax_lr] = t
 
 #print("listo")
 ## Transform data from 1D -> 3D
@@ -176,8 +186,8 @@ w.setWindowTitle('RTXRMQ Heat Cube')
 
 ## Bottom grid
 g = gl.GLGridItem(glOptions='opaque', color=(0,0,0,64))
-g.translate(50,50,0)
-g.scale(10, 10, 1)
+#g.translate(50,50,0)
+g.scale(20, 20, 1)
 g.setDepthValue(2)
 w.addItem(g)
 

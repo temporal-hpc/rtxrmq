@@ -23,7 +23,7 @@ void print_help(){
     fprintf(stderr, AC_BOLDGREEN "run as ./rtxrmq <n> <q> <lr> <alg>\n\n" AC_RESET
                     "n   = num elements\n"
                     "q   = num RMQ querys\n"
-                    "lr  = size of range\n"
+                    "lr  = length of range; min 1, max n\n"
                     "  >0 -> value\n"
                     "  -1 -> normal distribution (big values)\n"
                     "  -2 -> lognormal distribution (medium values)\n"
@@ -71,8 +71,8 @@ CmdArgs get_args(int argc, char *argv[]) {
         print_help();
         exit(EXIT_FAILURE);
     }
-    if (args.lr >= args.n) {
-        fprintf(stderr, "Error: lr can not be bigger than n\n");
+    if (args.lr > args.n) {
+        fprintf(stderr, "Error: lr=%i > n=%i  (lr must be between '1' and 'n')\n", args.lr, args.n);
         exit(EXIT_FAILURE);
     }
 

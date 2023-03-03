@@ -23,9 +23,9 @@ def heat_map(x, y, plane, df, vmax=100):
     ax_labels = {'n-exp': "Array size (2^x)",
                  'nb' : "Number of blocks (2^x)",
                  'lr-ratio' : "Segment size fraction (2^x)"}
-    ax_ticks = {'n-exp' : sorted(df['n-exp'].unique()),
-                'nb' : sorted(df['nb'].unique()),
-                'lr-ratio' : sorted(df['lr-ratio'].unique())}
+    ax_ticks = {'n-exp' : sorted(df_nb['n-exp'].unique()),
+                'nb' : sorted(df_nb['nb'].unique()),
+                'lr-ratio' : sorted(df_nb['lr-ratio'].unique())}
 
     pl = df_nb.pivot(values = 'mean_ns/q', index = y, columns = x)
 
@@ -33,22 +33,30 @@ def heat_map(x, y, plane, df, vmax=100):
     fig.set_figwidth(11)
     fig.set_figheight(7)
 
-    plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=.5, vmax=vmax))
+    minval = df_nb['mean_ns/q'].min()
+    maxval = df_nb['mean_ns/q'].max()
+    print(f"{minval=}   {maxval=}")
+    #plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=.5, vmax=vmax))
+    plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval))
     plt.colorbar()
     plt.xlabel(ax_labels[x])
     plt.ylabel(ax_labels[y])
     # plt.yticks([i for i in range(5,26,2)])
-    # plt.title("RTX 3090 Ti")
+    plt.title(f"RTX 3090 Ti, LR-frac vs #Blocks, n=2^{plane}")
     # plt.savefig(f"../plots/heat_map_3090Ti.pdf", dpi=300, facecolor="#ffffff", bbox_inches='tight')
     plt.show()
     plt.close()
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Run with arguments <csv_path> <n-exp>")
+        exit()
     data_path = sys.argv[1]
+    nexp = int(sys.argv[2])
     df_3d = get3Ddata(data_path)
 
     print("n:", sorted(df_3d['n-exp'].unique()))
     print("nb:", sorted(df_3d['nb'].unique()))
     print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('nb', 'lr-ratio', 24, df_3d, vmax=30)
+    heat_map('nb', 'lr-ratio', nexp, df_3d, vmax=30)
