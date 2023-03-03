@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
     int alg = args.alg;
 
     cudaSetDevice(dev);
+    omp_set_num_threads(nt);
     print_gpu_specs(dev);
     // 1) data on GPU, result has the resulting array and the states array
     float *hA, *dA;
@@ -72,7 +73,8 @@ int main(int argc, char *argv[]) {
     printf(AC_YELLOW "Generating q=%-10i queries...........", q); fflush(stdout);
     //std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
     //dQ = qs.first;
-    hQ = random_queries(q, lr, n, seed);
+    //hQ = random_queries(q, lr, n, seed);
+    hQ = random_queries_par(q, lr, n, nt, seed);
     cudaMalloc(&dQ, sizeof(int2)*q);
     cudaMemcpy(dQ, hQ, sizeof(int2)*q, cudaMemcpyHostToDevice);
     printf("done: %f secs\n" AC_RESET, timer.get_elapsed_ms()/1000.0f);
