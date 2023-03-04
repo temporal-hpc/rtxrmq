@@ -114,51 +114,71 @@ int2* random_queries(int q, int lr, int n, int seed) {
 }
 
 void fill_queries_constant(int2 *query, int q, int lr, int n, int nt, int seed){
-    std::mt19937 gen(seed);
-    int qsize = lr;
-    //printf("qsize  %i\n", qsize); fflush(stdout);
-    for(int i = 0; i < q; ++i){
-        std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
-        int l = lrand(gen);
-        query[i].x = l;
-        query[i].y = l + (qsize - 1);
-        //printf("(l,r) -> (%i, %i)\n\n", query[i].x, query[i].y);
+    #pragma omp parallel 
+    {
+        int tid = omp_get_thread_num();
+        std::mt19937 gen(seed*tid);
+        int chunk = (q+nt-1)/nt;
+        int begin = chunk*tid;
+        int end   = begin + chunk;
+        int qsize = lr;
+        for(int i=begin; i<end; ++i){
+            std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
+            int l = lrand(gen);
+            query[i].x = l;
+            query[i].y = l + (qsize - 1);
+            //printf("thread %i (l,r) -> (%i, %i)\n\n", tid, query[i].x, query[i].y);
+        }
     }
 }
 
 
 void fill_queries_uniform(int2 *query, int q, int lr, int n, int nt, int seed){
-    std::mt19937 gen(seed);
-    std::uniform_int_distribution<int> dist(1, n);
-    for(int i = 0; i < q; ++i){
-        int qsize = dist(gen);
-        std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
-        int l = lrand(gen);
-        query[i].x = l;
-        query[i].y = l + (qsize - 1);
-        //printf("(l,r) -> (%i, %i)\n\n", query[i].x, query[i].y);
+    #pragma omp parallel 
+    {
+        int tid = omp_get_thread_num();
+        std::mt19937 gen(seed*tid);
+        std::uniform_int_distribution<int> dist(1, n);
+        int chunk = (q+nt-1)/nt;
+        int begin = chunk*tid;
+        int end   = begin + chunk;
+        for(int i = begin; i < end; ++i){
+            int qsize = dist(gen);
+            std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
+            int l = lrand(gen);
+            query[i].x = l;
+            query[i].y = l + (qsize - 1);
+            //printf("(l,r) -> (%i, %i)\n\n", query[i].x, query[i].y);
+        }
     }
 }
 
 void fill_queries_lognormal(int2 *query, int q, int lr, int n, int nt, int seed, int scale){
-    std::mt19937 gen(seed);
-    //std::lognormal_distribution<double> dist_old(1.5, 1.0);
-    std::lognormal_distribution<double> dist(log(scale), 0.3);
-    //printf("fill_queries_lognormal: n=%i q=%i lr=%i  scale=%i\n", n, q, lr, scale);
-    for(int i = 0; i < q; ++i){
-        int qsize;
-        //do{ qsize = (int)(dist_old(gen) * pow(n, 0.7)); /*printf("dist_old gen! qsize=%i\n", qsize);*/}
-        do{ qsize = (int)dist(gen);  /*printf("dist gen! qsize=%i\n", qsize);*/ }
-        while (qsize <= 0 || qsize > n);
-        std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
-        int l = lrand(gen);
-        query[i].x = l;
-        query[i].y = l + (qsize - 1);
-        //printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
+    #pragma omp parallel 
+    {
+        int tid = omp_get_thread_num();
+        std::mt19937 gen(seed*tid);
+        //std::lognormal_distribution<double> dist_old(1.5, 1.0);
+        std::lognormal_distribution<double> dist(log(scale), 0.3);
+        int chunk = (q+nt-1)/nt;
+        int begin = chunk*tid;
+        int end   = begin + chunk;
+        //printf("fill_queries_lognormal: n=%i q=%i lr=%i  scale=%i\n", n, q, lr, scale);
+        for(int i = begin; i < end; ++i){
+            int qsize;
+            //do{ qsize = (int)(dist_old(gen) * pow(n, 0.7)); /*printf("dist_old gen! qsize=%i\n", qsize);*/}
+            do{ qsize = (int)dist(gen);  /*printf("dist gen! qsize=%i\n", qsize);*/ }
+            while (qsize <= 0 || qsize > n);
+            std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
+            int l = lrand(gen);
+            query[i].x = l;
+            query[i].y = l + (qsize - 1);
+            //printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
+        }
     }
 }
 
-int2* random_queries_par(int q, int lr, int n, int nt, int seed) {
+int2* random_queries_par_cpu(int q, int lr, int n, int nt, int seed) {
     omp_set_num_threads(nt);
     int2 *query = new int2[q];
     if(lr>0){

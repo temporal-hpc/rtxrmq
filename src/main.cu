@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     //std::pair<int2*, curandState*> qs = create_random_array_dev2(q, n, lr, seed+7); //TODO use previous states
     //dQ = qs.first;
     //hQ = random_queries(q, lr, n, seed);
-    hQ = random_queries_par(q, lr, n, nt, seed);
+    hQ = random_queries_par_cpu(q, lr, n, nt, seed);
     cudaMalloc(&dQ, sizeof(int2)*q);
     cudaMemcpy(dQ, hQ, sizeof(int2)*q, cudaMemcpyHostToDevice);
     printf("done: %f secs\n" AC_RESET, timer.get_elapsed_ms()/1000.0f);
