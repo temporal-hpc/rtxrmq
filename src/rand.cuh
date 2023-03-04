@@ -142,7 +142,7 @@ void fill_queries_uniform(int2 *query, int q, int lr, int n, int nt, int seed){
         int chunk = (q+nt-1)/nt;
         int begin = chunk*tid;
         int end   = begin + chunk;
-        for(int i = begin; i < end; ++i){
+        for(int i = begin; i<q && i<end; ++i){
             int qsize = dist(gen);
             std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
             int l = lrand(gen);
@@ -158,22 +158,20 @@ void fill_queries_lognormal(int2 *query, int q, int lr, int n, int nt, int seed,
     {
         int tid = omp_get_thread_num();
         std::mt19937 gen(seed*tid);
-        //std::lognormal_distribution<double> dist_old(1.5, 1.0);
         std::lognormal_distribution<double> dist(log(scale), 0.3);
         int chunk = (q+nt-1)/nt;
         int begin = chunk*tid;
         int end   = begin + chunk;
         //printf("fill_queries_lognormal: n=%i q=%i lr=%i  scale=%i\n", n, q, lr, scale);
-        for(int i = begin; i < end; ++i){
+        for(int i = begin; i<q && i<end; ++i){
             int qsize;
-            //do{ qsize = (int)(dist_old(gen) * pow(n, 0.7)); /*printf("dist_old gen! qsize=%i\n", qsize);*/}
             do{ qsize = (int)dist(gen);  /*printf("dist gen! qsize=%i\n", qsize);*/ }
             while (qsize <= 0 || qsize > n);
             std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
             int l = lrand(gen);
             query[i].x = l;
             query[i].y = l + (qsize - 1);
-            //printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
+            printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
         }
     }
 }
@@ -191,7 +189,7 @@ int2* random_queries_par_cpu(int q, int lr, int n, int nt, int seed) {
         fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.7));
     }
     else if(lr == -3){
-        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.3));
+        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.4));
     }
     return query;
 }
