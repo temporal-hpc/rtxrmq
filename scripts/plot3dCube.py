@@ -9,8 +9,11 @@ def sigmoid(x, s=0.8, k=0.1):
     s = 1 / (1 + np.exp( (-x + s) / k))
     return s
 
-if len(sys.argv) != 2:
-    print("Run with arguments <csv_path>")
+if len(sys.argv) != 5:
+    print(f"Run as:\n\tpython {sys.argv[0]} <csv_path> <s> <k> <a>\n")
+    print("s : sigmoid threshold value [0,1]")
+    print("k : threshold slope strength (smaller is stronger)")
+    print("a : overall transparency [0: transparent, 1: solid]\n")
     exit()
 
 def get3Ddata(file):
@@ -20,7 +23,7 @@ def get3Ddata(file):
     #print("HC",hc['n'].min())
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
-    print("nb",hc['nb'])
+    #print("nb",hc['nb'])
     hc['lr-ratio'] = np.round(np.log2(hc['lr'] / hc['n']))
     hc['mean_ns/q'] = hc['ns/q','mean']
     return hc[['n-exp', 'nb', 'lr-ratio', 'mean_ns/q']].to_numpy()
@@ -31,6 +34,10 @@ def get3Ddata(file):
 # SCRIPT
 
 data_path = sys.argv[1]
+sigmoid_s = float(sys.argv[2])
+sigmoid_k = float(sys.argv[3])
+alpha = float(sys.argv[4])
+print(f"ARGS:\n{data_path=}\n{sigmoid_s=}   {sigmoid_k=}   {alpha=}\n")
 ## Load data using pandas
 #full = np.genfromtxt(data_path, delimiter=",")
 full = get3Ddata(data_path)
@@ -135,7 +142,7 @@ strength = 30  # <-- Filters out lower values, a larger value is a more agressiv
 
 # polinomio
 #d2[..., 3] = np.power(1 - data, strength) * (255.)
-d2[..., 3] = np.maximum(0.00,sigmoid(1 - data, s=0.99, k=0.01)) * (16.)
+d2[..., 3] = np.maximum(0.00,sigmoid(1 - data, s=sigmoid_s, k=sigmoid_k)) * alpha*(255.)
 
 ## Color values
 # Filter helps to distribute the color map values among the values that are shown
