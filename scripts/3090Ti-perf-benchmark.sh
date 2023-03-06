@@ -18,7 +18,7 @@ printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
 #TODO
 #    - put efficient `bsize` values at each n/lr (obtained from results of hmap)
 
-# NORMAL DISTRIBUTION (large values)
+# UNIFORM DISTRIBUTION (large values)
 #./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bsize>   <lr> <filename>
 ./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      10   10     1   26   ${bsize}   -1   ${name}
 ./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      11   11     1   26   ${bsize}   -1   ${name}

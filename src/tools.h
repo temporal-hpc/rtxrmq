@@ -25,7 +25,7 @@ void print_help(){
                     "q   = num RMQ querys\n"
                     "lr  = length of range; min 1, max n\n"
                     "  >0 -> value\n"
-                    "  -1 -> normal distribution (big values)\n"
+                    "  -1 -> uniform distribution (large values)\n"
                     "  -2 -> lognormal distribution (medium values)\n"
                     "  -3 -> lognormal distribution (small values)\n"
                     "alg = algorithm\n"

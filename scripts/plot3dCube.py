@@ -9,8 +9,8 @@ def sigmoid(x, s=0.8, k=0.1):
     s = 1 / (1 + np.exp( (-x + s) / k))
     return s
 
-if len(sys.argv) != 5:
-    print(f"Run as:\n\tpython {sys.argv[0]} <csv_path> <s> <k> <a>\n")
+if len(sys.argv) != 6:
+    print(f"Run as:\n\tpython {sys.argv[0]} <csv_path> <title> <s> <k> <a>\n")
     print("s : sigmoid threshold value [0,1]")
     print("k : threshold slope strength (smaller is stronger)")
     print("a : overall transparency [0: transparent, 1: solid]\n")
@@ -34,9 +34,10 @@ def get3Ddata(file):
 # SCRIPT
 
 data_path = sys.argv[1]
-sigmoid_s = float(sys.argv[2])
-sigmoid_k = float(sys.argv[3])
-alpha = float(sys.argv[4])
+title     = sys.argv[2]
+sigmoid_s = float(sys.argv[3])
+sigmoid_k = float(sys.argv[4])
+alpha = float(sys.argv[5])
 print(f"ARGS:\n{data_path=}\n{sigmoid_s=}   {sigmoid_k=}   {alpha=}\n")
 ## Load data using pandas
 #full = np.genfromtxt(data_path, delimiter=",")
@@ -173,7 +174,7 @@ w = gl.GLViewWidget()
 w.opts['distance'] = 2000
 w.opts['fov'] = 1
 w.show()
-w.setWindowTitle('RTXRMQ Heat Cube')
+w.setWindowTitle(f'RTXRMQ Heat Cube: {title}')
 
 
 ## Bottom grid
