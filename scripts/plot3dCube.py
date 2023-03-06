@@ -43,55 +43,42 @@ print(f"ARGS:\n{data_path=}\n{sigmoid_s=}   {sigmoid_k=}   {alpha=}\n")
 full = get3Ddata(data_path)
 #print(full[:,0])
 ## Get the axis span
-x = np.unique(full[:, 1])
-y = np.unique(full[:, 0])
-z = np.unique(full[:, 2])
+x_nb = np.unique(full[:, 1])
+y_n = np.unique(full[:, 0])
+z_lr = np.unique(full[:, 2])
 
-print("X:", x)
-print("Y:", y)
-print("Z:", z)
-
-# ANTIGUO LINEAL
-## Create the data matrix for easier data handling
-#times = np.zeros((len(x)* len(y)* len(z)))
-#times = np.ones((len(x)* len(y)* len(z)))*100000
-
-## Load the actual times
-#for i, time in enumerate(full[:,-1]):
-#    times[i] = time
-
-## Transform data from 1D -> 3D
-#times = times.reshape(len(z),  len(y), len(x))
-#times = times.transpose(1,0,2)
-
-
+print("X nb:", x_nb)
+print("Y n:", y_n)
+print("Z lr:", z_lr)
 
 # NUEVO 3D
 ## Create the data matrix for easier data handling
 #times = np.zeros((len(x)* len(y)* len(z)))
-times = np.ones((len(x)* len(y)* len(z)))*np.max(full[:,-1])
+times = np.ones((len(x_nb)* len(y_n)* len(z_lr)))*np.max(full[:,-1])
 #times = np.ones((len(x)* len(y)* len(z)))*np.nan
-times = times.reshape(len(z),len(y),len(x))
-#print(times.shape)
+times = times.reshape(len(z_lr),len(y_n),len(x_nb))
+print("times: ",times.shape)
+print(f"n=[{y_n.min()}..{y_n.max()}]    nb=[{x_nb.min()}..{x_nb.max()}]    lr=[{z_lr.min()}..{z_lr.max()}]\n")
 
 ## Load the actual times
 for i, tup in enumerate(full):
     # num blocks
-    ax_nb = int(tup[1])
+    ax_nb = int(tup[1]) - int(x_nb.min())
 
     # n
-    ax_n = int(tup[0]) - 1
+    ax_n = int(tup[0]) - int(y_n.min())
 
     #print(tup[0],yv)
     #input()
     # lr
-    ax_lr = int(tup[2]) + 24
+    ax_lr = int(tup[2]) - int(z_lr.min())
 
+    print(f"{ax_nb=}, {ax_n=}, {ax_lr=}")
     t = tup[3]
     #print(f"{tup=}")
     #print(f"nb={2**(ax_n+1)/2**(ax_nb)}  n={2**int(tup[0])}  lr={2**(ax_n+1) * 2**int(tup[2])}  --> {t=}")
     #input()
-    times[ax_nb,ax_n,ax_lr] = t
+    times[ax_lr,ax_n,ax_nb] = t
 
 #print("listo")
 ## Transform data from 1D -> 3D
