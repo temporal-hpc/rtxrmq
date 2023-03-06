@@ -53,10 +53,8 @@ print("Z lr:", z_lr)
 
 # NUEVO 3D
 ## Create the data matrix for easier data handling
-#times = np.zeros((len(x)* len(y)* len(z)))
 times = np.ones((len(x_nb)* len(y_n)* len(z_lr)))*np.max(full[:,-1])
-#times = np.ones((len(x)* len(y)* len(z)))*np.nan
-times = times.reshape(len(z_lr),len(y_n),len(x_nb))
+times = times.reshape(len(x_nb),len(y_n),len(z_lr))
 print("times: ",times.shape)
 print(f"n=[{y_n.min()}..{y_n.max()}]    nb=[{x_nb.min()}..{x_nb.max()}]    lr=[{z_lr.min()}..{z_lr.max()}]\n")
 
@@ -64,21 +62,21 @@ print(f"n=[{y_n.min()}..{y_n.max()}]    nb=[{x_nb.min()}..{x_nb.max()}]    lr=[{
 for i, tup in enumerate(full):
     # num blocks
     ax_nb = int(tup[1]) - int(x_nb.min())
-
     # n
     ax_n = int(tup[0]) - int(y_n.min())
-
-    #print(tup[0],yv)
-    #input()
     # lr
     ax_lr = int(tup[2]) - int(z_lr.min())
-
-    print(f"{ax_nb=}, {ax_n=}, {ax_lr=}")
     t = tup[3]
+
+    #print(f"{ax_nb=}, {ax_n=}, {ax_lr=}")
+    #input()
     #print(f"{tup=}")
     #print(f"nb={2**(ax_n+1)/2**(ax_nb)}  n={2**int(tup[0])}  lr={2**(ax_n+1) * 2**int(tup[2])}  --> {t=}")
     #input()
-    times[ax_lr,ax_n,ax_nb] = t
+    times[ax_nb,ax_n,ax_lr] = t
+    #times[ax_lr,ax_nb,ax_n] = t
+
+#times[3,0,0] = 0
 
 #print("listo")
 ## Transform data from 1D -> 3D
