@@ -1,2 +1,4 @@
+RMQRMM64.o
+Basic_rmq.o
 rmqrmmBP.a
 !.gitignore
