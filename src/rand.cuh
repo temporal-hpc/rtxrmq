@@ -171,7 +171,7 @@ void fill_queries_lognormal(int2 *query, int q, int lr, int n, int nt, int seed,
             int l = lrand(gen);
             query[i].x = l;
             query[i].y = l + (qsize - 1);
-            printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
+            //printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
         }
     }
 }

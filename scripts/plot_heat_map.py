@@ -66,4 +66,4 @@ if __name__ == "__main__":
     print("nb:", sorted(df_3d['nb'].unique()))
     print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('nb', 'lr-ratio', nexp, df_3d, vmax=30)
+    heat_map('n-exp', 'lr-ratio', np.inf, df_3d, vmax=30)
