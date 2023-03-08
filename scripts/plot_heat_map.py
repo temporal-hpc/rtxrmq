@@ -13,16 +13,36 @@ def get3Ddata(file):
     hc['mean_ns/q'] = hc['ns/q','mean']
     return hc
 
+def get_label(col, ax):
+    unit = f"2^{ax}"
+    label = ""
+    match col:
+        case 'n-exp':
+            label += "Array size"
+        case 'nb' :
+            label += "Number of blocks"
+        case 'lr-ratio' :
+            label += "Segment size fraction"
+    return label + " " + unit
+
+def get_title(dev, x, y, col, plane):
+    ax_name = {'n-exp' : "N",
+                'nb' : "#Blocks",
+                'lr-ratio' : "LR-frac"}
+    if plane is None:
+        return f"{dev}, {ax_name[y]} vs {ax_name[x]}"
+    return f"{dev}, {ax_name[y]} vs {ax_name[x]}, {ax_name[col]}=2^{plane}"
+
+
+
 def heat_map(x, y, plane, df, vmax=100):
     col = ""
     for c in ['n-exp', 'nb', 'lr-ratio']:
         if c not in {x, y}:
             col = c
-    df_nb = df[df[col] == plane]
 
-    ax_labels = {'n-exp': "Array size (2^x)",
-                 'nb' : "Number of blocks (2^x)",
-                 'lr-ratio' : "Segment size fraction (2^x)"}
+    df_nb = df if plane is None else df[df[col] == plane]
+
     ax_ticks = {'n-exp' : sorted(df_nb['n-exp'].unique()),
                 'nb' : sorted(df_nb['nb'].unique()),
                 'lr-ratio' : sorted(df_nb['lr-ratio'].unique())}
@@ -39,10 +59,10 @@ def heat_map(x, y, plane, df, vmax=100):
     #plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=.5, vmax=vmax))
     plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval))
     plt.colorbar()
-    plt.xlabel(ax_labels[x])
-    plt.ylabel(ax_labels[y])
+    plt.xlabel(get_label(x, 'x'))
+    plt.ylabel(get_label(y, 'y'))
     # plt.yticks([i for i in range(5,26,2)])
-    plt.title(f"RTX 3090 Ti, LR-frac vs #Blocks, n=2^{plane}")
+    plt.title(get_title('RTX 3090 Ti', x, y, col, plane))
     # plt.savefig(f"../plots/heat_map_3090Ti.pdf", dpi=300, facecolor="#ffffff", bbox_inches='tight')
     plt.show()
     plt.close()
@@ -52,8 +72,7 @@ if __name__ == "__main__":
         print("Run with arguments <csv_path> <n-exp>")
         exit()
     data_path = sys.argv[1]
-    nexp = int(sys.argv[2])
-    print(f"ARGS:\n\t{data_path=}\n\t{nexp=}")
+    rint(f"ARGS:\n\t{data_path=}\n\t{nexp=}")
     df_3d = get3Ddata(data_path)
     nmin = int(df_3d['n-exp'].min())
     nmax = int(df_3d['n-exp'].max())
@@ -66,4 +85,4 @@ if __name__ == "__main__":
     print("nb:", sorted(df_3d['nb'].unique()))
     print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('n-exp', 'lr-ratio', np.inf, df_3d, vmax=30)
+    heat_map('n-exp', 'lr-ratio', None, df_3d, vmax=30)
