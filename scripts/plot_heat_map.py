@@ -72,7 +72,8 @@ if __name__ == "__main__":
         print("Run with arguments <csv_path> <n-exp>")
         exit()
     data_path = sys.argv[1]
-    rint(f"ARGS:\n\t{data_path=}\n\t{nexp=}")
+    nexp = int(sys.argv[2])
+    print(f"ARGS:\n\t{data_path=}\n\t{nexp=}")
     df_3d = get3Ddata(data_path)
     nmin = int(df_3d['n-exp'].min())
     nmax = int(df_3d['n-exp'].max())
