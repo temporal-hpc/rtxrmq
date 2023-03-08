@@ -1,2 +1,3 @@
 *.o
 rmprmmBP.a
+!.gitignore
