@@ -73,21 +73,21 @@ if __name__ == "__main__":
         exit()
     data_path = sys.argv[1]
     try:
-        nexp = int(sys.argv[2])
+        nb = int(sys.argv[2])
     except ValueError:
-        nexp = None
+        nb = None
     dev = sys.argv[3]
-    print(f"ARGS:\n\t{data_path=}\n\t{nexp=}")
+    print(f"ARGS:\n\t{data_path=}\n\t{nb=}")
     df_3d = get3Ddata(data_path)
     nmin = int(df_3d['n-exp'].min())
     nmax = int(df_3d['n-exp'].max())
     #print(f"{nmin=}  {nmax=}")
-    if nexp > nmax or nexp < nmin:
-        print(f"Error:\n\t'n-exp' must be between the file's range: {nmin}..{nmax}\n")
-        exit()
+    #if nexp > nmax or nexp < nmin:
+    #    print(f"Error:\n\t'n-exp' must be between the file's range: {nmin}..{nmax}\n")
+    #    exit()
 
     print("n:", sorted(df_3d['n-exp'].unique()))
     print("nb:", sorted(df_3d['nb'].unique()))
     print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('n-exp', 'lr-ratio', nexp, df_3d, dev, vmax=30)
+    heat_map('n-exp', 'lr-ratio', nb, df_3d, dev, vmax=30)
