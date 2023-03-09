@@ -5,16 +5,17 @@
 #include <getopt.h>
 
 #define ARG_BS 1
-#define ARG_REPS 2
-#define ARG_DEV 3
-#define ARG_NT 4
-#define ARG_SEED 5
-#define ARG_CHECK 6
-#define ARG_TIME 7
-#define ARG_POWER 8
+#define ARG_NB 2
+#define ARG_REPS 3
+#define ARG_DEV 4
+#define ARG_NT 5
+#define ARG_SEED 6
+#define ARG_CHECK 7
+#define ARG_TIME 8
+#define ARG_POWER 9
 
 struct CmdArgs {
-    int n, q, lr, alg, bs, reps, dev, nt, seed, check, save_time, save_power;
+    int n, q, lr, alg, bs, nb, reps, dev, nt, seed, check, save_time, save_power;
     std::string time_file, power_file;
 };
 
@@ -38,6 +39,7 @@ void print_help(){
                     "   6 -> %s\n\n"
                     "Options:\n"
                     "   --bs <block size>         block size for RTX_blocks (default: 2^15)\n"
+                    "   --nb <#blocks>            number of blocks for RTX_blocks (overrides --bs)\n"
                     "   --reps <repetitions>      RMQ repeats for the avg time (default: 10)\n"
                     "   --dev <device ID>         device ID (default: 0)\n"
                     "   --nt  <thread num>        number of CPU threads\n"
@@ -77,6 +79,7 @@ CmdArgs get_args(int argc, char *argv[]) {
     }
 
     args.bs = 1<<15;
+    args.nb = args.n / args.bs;
     args.reps = 10;
     args.seed = time(0);
     args.dev = 0;
@@ -89,14 +92,15 @@ CmdArgs get_args(int argc, char *argv[]) {
     
     static struct option long_option[] = {
         // {name , has_arg, flag, val}
-        {"bs", required_argument, 0, 1},
-        {"reps", required_argument, 0, 2},
-        {"dev", required_argument, 0, 3},
-        {"nt", required_argument, 0, 4},
-        {"seed", required_argument, 0, 5},
-        {"check", no_argument, 0, 6},
-        {"save-time", optional_argument, 0, 7},
-        {"save-power", optional_argument, 0, 8},
+        {"bs", required_argument, 0, ARG_BS},
+        {"nb", required_argument, 0, ARG_NB},
+        {"reps", required_argument, 0, ARG_REPS},
+        {"dev", required_argument, 0, ARG_DEV},
+        {"nt", required_argument, 0, ARG_NT},
+        {"seed", required_argument, 0, ARG_SEED},
+        {"check", no_argument, 0, ARG_CHECK},
+        {"save-time", optional_argument, 0, ARG_TIME},
+        {"save-power", optional_argument, 0, ARG_POWER},
     };
     int opt, opt_idx;
     while ((opt = getopt_long(argc, argv, "123", long_option, &opt_idx)) != -1) {
@@ -105,6 +109,11 @@ CmdArgs get_args(int argc, char *argv[]) {
         switch (opt) {
             case ARG_BS:
                 args.bs = atoi(optarg);
+                args.nb = args.n / args.bs;
+                break;
+            case ARG_NB:
+                args.nb = atoi(optarg);
+                args.bs = args.n / args.nb;
                 break;
             case ARG_REPS:
                 args.reps = atoi(optarg);
@@ -141,6 +150,7 @@ CmdArgs get_args(int argc, char *argv[]) {
             args.alg != ALG_GPU_RTX_BLOCKS &&
             args.alg != ALG_GPU_RTX_LUP) {
         args.bs = 0;
+        args.nb = 0;
     }
 
     printf( "Params:\n"
