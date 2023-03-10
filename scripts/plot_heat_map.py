@@ -36,17 +36,23 @@ def get_label(col, ax):
             label += f"Query length = $n{unit}$"
     return label
 
-def get_title(dev, x, y, col, plane):
+def get_title(title, x, y, col, plane):
+    #ax_name = {'n-exp' : "n",
+    #            'nb' : "#Blocks",
+    #            'lr-ratio' : "Query length"}
+    #if plane is None:
+    #    return f"{title}, {ax_name[y]} vs {ax_name[x]}"
+    #return f"{title}, {ax_name[y]} vs {ax_name[x]}, {ax_name[col]}=2^{plane}"
     ax_name = {'n-exp' : "n",
                 'nb' : "#Blocks",
                 'lr-ratio' : "Query length"}
     if plane is None:
-        return f"{dev}, {ax_name[y]} vs {ax_name[x]}"
-    return f"{dev}, {ax_name[y]} vs {ax_name[x]}, {ax_name[col]}=2^{plane}"
+        return f"Heat Map: {title}"
+    return f"Heat Map: {title}, {ax_name[col]}=2^{plane}"
 
 
 
-def heat_map(x, y, plane, df, dev, filename, saveFlag, vmax=100):
+def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
     col = ""
     for c in ['n-exp', 'nb', 'lr-ratio']:
         if c not in {x, y}:
@@ -75,7 +81,7 @@ def heat_map(x, y, plane, df, dev, filename, saveFlag, vmax=100):
     #plt.xticks(fontsize=16)
     #plt.yticks(fontsize=16)
     # plt.yticks([i for i in range(5,26,2)])
-    plt.title(get_title(dev, x, y, col, plane))
+    plt.title(get_title(title, x, y, col, plane))
     if saveFlag:
         plt.savefig(f"../plots/{filename}.pdf", dpi=300, facecolor="#ffffff", bbox_inches='tight')
     else:
@@ -84,16 +90,16 @@ def heat_map(x, y, plane, df, dev, filename, saveFlag, vmax=100):
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
-        print("Run with arguments <csv_path> <#blocks> <device_name> <save_1_0>")
+        print("Run with arguments <csv_path> <#blocks> <title> <save_1_0>")
         exit()
     data_path = sys.argv[1]
-    fname=Path('data_path').stem
+    fname=Path(data_path).stem
     print(f"{fname=}")
     try:
         nb = int(sys.argv[2])
     except ValueError:
         nb = None
-    dev = sys.argv[3]
+    title = sys.argv[3]
     saveFlag= sys.argv[4]
     print(f"ARGS:\n\t{data_path=}\n\t{nb=}\n\t{saveFlag}")
     df_3d = get3Ddata(data_path)
@@ -108,4 +114,4 @@ if __name__ == "__main__":
     print("nb:", sorted(df_3d['nb'].unique()))
     print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('n-exp', 'lr-ratio', nb, df_3d, dev,fname,saveFlag, vmax=30)
+    heat_map('n-exp', 'lr-ratio', nb, df_3d, title,fname,saveFlag, vmax=30)
