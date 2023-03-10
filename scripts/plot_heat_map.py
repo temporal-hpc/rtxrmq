@@ -3,6 +3,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+from pathlib import Path
+
 
 def get3Ddata(file):
     hc = pd.read_csv(file)
@@ -15,27 +17,36 @@ def get3Ddata(file):
 
 def get_label(col, ax):
     unit = f"2^{ax}"
+    #label = ""
+    #match col:
+    #    case 'n-exp':
+    #        label += "Array size"
+    #    case 'nb' :
+    #        label += "Number of blocks"
+    #    case 'lr-ratio' :
+    #        label += "Segment size fraction"
+    #return label + " " + unit
     label = ""
     match col:
         case 'n-exp':
-            label += "Array size"
+            label += f"Array size $n={unit}$"
         case 'nb' :
-            label += "Number of blocks"
+            label += f"Number of blocks $n_b={unit}$"
         case 'lr-ratio' :
-            label += "Segment size fraction"
-    return label + " " + unit
+            label += f"Query length = $n{unit}$"
+    return label
 
 def get_title(dev, x, y, col, plane):
-    ax_name = {'n-exp' : "N",
+    ax_name = {'n-exp' : "n",
                 'nb' : "#Blocks",
-                'lr-ratio' : "LR-frac"}
+                'lr-ratio' : "Query length"}
     if plane is None:
         return f"{dev}, {ax_name[y]} vs {ax_name[x]}"
     return f"{dev}, {ax_name[y]} vs {ax_name[x]}, {ax_name[col]}=2^{plane}"
 
 
 
-def heat_map(x, y, plane, df, dev, vmax=100):
+def heat_map(x, y, plane, df, dev, filename, saveFlag, vmax=100):
     col = ""
     for c in ['n-exp', 'nb', 'lr-ratio']:
         if c not in {x, y}:
@@ -50,8 +61,8 @@ def heat_map(x, y, plane, df, dev, vmax=100):
     pl = df_nb.pivot(values = 'mean_ns/q', index = y, columns = x)
 
     fig = plt.figure()
-    fig.set_figwidth(11)
-    fig.set_figheight(7)
+    fig.set_figwidth(6)
+    fig.set_figheight(4)
 
     minval = df_nb['mean_ns/q'].min()
     maxval = df_nb['mean_ns/q'].max()
@@ -61,23 +72,30 @@ def heat_map(x, y, plane, df, dev, vmax=100):
     plt.colorbar()
     plt.xlabel(get_label(x, 'x'))
     plt.ylabel(get_label(y, 'y'))
+    #plt.xticks(fontsize=16)
+    #plt.yticks(fontsize=16)
     # plt.yticks([i for i in range(5,26,2)])
     plt.title(get_title(dev, x, y, col, plane))
-    # plt.savefig(f"../plots/heat_map_3090Ti.pdf", dpi=300, facecolor="#ffffff", bbox_inches='tight')
-    plt.show()
+    if saveFlag:
+        plt.savefig(f"../plots/{filename}.pdf", dpi=300, facecolor="#ffffff", bbox_inches='tight')
+    else:
+        plt.show()
     plt.close()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Run with arguments <csv_path> <#blocks> <device_name>")
+    if len(sys.argv) != 5:
+        print("Run with arguments <csv_path> <#blocks> <device_name> <save_1_0>")
         exit()
     data_path = sys.argv[1]
+    fname=Path('data_path').stem
+    print(f"{fname=}")
     try:
         nb = int(sys.argv[2])
     except ValueError:
         nb = None
     dev = sys.argv[3]
-    print(f"ARGS:\n\t{data_path=}\n\t{nb=}")
+    saveFlag= sys.argv[4]
+    print(f"ARGS:\n\t{data_path=}\n\t{nb=}\n\t{saveFlag}")
     df_3d = get3Ddata(data_path)
     nmin = int(df_3d['n-exp'].min())
     nmax = int(df_3d['n-exp'].max())
@@ -90,4 +108,4 @@ if __name__ == "__main__":
     print("nb:", sorted(df_3d['nb'].unique()))
     print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('n-exp', 'lr-ratio', nb, df_3d, dev, vmax=30)
+    heat_map('n-exp', 'lr-ratio', nb, df_3d, dev,fname,saveFlag, vmax=30)
