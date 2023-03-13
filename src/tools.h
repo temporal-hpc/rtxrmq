@@ -108,11 +108,11 @@ CmdArgs get_args(int argc, char *argv[]) {
                 continue;
         switch (opt) {
             case ARG_BS:
-                args.bs = atoi(optarg);
+                args.bs = min(args.n, atoi(optarg));
                 args.nb = args.n / args.bs;
                 break;
             case ARG_NB:
-                args.nb = atoi(optarg);
+                args.nb = min(args.n, atoi(optarg));
                 args.bs = args.n / args.nb;
                 break;
             case ARG_REPS:
