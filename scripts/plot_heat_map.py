@@ -47,8 +47,8 @@ def get_title(title, x, y, col, plane):
                 'nb' : "#Blocks",
                 'lr-ratio' : "Query length"}
     if plane is None:
-        return f"Heat Map: {title}"
-    return f"Heat Map: {title}, {ax_name[col]}=2^{plane}"
+        return f"{title}"
+    return f"{title}, {ax_name[col]}=2^{plane}"
 
 
 

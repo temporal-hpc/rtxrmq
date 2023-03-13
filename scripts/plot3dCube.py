@@ -179,8 +179,8 @@ w.setWindowTitle(f'RTXRMQ Heat Cube: {title}')
 
 ## Bottom grid
 g = gl.GLGridItem(glOptions='opaque', color=(0,0,0,64))
-#g.translate(50,50,0)
-g.scale(20, 20, 1)
+g.translate(100,100,0)
+g.scale(10, 10, 1)
 g.setDepthValue(2)
 w.addItem(g)
 
@@ -195,17 +195,17 @@ w.addItem(v)
 def genText(pos, color, text):
     t = gl.GLTextItem()
     t.setData(pos=pos, color=color, text=text)
-    t.scale(10,10,10)
+    t.scale(100,100,100)
     return t
 #                  x, y, z
-w.addItem(genText((2, 0, 0), (255, 0, 0, 255), "# blocks"))
-w.addItem(genText((0, 2, 0), (0, 255, 0, 255), "n"))
-w.addItem(genText((0, 0, 2), (0, 0, 255, 255), "lr"))
+w.addItem(genText((2, 0, 0), (220, 99, 71, 255), "# blocks"))
+w.addItem(genText((0, 2, 0), (60, 150, 113, 255), "n"))
+w.addItem(genText((0, 0, 2), (63, 114, 157, 255), "lr"))
 
 
 ## Axis lines, not very visible
 ax = gl.GLAxisItem(glOptions='opaque')
-ax.setSize(x=10, y=10,z=10)
+ax.setSize(x=25,y=25,z=25)
 ax.scale(10,10,10)
 w.addItem(ax)
 
