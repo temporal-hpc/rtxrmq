@@ -191,5 +191,11 @@ int2* random_queries_par_cpu(int q, int lr, int n, int nt, int seed) {
     else if(lr == -3){
         fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.4));
     }
+    else if(lr == -4){
+        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)max(1,n/(1<<8)));
+    }
+    else if(lr == -5){
+        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)max(1,n/(1<<15)));
+    }
     return query;
 }

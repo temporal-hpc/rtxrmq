@@ -1,0 +1,68 @@
+if [ "$#" -ne 4 ]; then
+    echo "Run as"
+    printf "     ${0} <dev> <nt> <alg> <filename>\n"
+    printf "e.g: ${0}   0     8    5    RTX3090Ti\n"
+    printf "\nnote:\n"
+    printf "  - dev   : GPU device ID\n"
+    printf "  - nt    : number of CPU threads (relevant for CPU methods)\n"
+    printf "  - alg   : algorithm (check ./rtxrmq help message)\n"
+    exit
+fi
+dev=${1}
+nt=${2}
+alg=${3}
+name=${4}
+
+const_bs=15
+const_nb=9
+
+printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
+
+if [ "$alg" -ne 5 ]; then
+	for lr in {-1..-5}
+	do
+		if [ "$alg" -ne 3 ]; then
+			#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+			./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26      1   26       nb       0      ${lr}  ${name}
+		else
+			./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   24      1   26       nb       0      ${lr}  ${name}
+		fi
+	done
+else
+	# UNIFORM DISTRIBUTION (large values)
+	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   18     1   26       nb         0      -1   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      19   21     1   26       nb        14      -1   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      22   26     1   26       nb         7      -1   ${name}
+	# constant BS and NB
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       bs   ${const_bs}  -1   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       nb   ${const_nb}  -1   ${name}
+
+	# LOGNORMAL DISTRIBUTION (medium values)
+	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   20     1   26       nb         0      -2   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      21   26     1   26       nb         1      -2   ${name}
+	# constant BS and NB
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       bs   ${const_bs}  -2   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       nb   ${const_nb}  -2   ${name}
+
+	# LOGNORMAL DISTRIBUTION (small values)
+	# TODO
+	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1    9     1   26       nb         0      -3   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      10   16     1   26       nb         1      -3   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      17   20     1   26       nb         9      -3   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      21   26     1   26       nb        12      -3   ${name}
+	# constant BS and NB
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       bs   ${const_bs}  -3   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       nb   ${const_nb}  -3   ${name}
+
+
+	# LOGNORMAL V2
+	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26      1   26       nb        1      -4    ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26      1   26       nb       11      -5    ${name}
+	# constant BS and NB
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       bs   ${const_bs}  -4   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     1   26       nb   ${const_nb}  -5   ${name}
+fi
