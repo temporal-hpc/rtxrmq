@@ -15,6 +15,8 @@ name=${4}
 
 const_bs=15
 const_nb=9
+DATEBEGIN=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
+echo "START #DATE = ${DATEBEGIN}"
 
 printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
 
@@ -65,3 +67,6 @@ else
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       bs   ${const_bs}  -4   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       nb   ${const_nb}  -5   ${name}
 fi
+DATEEND=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
+printf "FULL BENCHMARK FINISHED: args dev=${dev} nt=${nt} alg=${alg} name=${name}\n"
+printf "\tBEGIN: ${DATEBEGIN}\n\tEND: ${DATEEND}\n\n"

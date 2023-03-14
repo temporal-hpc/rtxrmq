@@ -26,8 +26,8 @@ binary=./rtxrmq
 
 printf "args:\ndev=${dev} nt=${nt} alg=${alg} rea=${rea} reps=${reps} n=${n1}-${n2} q=${q1}-${q2} bsize=${bsize} lr=${lr}   outfile_path=${outfile_path}\n\n"
 [ ! -f ${outfile_path} ] && echo "dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction" > ${outfile_path}
-DATE=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
-echo "START #DATE = ${DATE}"
+DATEBEGIN=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
+echo "START #DATE = ${DATEBEGIN}"
 
 # change to bin directory
 cd ../build
@@ -41,7 +41,7 @@ do
             printf "\n\n\n\n\n\n\n\n"
             SEED=${RANDOM}
             printf "REALIZATION $R -> n=$((2**$n)) q=$((2**$q))\n"
-	    if [ "${bs_or_nb}" = "bs" ]; then 
+	    if [ "${bs_or_nb}" = "bs" ]; then
 		    printf "${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs $((2**${bsize})) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n"
 		    ${binary} $((2**$n)) $((2**$q)) ${lr} ${alg} --bs $((2**${bsize})) --reps $reps --nt $nt --dev $dev --save-time=${outfile_path} --seed ${SEED}\n
             else
@@ -53,5 +53,6 @@ do
 done
 # come back to scripts directory
 cd ../scripts
-DATE=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
-echo "FINISH #DATE = ${DATE}"
+DATEEND=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
+printf "perf-benchmark.sh FINISHED:\n"
+printf "\tBEGIN: ${DATEBEGIN}\n\tEND: ${DATEEND}\n\n"

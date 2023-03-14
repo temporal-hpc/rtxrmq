@@ -8,6 +8,7 @@ from pathlib import Path
 
 def get3Ddata(file):
     hc = pd.read_csv(file)
+    #hc = hc.groupby(['dev', 'alg','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
     hc = hc.groupby(['dev', 'alg','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
@@ -58,13 +59,16 @@ def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
         if c not in {x, y}:
             col = c
 
-    df_nb = df if plane is None else df[df[col] == plane]
+    #df_nb = df if plane is None else df[df[col] == plane]
+    df_nb = df.groupby(['n-exp', 'lr-ratio']).agg(np.min).reset_index();
+    print(df_nb)
 
     ax_ticks = {'n-exp' : sorted(df_nb['n-exp'].unique()),
-                'nb' : sorted(df_nb['nb'].unique()),
+                #'nb' : sorted(df_nb['nb'].unique()),
                 'lr-ratio' : sorted(df_nb['lr-ratio'].unique())}
 
     pl = df_nb.pivot(values = 'mean_ns/q', index = y, columns = x)
+    print(pl.shape)
 
     fig = plt.figure()
     fig.set_figwidth(6)
@@ -74,7 +78,9 @@ def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
     maxval = df_nb['mean_ns/q'].max()
     print(f"{minval=}   {maxval=}")
     #plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=.5, vmax=vmax))
+
     plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval))
+    #plt.imshow(pl)
     plt.colorbar()
     plt.xlabel(get_label(x, 'x'))
     plt.ylabel(get_label(y, 'y'))

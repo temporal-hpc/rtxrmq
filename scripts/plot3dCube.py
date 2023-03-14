@@ -117,19 +117,6 @@ cmap = matplotlib.cm.get_cmap('viridis')
 
 
 data = times
-## Color array
-d2 = np.empty(data.shape + (4,), dtype=np.ubyte)
-## Alpha
-# Option 1: Fixed alpha
-#d2[..., 3] = 4
-
-# Option 2: Data dependent
-strength = 30  # <-- Filters out lower values, a larger value is a more agressive filter
-
-# polinomio
-#d2[..., 3] = np.power(1 - data, strength) * (255.)
-d2[..., 3] = np.maximum(0.00,sigmoid(1 - data, s=sigmoid_s, k=sigmoid_k)) * alpha*(255.)
-
 ## Color values
 # Filter helps to distribute the color map values among the values that are shown
 # (with significant alpha)
@@ -140,6 +127,19 @@ for i in range(data.shape[1]):
     slice = data[:,i,:].copy()
     slice_normalized = (slice - np.min(slice)) / (np.max(slice) - np.min(slice))
     data[:, i, :,] = slice_normalized
+## Color array
+d2 = np.empty(data.shape + (4,), dtype=np.ubyte)
+## Alpha
+# Option 1: Fixed alpha
+#d2[..., 3] = 4
+
+# Option 2: Data dependent
+strength = 1  # <-- Filters out lower values, a larger value is a more agressive filter
+
+# polinomio
+#d2[..., 3] = np.power(1 - data, strength) * (255.)
+d2[..., 3] = np.maximum(0.00,sigmoid(1 - data, s=sigmoid_s, k=sigmoid_k)) * alpha*(255.)
+
 
 # Option 1: Scale
 d2[..., 0] = cmap(data)[...,0] * 255#0#255
@@ -171,7 +171,7 @@ pg.setConfigOption('background', (255,255,255,255))
 app = QtWidgets.QApplication([])
 w = gl.GLViewWidget()
 # Switch to 'nearly' orthographic projection.
-w.opts['distance'] = 2000
+w.opts['distance'] = 10000
 w.opts['fov'] = 1
 w.show()
 w.setWindowTitle(f'RTXRMQ Heat Cube: {title}')
@@ -180,7 +180,8 @@ w.setWindowTitle(f'RTXRMQ Heat Cube: {title}')
 ## Bottom grid
 g = gl.GLGridItem(glOptions='opaque', color=(0,0,0,64))
 g.translate(100,100,0)
-g.scale(10, 10, 1)
+g.scale(20, 20, 1)
+g.setSpacing(0.5,0.5,0)
 g.setDepthValue(2)
 w.addItem(g)
 
