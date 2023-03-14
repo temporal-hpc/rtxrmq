@@ -16,108 +16,52 @@ def get3Ddata(file):
     hc['mean_ns/q'] = hc['ns/q','mean']
     return hc
 
-def get_label(col, ax):
-    unit = f"2^{ax}"
-    #label = ""
-    #match col:
-    #    case 'n-exp':
-    #        label += "Array size"
-    #    case 'nb' :
-    #        label += "Number of blocks"
-    #    case 'lr-ratio' :
-    #        label += "Segment size fraction"
-    #return label + " " + unit
-    label = ""
-    match col:
-        case 'n-exp':
-            label += f"Array size $n={unit}$"
-        case 'nb' :
-            label += f"Number of blocks $n_b={unit}$"
-        case 'lr-ratio' :
-            label += f"Query length = $n{unit}$"
-    return label
 
-def get_title(title, x, y, col, plane):
-    #ax_name = {'n-exp' : "n",
-    #            'nb' : "#Blocks",
-    #            'lr-ratio' : "Query length"}
-    #if plane is None:
-    #    return f"{title}, {ax_name[y]} vs {ax_name[x]}"
-    #return f"{title}, {ax_name[y]} vs {ax_name[x]}, {ax_name[col]}=2^{plane}"
-    ax_name = {'n-exp' : "n",
-                'nb' : "#Blocks",
-                'lr-ratio' : "Query length"}
-    if plane is None:
-        return f"{title}"
-    return f"{title}, {ax_name[col]}=2^{plane}"
-
-
-
-def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
-    col = ""
-    for c in ['n-exp', 'nb', 'lr-ratio']:
-        if c not in {x, y}:
-            col = c
-
-    #df_nb = df if plane is None else df[df[col] == plane]
+def heat_map(x, y, df, title, filename, saveFlag, vmax=100):
     df_nb = df.groupby(['n-exp', 'lr-ratio']).agg(np.min).reset_index();
-    print(df_nb)
-
     ax_ticks = {'n-exp' : sorted(df_nb['n-exp'].unique()),
-                #'nb' : sorted(df_nb['nb'].unique()),
                 'lr-ratio' : sorted(df_nb['lr-ratio'].unique())}
 
     pl = df_nb.pivot(values = 'mean_ns/q', index = y, columns = x)
     print(pl.shape)
 
     fig = plt.figure()
-    fig.set_figwidth(6)
-    fig.set_figheight(4)
+    k=0.5
+    fig.set_figwidth(6*k)
+    fig.set_figheight(4*k)
 
     minval = df_nb['mean_ns/q'].min()
     maxval = df_nb['mean_ns/q'].max()
     print(f"{minval=}   {maxval=}")
-    #plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=.5, vmax=vmax))
-
-    plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval))
-    #plt.imshow(pl)
-    plt.colorbar()
-    plt.xlabel(get_label(x, 'x'))
-    plt.ylabel(get_label(y, 'y'))
-    #plt.xticks(fontsize=16)
-    #plt.yticks(fontsize=16)
+    plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval), rasterized=True)
+    #plt.colorbar()
+    plt.xlabel("Array Size $n=2^x$", fontsize=12)
+    plt.ylabel("Query length $=n2^y$", fontsize=12)
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
     # plt.yticks([i for i in range(5,26,2)])
-    plt.title(get_title(title, x, y, col, plane))
+    plt.title(f"{title}")
     if saveFlag:
-        plt.savefig(f"../plots/{filename}.pdf", dpi=300, facecolor="#ffffff", bbox_inches='tight')
+        plt.savefig(f"../plots/{filename}-best2D.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
     else:
         plt.show()
     plt.close()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print("Run with arguments <csv_path> <#blocks> <title> <save_1_0>")
+    if len(sys.argv) != 4:
+        print("Run with arguments <csv_path> <title> <save_1_0>")
         exit()
     data_path = sys.argv[1]
     fname=Path(data_path).stem
     print(f"{fname=}")
-    try:
-        nb = int(sys.argv[2])
-    except ValueError:
-        nb = None
-    title = sys.argv[3]
-    saveFlag= int(sys.argv[4])
-    print(f"ARGS:\n\t{data_path=}\n\t{nb=}\n\t{saveFlag}")
+    title = sys.argv[2]
+    saveFlag= int(sys.argv[3])
+    print(f"ARGS:\n\t{data_path=}\n\t{saveFlag}")
     df_3d = get3Ddata(data_path)
     nmin = int(df_3d['n-exp'].min())
     nmax = int(df_3d['n-exp'].max())
-    #print(f"{nmin=}  {nmax=}")
-    #if nexp > nmax or nexp < nmin:
-    #    print(f"Error:\n\t'n-exp' must be between the file's range: {nmin}..{nmax}\n")
-    #    exit()
 
     print("n:", sorted(df_3d['n-exp'].unique()))
-    print("nb:", sorted(df_3d['nb'].unique()))
     print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
-    heat_map('n-exp', 'lr-ratio', nb, df_3d, title,fname,saveFlag, vmax=30)
+    heat_map('n-exp', 'lr-ratio', df_3d, title,fname,saveFlag, vmax=30)

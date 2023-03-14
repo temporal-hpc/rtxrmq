@@ -67,19 +67,20 @@ def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
     pl = df_nb.pivot(values = 'mean_ns/q', index = y, columns = x)
 
     fig = plt.figure()
-    fig.set_figwidth(6)
-    fig.set_figheight(4)
+    k=0.5
+    fig.set_figwidth(6*k)
+    fig.set_figheight(4*k)
 
     minval = df_nb['mean_ns/q'].min()
     maxval = df_nb['mean_ns/q'].max()
     print(f"{minval=}   {maxval=}")
     #plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=.5, vmax=vmax))
-    plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval))
-    plt.colorbar()
-    plt.xlabel(get_label(x, 'x'))
-    plt.ylabel(get_label(y, 'y'))
-    #plt.xticks(fontsize=16)
-    #plt.yticks(fontsize=16)
+    plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval), rasterized=True)
+    #plt.colorbar()
+    plt.xlabel(get_label(x, 'x'), fontsize=12)
+    plt.ylabel(get_label(y, 'y'), fontsize=12)
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
     # plt.yticks([i for i in range(5,26,2)])
     plt.title(get_title(title, x, y, col, plane))
     if saveFlag:

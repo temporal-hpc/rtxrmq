@@ -14,9 +14,10 @@ python plot_heat_map.py ../csv-finales/hmap-RTX3090Ti-ALG5.csv 15 "RTXRMQ-B (RTX
 python plot_heat_map.py ../csv-finales/hmap-RTX3090Ti-ALG7.csv None "LCA-GPU (RTX 3090Ti)" 1
 
 # RTX 4090
-python plot_heat_map.py ../csv-finales/hmap-RTX4090-ALG3.csv None "RTXRMQ (RTX 4090)" 1
-python plot_heat_map.py ../csv-finales/hmap-RTX4090-ALG5.csv 15 "RTXRMQ-B (RTX 4090)" 1
-python plot_heat_map.py ../csv-finales/hmap-RTX4090-ALG7.csv None "LCA-GPU (RTX 4090)" 1
+python plot_heat_map.py ../csv-finales/hmap-RTX4090-ALG3.csv None "RTXRMQ" 1
+python plot_heat_map.py ../csv-finales/hmap-RTX4090-ALG5.csv 15 "RTXRMQ-B" 1
+python plot_heat_map.py ../csv-finales/hmap-RTX4090-ALG7.csv None "LCA-GPU" 1
+python plot_best_heatmap_from_3D.py ../csv-finales/hmap-RTX4090-ALG5.csv "RTXRMQ-B, Best Configuration" 1
 
 # A100
 python plot_heat_map.py ../csv-finales/hmap-A100-ALG3.csv None "RTXRMQ (A100)" 1
