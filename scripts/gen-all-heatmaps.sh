@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # HRMQ (CPU)
-python plot_heat_map.py ../csv-finales/hmap-THREADRIPPER-5975WX-ALG1.csv None "HRMQ-CPU (32-core 5975WX)" 1
+python plot_heat_map.py ../csv-finales/hmap-THREADRIPPER-5975WX-ALG1.csv None "HRMQ-CPU" 1
 
 # TITAN RTX
 python plot_heat_map.py ../csv-finales/hmap-TITANRTX-ALG3.csv None "RTXRMQ (TITAN RTX)" 1
