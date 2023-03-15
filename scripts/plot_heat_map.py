@@ -29,11 +29,11 @@ def get_label(col, ax):
     label = ""
     match col:
         case 'n-exp':
-            label += f"Array size $n={unit}$"
+            label += f"Array size ($n={unit}$)"
         case 'nb' :
-            label += f"Number of blocks $n_b={unit}$"
+            label += f"Number of blocks ($n_b={unit}$)"
         case 'lr-ratio' :
-            label += f"Query length = $n{unit}$"
+            label += f"Query length ($|q| = n{unit}$)"
     return label
 
 def get_title(title, x, y, col, plane):
@@ -79,8 +79,9 @@ def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
     #plt.colorbar()
     plt.xlabel(get_label(x, 'x'), fontsize=12)
     plt.ylabel(get_label(y, 'y'), fontsize=12)
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10)
+    plt.xticks(range(0,26,5), fontsize=10)
+    plt.xlim(0,27)
+    plt.yticks(range(0,-26,-5), fontsize=10)
     # plt.yticks([i for i in range(5,26,2)])
     plt.title(get_title(title, x, y, col, plane))
     if saveFlag:
