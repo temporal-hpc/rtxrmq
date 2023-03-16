@@ -65,6 +65,8 @@ else
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26      26   26       nb       11      -5    ${name}
 	# constant BS and NB
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       bs   ${const_bs}  -4   ${name}-constBS
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       bs   ${const_bs}  -5   ${name}-constBS
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       nb   ${const_nb}  -4   ${name}-constNB
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       nb   ${const_nb}  -5   ${name}-constNB
 fi
 DATEEND=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
