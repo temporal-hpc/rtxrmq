@@ -10,16 +10,20 @@ CONSTANT_NB = 9
 
 plot_dir = "../plots/"
 csv_dir = "../csv-finales/"
-files = ["perf-THREADRIPPER-5975WX-ALG1.csv",
-         "perf-RTX3090Ti-ALG3.csv",
-         "perf-RTX3090Ti-ALG5.csv",
-         "perf-RTX3090Ti-constBS-ALG5.csv",
-         "perf-RTX3090Ti-constNB-ALG5.csv"]
+def get_files(dev):
+    return [f"perf-THREADRIPPER-5975WX-ALG1.csv",
+            f"perf-{dev}-ALG3.csv",
+            f"perf-{dev}-ALG5.csv",
+            f"perf-{dev}-constBS-ALG5.csv",
+            f"perf-{dev}-constNB-ALG5.csv",
+            f"perf-{dev}-ALG7.csv"]
+
 labels = ["hrmq",
           "alg3",
           "alg5, best config",
           f"alg5, bs=2^{CONSTANT_BS}",
-          f"alg5, nb=2^{CONSTANT_NB}"]
+          f"alg5, nb=2^{CONSTANT_NB}",
+          "lca"]
 
 def get_data(file):
     hc = pd.read_csv(csv_dir + file)
@@ -72,11 +76,12 @@ if __name__ == "__main__":
         print("Run with arguments <save_1_0>")
         exit()
     saveFlag = int(sys.argv[1])
+    dev = "RTX3090Ti"
 
     df = []
-    for file in files:
+    for file in get_files(dev):
         df.append(get_data(file))
 
     for lr in range(-1,-6,-1):
-        plot_time(df, lr, "RTX3090Ti", saveFlag)
-        plot_speedup(df, lr, "RTX3090Ti", saveFlag)
+        plot_time(df, lr, dev, saveFlag)
+        plot_speedup(df, lr, dev, saveFlag)
