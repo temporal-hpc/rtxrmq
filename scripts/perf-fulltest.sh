@@ -53,7 +53,8 @@ else
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1    9     26   26       nb         0      -3   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      10   16     26   26       nb         1      -3   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      17   20     26   26       nb         9      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      21   26     26   26       nb        12      -3   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      21   24     26   26       nb        11      -3   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      25   26     26   26       nb        13      -3   ${name}
 	# constant BS and NB
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       bs   ${const_bs}  -3   ${name}-constBS
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       1   26     26   26       nb   ${const_nb}  -3   ${name}-constNB
