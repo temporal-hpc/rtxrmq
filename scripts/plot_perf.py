@@ -24,6 +24,8 @@ labels = ["hrmq",
           f"alg5, bs=2^{CONSTANT_BS}",
           f"alg5, nb=2^{CONSTANT_NB}",
           "lca"]
+line_color = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2',
+ '#7f7f7f', '#bcbd22', '#17becf']
 
 def get_data(file):
     hc = pd.read_csv(csv_dir + file)
@@ -37,7 +39,7 @@ def get_data(file):
 def plot_time(data_frame, lr, dev, saveFlag):
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
-        plt.plot(df['n-exp'], df['mean_ns/q'], label=labels[i])
+        plt.plot(df['n-exp'], df['mean_ns/q'], label=labels[i], color=line_color[i])
 
     plt.legend()
     plt.xlabel("Array size ($2^x$)")
@@ -57,7 +59,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
         df = df[df['lr'] == lr]
         df_array = np.array(df['mean_ns/q'])
         hrmq_array = np.array(hrmq['mean_ns/q'])[:df_array.size]
-        plt.plot(df['n-exp'], hrmq_array/df_array, label=labels[i])
+        plt.plot(df['n-exp'], hrmq_array/df_array, label=labels[i], color=line_color[i])
 
     plt.legend()
     plt.xlabel("Array size ($2^x$)")
