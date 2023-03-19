@@ -101,10 +101,12 @@ if __name__ == "__main__":
 
     #print("Files:", files)
     #print("Labels", labels)
+    print(f"Generating {metric} plots for {outName}.......",end="")
+    sys.stdout.flush()
 
     df = []
     for file in files:
-        print(f"Processing {file=}")
+        #print(f"Processing {file=}")
         df.append(get_data(file))
 
 
@@ -114,3 +116,4 @@ if __name__ == "__main__":
             plot_time(df, lr, outName, saveFlag)
         if metric=="speedup":
             plot_speedup(df, lr, outName, saveFlag)
+    print("done")
