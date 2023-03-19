@@ -10,7 +10,7 @@ CONSTANT_NB = 9
 
 plot_dir = "../plots/"
 csv_dir = "../csv-finales/"
-lrLabels = ["","Large Query Length (Uniform Dist)","Medium Query Length (LogNormal)", "Small Query Length (LogNormal)", "Medium Query Length (Fixed Fraction)", "Small Query Length (Fixed Fraction)"]
+lrLabels = ["","Large Range (Uniform)","Medium Range (LogNormal)", "Small Range (LogNormal)", "Medium Range (Fixed Fraction)", "Small Range (Fixed Fraction)"]
 linestyles=['dotted', 'solid', 'solid','dashed','dotted','dashed']
 colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
 
@@ -38,7 +38,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
     plt.yscale('log')
     plt.xlabel("Array size ($n=2^x$)",fontsize=12)
     plt.ylabel("Time [ms]",fontsize=12)
-    plt.title(f"{lrLabels[-lr]}")
+    plt.title(f"{dev}, {lrLabels[-lr]}")
 
     if saveFlag:
         plt.savefig(f"{plot_dir}time-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
@@ -67,7 +67,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     plt.legend(fontsize=6)
     plt.xlabel("Array size ($n=2^x$)",fontsize=12)
     plt.ylabel("Speedup",fontsize=12)
-    plt.title(f"{lrLabels[-lr]}")
+    plt.title(f"{dev}, {lrLabels[-lr]}")
 
     if saveFlag:
         plt.savefig(f"{plot_dir}speedup-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
