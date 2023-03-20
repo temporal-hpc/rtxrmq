@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ "$#" -ne 4 ]; then
     echo "Run as"
     printf "     ${0} <dev> <nt> <alg> <filename>\n"
