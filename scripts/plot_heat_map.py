@@ -33,7 +33,7 @@ def get_label(col, ax):
         case 'nb' :
             label += f"Number of blocks ($n_b={unit}$)"
         case 'lr-ratio' :
-            label += f"Query length ($|q| = n{unit}$)"
+            label += f"Query Range ($|q| = n{unit}$)"
     return label
 
 def get_title(title, x, y, col, plane):
@@ -45,7 +45,7 @@ def get_title(title, x, y, col, plane):
     #return f"{title}, {ax_name[y]} vs {ax_name[x]}, {ax_name[col]}=2^{plane}"
     ax_name = {'n-exp' : "n",
                 'nb' : "#Blocks",
-                'lr-ratio' : "Query length"}
+                'lr-ratio' : "Query Range"}
     if plane is None:
         return f"{title}"
     return f"{title}, {ax_name[col]}=2^{plane}"

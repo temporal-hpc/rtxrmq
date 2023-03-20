@@ -10,7 +10,7 @@ CONSTANT_NB = 9
 
 plot_dir = "../plots/"
 csv_dir = "../csv-finales/"
-lrLabels = ["","Large Range (Uniform)","Medium Range (LogNormal)", "Small Range (LogNormal)", "Medium Range (Fixed Fraction)", "Small Range (Fixed Fraction)"]
+lrLabels = ["","Large $(l,r)$ Range","Medium $(l,r)$ Range", "Small $(l,r)$ Range", "Medium $(l,r)$ Range", "Small $(l,r)$ Range"]
 linestyles=['dotted', 'solid', 'solid','dashed','dotted','dashed']
 colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
 
@@ -25,7 +25,7 @@ def get_data(file):
 
 def plot_time(data_frame, lr, dev, saveFlag):
     # common plot settings
-    k=0.7
+    k=0.5
     plt.figure(figsize=(6*k,4*k))
     plt.xticks(range(0,26,5), fontsize=10)
     plt.xlim(0,27)
@@ -48,7 +48,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
 
 def plot_speedup(data_frame, lr, dev, saveFlag):
     # common plot settings
-    k=0.7
+    k=0.5
     plt.figure(figsize=(6*k,4*k))
     plt.xticks(range(0,26,5), fontsize=10)
     plt.xlim(0,27)
