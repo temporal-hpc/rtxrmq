@@ -178,10 +178,12 @@ float3* gen_vertices_blocks_dev(int N, int bs, float *darray){
     kernel_min_blocks<<<grid_mins, block>>>(min_blocks, darray, num_blocks, N, bs);
     CUDA_CHECK( cudaDeviceSynchronize() );
     //print_darray<<<1,1>>>(min_blocks, num_blocks);
+        printf("inside gen bl 2\n");
 
     // vertices data
     float3 *devVertices;
     cudaMalloc(&devVertices, sizeof(float3)*3*ntris);
+        printf("inside gen bl 3\n");
 
     // setup states
     dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 

@@ -21,9 +21,10 @@
 #define ALG_GPU_RTX_TRANS   4
 #define ALG_GPU_RTX_BLOCKS  5
 #define ALG_GPU_RTX_LUP     6
+#define ALG_GPU_RTX_IAS     8
 
 // TODO add other state-of-the-art GPU rmq algs
-const char *algStr[7] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks", "[GPU] RTX_lup"}; 
+const char *algStr[9] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks", "[GPU] RTX_lup", "[GPU] LCA", "[GPU] RTX_ias"}; 
 
 
 #include "common/common.h"

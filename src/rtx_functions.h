@@ -1,4 +1,7 @@
 #pragma once
+
+//#define DEBUG
+
 template <typename IntegerType>
 __device__ __host__ IntegerType roundUp(IntegerType x, IntegerType y) {
   return ((x + y - 1) / y) * y;
@@ -30,12 +33,14 @@ struct GASstate {
   size_t temp_buffer_size = 0;
   CUdeviceptr d_temp_buffer = 0;
   CUdeviceptr d_temp_vertices = 0;
-  //CUdeviceptr d_instances = 0;
+  CUdeviceptr d_instances = 0;
 
   unsigned int triangle_flags = OPTIX_GEOMETRY_FLAG_NONE;
 
   OptixBuildInput triangle_input = {};
+  OptixBuildInput ias_instance_input = {};
   OptixTraversableHandle gas_handle;
+  OptixTraversableHandle* handles;
   CUdeviceptr d_gas_output_buffer;
   size_t gas_output_buffer_size = 0;
 
@@ -55,8 +60,12 @@ void createOptixContext(GASstate &state) {
 
   OptixDeviceContextOptions options = {};
   options.logCallbackFunction = &optixLogCallback;
-  //options.logCallbackLevel = 4;
+#ifdef DEBUG
+  options.logCallbackLevel = 4;
+  options.validationMode = OPTIX_DEVICE_CONTEXT_VALIDATION_MODE_ALL;
+#else
   options.logCallbackLevel = 1;
+#endif 
 
   OptixDeviceContext optix_context = nullptr;
   optixDeviceContextCreate(0, // use current CUDA context
@@ -71,12 +80,17 @@ void loadAppModule(GASstate &state) {
 
   OptixModuleCompileOptions module_compile_options = {};
   module_compile_options.maxRegisterCount = OPTIX_COMPILE_DEFAULT_MAX_REGISTER_COUNT;
+#ifdef DEBUG
+  module_compile_options.optLevel = OPTIX_COMPILE_OPTIMIZATION_LEVEL_0;
+  module_compile_options.debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_FULL;
+#else
   module_compile_options.optLevel = OPTIX_COMPILE_OPTIMIZATION_DEFAULT;
-  //module_compile_options.debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_MODERATE;
   module_compile_options.debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_NONE;
+#endif
 
   state.pipeline_compile_options.usesMotionBlur = false;
   state.pipeline_compile_options.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
+  //state.pipeline_compile_options.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_ANY;
   state.pipeline_compile_options.numPayloadValues = 1;
   state.pipeline_compile_options.numAttributeValues = 2; // 2 is the minimum
   state.pipeline_compile_options.exceptionFlags = OPTIX_EXCEPTION_FLAG_NONE;
@@ -165,7 +179,9 @@ void createGroupsClosestHit_LUP(GASstate &state) {
 void createPipeline(GASstate &state) {
   OptixPipelineLinkOptions pipeline_link_options = {};
   pipeline_link_options.maxTraceDepth = 1;
+#ifdef DEBUG
   pipeline_link_options.debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_FULL;
+#endif
   OPTIX_CHECK(optixPipelineCreate(state.context, &state.pipeline_compile_options, &pipeline_link_options, state.program_groups, 3, nullptr, nullptr, &state.pipeline));
 }
 
@@ -355,6 +371,136 @@ void buildASFromDeviceData(GASstate &state, int nverts, int ntris, float3 *devVe
     state.gas_output_buffer_size = gas_buffer_sizes.outputSizeInBytes;
   //}
   //CUDA_CHECK(cudaFree(d_vertices));
+}
+
+void buildBlockGeometry(GASstate &state, int idx, int begin, int ntris, float3 *devVertices, uint3 *devTriangles) {
+  OptixAccelBuildOptions accel_options = {};
+  //accel_options.buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION | OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
+  state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE;
+  accel_options.buildFlags = state.gas_build_options;
+  accel_options.operation = OPTIX_BUILD_OPERATION_BUILD;
+
+  OptixBuildInput triangle_input = {};
+  triangle_input.type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
+  triangle_input.triangleArray.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
+  triangle_input.triangleArray.numVertices = static_cast<unsigned int>(ntris * 3);
+  //triangle_input.triangleArray.vertexBuffers = reinterpret_cast<CUdeviceptr>(devVertices + begin*3); // TODO check if this works
+  triangle_input.triangleArray.vertexBuffers = reinterpret_cast<CUdeviceptr*>(devVertices + begin*3); // TODO check if this works
+  triangle_input.triangleArray.flags = &state.triangle_flags;
+  triangle_input.triangleArray.numSbtRecords = 1;
+  triangle_input.triangleArray.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
+  triangle_input.triangleArray.numIndexTriplets = static_cast<unsigned int>(ntris);
+  triangle_input.triangleArray.indexBuffer = reinterpret_cast<CUdeviceptr>(devTriangles + begin); // TODO check if this works
+
+        printf("here 1\n"); fflush(stdout);
+  OptixAccelBufferSizes gas_buffer_sizes;
+  OPTIX_CHECK( optixAccelComputeMemoryUsage(state.context, &accel_options, &triangle_input, 1, &gas_buffer_sizes) );
+
+        printf("here 2\n"); fflush(stdout);
+
+  CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&state.d_temp_buffer), gas_buffer_sizes.tempSizeInBytes) );
+        printf("here 3\n"); fflush(stdout);
+
+  // non-compact output
+  CUdeviceptr d_buffer_temp_output_gas_and_compacted_size;
+  size_t compactedSizeOffset = roundUp<size_t>(gas_buffer_sizes.outputSizeInBytes, 8ull);
+  CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&d_buffer_temp_output_gas_and_compacted_size), compactedSizeOffset + 8) );
+
+  OptixAccelEmitDesc emitProperty = {};
+  //emitProperty.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
+  emitProperty.type = OPTIX_PROPERTY_TYPE_AABBS;
+  emitProperty.result = (CUdeviceptr)((char *)d_buffer_temp_output_gas_and_compacted_size + compactedSizeOffset);
+
+  OPTIX_CHECK( optixAccelBuild(
+        state.context,
+        0, 
+        &accel_options, 
+        &triangle_input,
+        1,
+        state.d_temp_buffer,
+        gas_buffer_sizes.tempSizeInBytes,
+	    d_buffer_temp_output_gas_and_compacted_size,
+	    gas_buffer_sizes.outputSizeInBytes,
+        state.handles + idx,
+        &emitProperty, 1) 
+  );  
+}
+
+void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles, int bs, int nb) {
+
+  state.handles = (OptixTraversableHandle*)malloc(sizeof(OptixTraversableHandle)*(nb+1));
+
+  // geometry for minimums per block
+  buildBlockGeometry(state, 0, 0, nb, devVertices, devTriangles);
+
+  // geomtery for each block
+  for (int i = 1; i < nb; ++i)
+    buildBlockGeometry(state, i, nb+bs*(i-1), bs, devVertices, devTriangles);
+
+  // geometry for last block
+  int idx_last = nb + bs*(nb-1);
+  buildBlockGeometry(state, nb, idx_last, ntris-idx_last, devVertices, devTriangles);
+
+  // IAS
+  OptixInstance instance = { { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0 } };
+
+  OptixInstance* instances = (OptixInstance*)malloc(sizeof(OptixInstance)*(nb+1));
+  for (int i = 0; i <= nb; ++i) {
+    instances[i].instanceId = i;
+    instances[i].sbtOffset = 0; // maybe = i?
+    instances[i].visibilityMask = 255;
+    instances[i].flags = OPTIX_INSTANCE_FLAG_DISABLE_ANYHIT;
+    instances[i].traversableHandle = state.handles[i];
+    memcpy(instances[i].transform, instance.transform, sizeof(float) * 12);
+
+  }
+  size_t instances_size_in_bytes = sizeof( OptixInstance ) * (nb+1);
+  CUDA_CHECK( cudaMalloc( ( void** )&state.d_instances, instances_size_in_bytes ) );
+  CUDA_CHECK( cudaMemcpy( ( void* )state.d_instances, instances, instances_size_in_bytes, cudaMemcpyHostToDevice ) );
+
+  state.ias_instance_input.type = OPTIX_BUILD_INPUT_TYPE_INSTANCES;
+  state.ias_instance_input.instanceArray.instances = state.d_instances;
+  state.ias_instance_input.instanceArray.numInstances = nb+1;
+
+  OptixAccelBuildOptions ias_accel_options = {};
+  ias_accel_options.buildFlags = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE;
+  ias_accel_options.motionOptions.numKeys = 1;
+  ias_accel_options.operation = OPTIX_BUILD_OPERATION_BUILD;
+
+  OptixAccelBufferSizes ias_buffer_sizes;
+  OPTIX_CHECK( optixAccelComputeMemoryUsage( state.context, &ias_accel_options, &state.ias_instance_input, 1, &ias_buffer_sizes ) );
+
+  // non-compacted output
+  CUdeviceptr d_buffer_temp_output_ias_and_compacted_size;
+  size_t compactedSizeOffset = roundUp<size_t>( ias_buffer_sizes.outputSizeInBytes, 8ull );
+  CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>( &d_buffer_temp_output_ias_and_compacted_size ), compactedSizeOffset + 8 ) );
+ 
+  CUdeviceptr d_ias_temp_buffer;
+  bool needIASTempBuffer = ias_buffer_sizes.tempSizeInBytes > state.temp_buffer_size;
+  if( needIASTempBuffer )
+  {
+    CUDA_CHECK( cudaMalloc( (void**)&d_ias_temp_buffer, ias_buffer_sizes.tempSizeInBytes ) );
+  }
+  else
+  {
+    d_ias_temp_buffer = state.d_temp_buffer;
+  }
+
+  OptixAccelEmitDesc emitProperty = {};
+  emitProperty.type = OPTIX_PROPERTY_TYPE_AABBS;
+  emitProperty.result = ( CUdeviceptr )( (char*)d_buffer_temp_output_ias_and_compacted_size + compactedSizeOffset );
+
+  OPTIX_CHECK( optixAccelBuild( state.context, 0, &ias_accel_options, &state.ias_instance_input, 1, d_ias_temp_buffer,
+        ias_buffer_sizes.tempSizeInBytes, d_buffer_temp_output_ias_and_compacted_size,
+        ias_buffer_sizes.outputSizeInBytes, &state.gas_handle, &emitProperty, 1 ) );
+
+  if( needIASTempBuffer )
+  {
+    CUDA_CHECK( cudaFree( (void*)d_ias_temp_buffer ) );
+  }
+
+  //state.d_ias_output_buffer = d_buffer_temp_output_ias_and_compacted_size;
+  //state.ias_output_buffer_size = ias_buffer_sizes.outputSizeInBytes;
 }
 
 void updateASFromDevice(GASstate &state) {

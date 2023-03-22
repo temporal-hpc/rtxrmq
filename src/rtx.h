@@ -13,13 +13,14 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     float3 *devVertices;
     int orig_n;
     float *LUP = nullptr;
-    if (alg == ALG_GPU_RTX_BLOCKS) {
-        devVertices = gen_vertices_blocks_dev(n, bs, darray); // TODO implement
-        int num_blocks = (n+bs-1) / bs;
+    int num_blocks;
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS) {
+        devVertices = gen_vertices_blocks_dev(n, bs, darray);
+        num_blocks = (n+bs-1) / bs;
         orig_n = n;
         n += num_blocks;
     } else if (alg == ALG_GPU_RTX_LUP) {
-        devVertices = gen_vertices_lup_dev(n, bs, darray, LUP); // TODO implement
+        devVertices = gen_vertices_lup_dev(n, bs, darray, LUP);
     } else {
         devVertices = gen_vertices_dev(alg, n, darray);
     }
@@ -50,7 +51,10 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     // 3) Build Acceleration Structure 
     printf("%sBuild AS on GPU...........................", AC_MAGENTA); fflush(stdout);
     timer.restart();
-    buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
+    if (alg == ALG_GPU_RTX_IAS)
+        buildIAS(state, 3*n, n, devVertices, devTriangles, bs, num_blocks);
+    else
+        buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
     cudaDeviceSynchronize();
     timer.stop();
     float AS_time = timer.get_elapsed_ms();
@@ -70,13 +74,12 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     if (alg == ALG_GPU_RTX_BLOCKS) {
         params.query = nullptr;
         params.iquery = dquery;
-        int num_blocks = (orig_n + bs - 1) / bs;
         params.num_blocks = ceil(sqrt(num_blocks + 1));
         params.block_size = bs;
     } else if (alg == ALG_GPU_RTX_LUP) {
         params.query = nullptr;
         params.iquery = dquery;
-        int num_blocks = (n + bs - 1) / bs;
+        num_blocks = (n + bs - 1) / bs;
         params.num_blocks = ceil(sqrt(num_blocks));
         params.nb = num_blocks;
         params.block_size = bs;
