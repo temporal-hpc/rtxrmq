@@ -35,3 +35,21 @@ python plot_perf.py speedup 1 RTX4090 ../csv-finales/perf-TRPRO-5975WX-ALG1.csv 
                                  ../csv-finales/perf-RTX4090-constNB-ALG5.csv 'RTXRMQ-B ($B=2^9$)'\
                                  ../csv-finales/perf-RTX4090-ALG7.csv 'LCA-GPU'
 printf "\n"
+
+
+# A100
+echo "A100 Plots"
+python plot_perf.py time 1 A100 ../csv-finales/perf-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+                                 ../csv-finales/perf-A100-ALG3.csv 'RTXRMQ'\
+                                 ../csv-finales/perf-A100-ALG5.csv 'RTXRMQ-B (optimal)'\
+                                 ../csv-finales/perf-A100-constBS-ALG5.csv 'RTXRMQ-B ($n_b=2^{15}$)'\
+                                 ../csv-finales/perf-A100-constNB-ALG5.csv 'RTXRMQ-B ($B=2^9$)'\
+                                 ../csv-finales/perf-A100-ALG7.csv 'LCA-GPU'
+
+python plot_perf.py speedup 1 A100 ../csv-finales/perf-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+                                 ../csv-finales/perf-A100-ALG3.csv 'RTXRMQ'\
+                                 ../csv-finales/perf-A100-ALG5.csv 'RTXRMQ-B (optimal)'\
+                                 ../csv-finales/perf-A100-constBS-ALG5.csv 'RTXRMQ-B ($n_b=2^{15}$)'\
+                                 ../csv-finales/perf-A100-constNB-ALG5.csv 'RTXRMQ-B ($B=2^9$)'\
+                                 ../csv-finales/perf-A100-ALG7.csv 'LCA-GPU'
+printf "\n"
