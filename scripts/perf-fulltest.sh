@@ -22,7 +22,7 @@ echo "START #DATE = ${DATEBEGIN}"
 printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
 
 if [ "$alg" -ne 5 ]; then
-	for lr in {-1..-5}
+	for lr in {-1..-3}
 	do
 		if [ "$alg" -ne 3 ]; then
 			#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
@@ -45,12 +45,12 @@ else
 
 
 
-	# LOGNORMAL DISTRIBUTION (medium values)
+	# LOGNORMAL DISTRIBUTION (medium values) EXP 0.6
 	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   22     26   26       nb         0      -2   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      23   24     26   26       nb         1      -2   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      25   25     26   26       nb         1      -2   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      26   26     26   26       nb         8      -2   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      26   26     26   26       nb         9      -2   ${name}
 	# constant BS and NB
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -2   ${name}-constBS
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -2   ${name}-constNB
@@ -58,7 +58,7 @@ else
 
 
 
-	# LOGNORMAL DISTRIBUTION (small values)
+	# LOGNORMAL DISTRIBUTION (small values) EXP 0.3
 	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0    9     26   26       nb         0      -3   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      10   19     26   26       nb         1      -3   ${name}
