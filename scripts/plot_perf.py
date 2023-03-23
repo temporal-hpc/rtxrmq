@@ -110,9 +110,10 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
         hrmq_array = np.array(hrmq['mean_ns/q'])[:df_array.size]
         #print(f"{df_array.shape=} {labels[i]=}  {hrmq_array.shape=}")
         plt.plot(df['n-exp'], hrmq_array/df_array, label=labels[i], linestyle=linestyles[i], color=colors[i])
-    
+
 
     plt.legend(fontsize=6)
+    plt.yscale('log')
 
     if saveFlag:
         plt.savefig(f"{plot_dir}speedup-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')

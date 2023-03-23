@@ -171,7 +171,7 @@ void fill_queries_lognormal(int2 *query, int q, int lr, int n, int nt, int seed,
             int l = lrand(gen);
             query[i].x = l;
             query[i].y = l + (qsize - 1);
-            //printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
+            printf("qsize=%i (l,r) -> (%i, %i)\n\n", qsize, query[i].x, query[i].y);
         }
     }
 }
@@ -186,10 +186,10 @@ int2* random_queries_par_cpu(int q, int lr, int n, int nt, int seed) {
         fill_queries_uniform(query, q, lr, n, nt, seed);
     }
     else if(lr == -2){
-        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.7));
+        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.6));
     }
     else if(lr == -3){
-        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.4));
+        fill_queries_lognormal(query, q, lr, n, nt, seed, (int)pow((double)n,0.3));
     }
     else if(lr == -4){
         fill_queries_lognormal(query, q, lr, n, nt, seed, (int)max(1,n/(1<<8)));
