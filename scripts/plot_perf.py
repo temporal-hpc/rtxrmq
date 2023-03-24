@@ -113,7 +113,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
 
 
     plt.legend(fontsize=6)
-    plt.yscale('log')
+    #plt.yscale('log')
 
     if saveFlag:
         plt.savefig(f"{plot_dir}speedup-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
 
     # generate plots
-    for lr in range(-1,-6,-1):
+    for lr in range(-1,-4,-1):
         if metric=="time":
             plot_time(df, lr, outName, saveFlag)
         if metric=="speedup":
