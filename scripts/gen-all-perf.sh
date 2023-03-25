@@ -1,6 +1,27 @@
 #!/bin/bash
 CSVPATH=../csv-to-plot
 
+# TITAN RTX
+echo "TITAN RTX Plots"
+python plot_perf.py time 1 TITANRTX ${CSVPATH}/perf-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+                                 ${CSVPATH}/perf-TITANRTX-ALG3.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perf-TITANRTX-ALG5.csv 'RTXRMQ-B (optimal)'\
+                                 ${CSVPATH}/perf-TITANRTX-constBS-ALG5.csv 'RTXRMQ-B ($n_b=2^{9}$)'\
+                                 ${CSVPATH}/perf-TITANRTX-constNB-ALG5.csv 'RTXRMQ-B ($B=2^{15}$)'\
+                                 ${CSVPATH}/perf-TITANRTX-ALG7.csv 'LCA-GPU'
+
+python plot_perf.py speedup 1 TITANRTX ${CSVPATH}/perf-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+                                 ${CSVPATH}/perf-TITANRTX-ALG3.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perf-TITANRTX-ALG5.csv 'RTXRMQ-B (optimal)'\
+                                 ${CSVPATH}/perf-TITANRTX-constNB-ALG5.csv 'RTXRMQ-B ($n_b=2^{9}$)'\
+                                 ${CSVPATH}/perf-TITANRTX-constBS-ALG5.csv 'RTXRMQ-B ($B=2^{15}$)'\
+                                 ${CSVPATH}/perf-TITANRTX-ALG7.csv 'LCA-GPU'
+printf "\n"
+
+
+
+
+
 # RTX 3090Ti
 echo "RTX3090Ti Plots"
 python plot_perf.py time 1 RTX3090Ti ${CSVPATH}/perf-TRPRO-5975WX-ALG1.csv 'HRMQ'\
