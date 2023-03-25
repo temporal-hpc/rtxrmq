@@ -35,7 +35,8 @@ else
 	# UNIFORM DISTRIBUTION (large values)
 	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   12     26   26       nb         0      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      13   16     26   26       nb         9      -1   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      13   13     26   26       nb        13      -1   ${name}
+	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      14   16     26   26       nb         9      -1   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      17   17     26   26       nb        10      -1   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      18   18     26   26       nb        12      -1   ${name}
 	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      19   21     26   26       nb        14      -1   ${name}
