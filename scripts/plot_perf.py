@@ -29,14 +29,13 @@ CONSTANT_BS = 15
 CONSTANT_NB = 9
 SIZE_MULT = 1.3
 plot_dir = "../plots/"
-csv_dir = "../csv-finales/"
 lrLabels = ["","Large $(l,r)$ Range","Medium $(l,r)$ Range", "Small $(l,r)$ Range", "Medium $(l,r)$ Range", "Small $(l,r)$ Range"]
 linestyles=[ls['densely dotted'], ls['densely dashed'], ls['solid'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
 colors=[ "#EC0B43", "darkslategrey"  , "#0099ff", "#763b82", "#44AF69","#ECA400"]
 
 def get_data(file):
-    hc = pd.read_csv(csv_dir + file)
+    hc = pd.read_csv(file)
     hc = hc.groupby(['dev', 'alg','n','bs','q','lr']).agg([np.mean, np.std]).reset_index();
     hc['n-exp'] = np.log2(hc['n'])
     hc['nb'] = np.log2(hc['n'] / hc['bs'])
