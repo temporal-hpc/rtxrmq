@@ -64,14 +64,14 @@ def plot_time(data_frame, lr, dev, saveFlag):
 
     ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
 
-    plt.ylabel("$\frac{ns}{q}$",fontsize=12)
+    plt.ylabel("$\\frac{ns}{q}$",fontsize=12, rotation=0)
 
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
         plt.plot(df['n-exp'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i])
 
     plt.legend(fontsize=6)
-    #plt.yscale('log')
+    plt.yscale('log')
 
     if saveFlag:
         plt.savefig(f"{plot_dir}time-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
