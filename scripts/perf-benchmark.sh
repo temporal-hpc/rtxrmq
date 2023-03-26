@@ -2,8 +2,8 @@
 printf "ARGS ${#}\n"
 if [ "$#" -ne 15 ]; then
     echo "Run as"
-    printf "    ${0} <dev> <nt> <alg> <rea> <reps>  <n1>         <n2>        <dn>       <q1>        <q2>    <dq> <bs|nb> <block> <lr> <name>\n\n"
-    printf "e.g ${0}  0     8     5     8     10  \$((10**6)) \$((10**8))  \$((10**6)) \$((2**26)) \$((2**26))   100    bs     15    -1  RTX3090Ti\n"
+    printf "    ${0} <dev> <nt> <alg> <rea> <reps>  <n1>         <n2>        <dn>       <q1>        <q2>         <dq>   <bs|nb> <block>     <lr> <name>\n\n"
+    printf "e.g ${0}  0     8     5     8     10  \$((10**6)) \$((10**8))  \$((10**6)) \$((2**26)) \$((2**26))   100      bs    \$((2**15))  -1  RTX3090Ti\n"
     printf "\nnote:\n"
     printf "  - the *.csv extension will be placed automatically\n"
     printf "  - prefix (perf) and suffix (alg) will be added to filename\n\n"
