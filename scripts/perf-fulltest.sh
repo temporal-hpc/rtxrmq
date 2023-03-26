@@ -16,88 +16,62 @@ name=${4}
 
 const_bs=15
 const_nb=9
+N1=$((10**6))
+N2=$((10**8))
+N2A3=$((16*(10**6)))
+DN=$((10**6))
+
+Q1=$((2**26))
+Q2=$((2**26))
+DQ=$((100))
+
 DATEBEGIN=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 echo "START #DATE = ${DATEBEGIN}"
 
-printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
+printf "args dev=${dev} nt=${nt} alg=${alg} name=${name}, N1=${N1}, N2=${N2}, N2A3=${N2A3}, DN=${DN}, Q1=${Q1}, Q2=${Q2}, DQ=${DQ}\n\n"
 
 if [ "$alg" -ne 5 ]; then
 	for lr in {-1..-3}
 	do
 		if [ "$alg" -ne 3 ]; then
-			#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-			./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb       0      ${lr}  ${name}
+			#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>  <n1>   <n2>   <dn>      <q1>  <q2>   <dq> <bs|nb> <block> <lr>   <name>
+			./perf-benchmark.sh     ${dev} ${nt} ${alg}  8     8    ${N1} ${N2}   ${DN}       ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
 		else
-			./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   24      26   26       nb       0      ${lr}  ${name}
+			./perf-benchmark.sh     ${dev} ${nt} ${alg}  8     8    ${N1} ${N2A3} ${DN}       ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
 		fi
 	done
 else
-	# UNIFORM DISTRIBUTION (large values)
-	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   12     26   26       nb         0      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      13   13     26   26       nb        13      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      14   16     26   26       nb         9      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      17   17     26   26       nb        10      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      18   18     26   26       nb        12      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      19   21     26   26       nb        14      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      22   24     26   26       nb         9      -1   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      25   26     26   26       nb         8      -1   ${name}
+	# LR=-1  UNIFORM DISTRIBUTION (large values)
+	#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>       <n1>         <n2>          <dn>    <q1>   <q2>   <dq>   <bs|nb> <block>  <lr>   <name>
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 1*${N1}))  $(( 3*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      14     -1   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 4*${N1}))  $((33*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb       9     -1   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((34*${N1}))  $((67*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb       8     -1   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((68*${N1})) $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb       8     -1   ${name}
 	# constant BS and NB
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -1   ${name}-constBS
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -1   ${name}-constNB
+	./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8          ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     bs   ${const_bs}  -1   ${name}-constBS
+	./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8          ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     nb   ${const_nb}  -1   ${name}-constNB
 
-
-
-
-
-	# LOGNORMAL DISTRIBUTION (medium values) EXP 0.6
-	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   20     26   26       nb         0      -2   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      21   25     26   26       nb         1      -2   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      26   26     26   26       nb         9      -2   ${name}
+	# LR=-2  LOGNORMAL DISTRIBUTION (medium values)
+	#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>       <n1>         <n2>          <dn>    <q1>   <q2>   <dq>   <bs|nb> <block>  <lr>   <name>
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 1*${N1}))  $(( 3*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb       1     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 4*${N1}))  $((33*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb       1     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((34*${N1}))  $((67*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb       1     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((68*${N1})) $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb       9     -2   ${name}
 	# constant BS and NB
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -2   ${name}-constBS
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -2   ${name}-constNB
+	./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8          ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     bs   ${const_bs}  -1   ${name}-constBS
+	./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8          ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     nb   ${const_nb}  -1   ${name}-constNB
 
-
-
-
-	# LOGNORMAL DISTRIBUTION (small values) EXP 0.3
-	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0    9     26   26       nb         0      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      10   11     26   26       nb         1      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      12   12     26   26       nb         7      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      13   13     26   26       nb         7      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      14   14     26   26       nb         8      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      15   15     26   26       nb         9      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      16   18     26   26       nb        10      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      19   20     26   26       nb        11      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      21   21     26   26       nb        12      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      22   24     26   26       nb        13      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      25   25     26   26       nb        14      -3   ${name}
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      26   26     26   26       nb        13      -3   ${name}
+	# LR=-3  LOGNORMAL DISTRIBUTION (small values)
+	#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>       <n1>         <n2>          <dn>    <q1>   <q2>   <dq>   <bs|nb> <block>  <lr>   <name>
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 1*${N1}))  $(( 1*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      11     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 2*${N1}))  $(( 2*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      12     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 4*${N1}))  $((33*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      13     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((34*${N1}))  $((67*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      14     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((68*${N1})) $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      16     -2   ${name}
 	# constant BS and NB
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -3   ${name}-constBS
-	./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -3   ${name}-constNB
+	./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8          ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     bs   ${const_bs}  -1   ${name}-constBS
+	./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8          ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     nb   ${const_nb}  -1   ${name}-constNB
 
-
-
-
-
-	# LOGNORMAL V2
-	#./perf-benchmark.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   24      26   26       nb        1      -4    ${name}
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      25   26      26   26       nb        7      -4    ${name}
-
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0    9      26   26       nb        0      -5    ${name}
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      10   19      26   26       nb       11      -5    ${name}
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      20   24      26   26       nb       11      -5    ${name}
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32      25   26      26   26       nb       13      -5    ${name}
-	## constant BS and NB
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -4   ${name}-constBS
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -5   ${name}-constBS
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -4   ${name}-constNB
-	#./perf-benchmark.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -5   ${name}-constNB
 fi
 DATEEND=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 printf "FULL BENCHMARK FINISHED: args dev=${dev} nt=${nt} alg=${alg} name=${name}\n"
