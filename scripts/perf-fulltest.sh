@@ -64,7 +64,7 @@ else
 	# LR=-3  LOGNORMAL DISTRIBUTION (small values)
 	#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>       <n1>         <n2>          <dn>    <q1>   <q2>   <dq>   <bs|nb> <block>  <lr>   <name>
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 1*${N1}))  $(( 1*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      11     -2   ${name}
-    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 2*${N1}))  $(( 2*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      12     -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 3*${N1}))  $(( 2*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      12     -2   ${name}
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $(( 4*${N1}))  $((33*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      13     -2   ${name}
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((34*${N1}))  $((67*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      14     -2   ${name}
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  8     8      $((68*${N1})) $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb      16     -2   ${name}
