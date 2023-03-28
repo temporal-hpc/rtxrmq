@@ -1,6 +1,11 @@
 #pragma once
 
-//#define DEBUG
+#define DEBUG
+#ifdef DEBUG
+#define dbg(msg) do {printf(msg "\n"); fflush(stdout);} while (0)
+#else
+#define dbg(msg)
+#endif
 
 template <typename IntegerType>
 __device__ __host__ IntegerType roundUp(IntegerType x, IntegerType y) {
@@ -34,6 +39,8 @@ struct GASstate {
   CUdeviceptr d_temp_buffer = 0;
   CUdeviceptr d_temp_vertices = 0;
   CUdeviceptr d_instances = 0;
+  CUdeviceptr* d_block_vertices;
+  CUdeviceptr* d_block_triangles;
 
   unsigned int triangle_flags = OPTIX_GEOMETRY_FLAG_NONE;
 
@@ -373,33 +380,35 @@ void buildASFromDeviceData(GASstate &state, int nverts, int ntris, float3 *devVe
   //CUDA_CHECK(cudaFree(d_vertices));
 }
 
-void buildBlockGeometry(GASstate &state, int idx, int begin, int ntris, float3 *devVertices, uint3 *devTriangles) {
+void buildBlockGeometry(GASstate &state, int idx, int ntris, float3 *devVertices, uint3 *devTriangles) {
   OptixAccelBuildOptions accel_options = {};
   //accel_options.buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION | OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
   state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE;
   accel_options.buildFlags = state.gas_build_options;
   accel_options.operation = OPTIX_BUILD_OPERATION_BUILD;
+  //dbg("after build options");
 
   OptixBuildInput triangle_input = {};
   triangle_input.type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
   triangle_input.triangleArray.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
   triangle_input.triangleArray.numVertices = static_cast<unsigned int>(ntris * 3);
-  //triangle_input.triangleArray.vertexBuffers = reinterpret_cast<CUdeviceptr>(devVertices + begin*3); // TODO check if this works
-  triangle_input.triangleArray.vertexBuffers = reinterpret_cast<CUdeviceptr*>(devVertices + begin*3); // TODO check if this works
+  //triangle_input.triangleArray.vertexBuffers = reinterpret_cast<CUdeviceptr*>(devVertices + begin*3); // TODO check if this works
+  triangle_input.triangleArray.vertexBuffers = &state.d_block_vertices[idx]; // TODO check if this works
   triangle_input.triangleArray.flags = &state.triangle_flags;
   triangle_input.triangleArray.numSbtRecords = 1;
+  //dbg("before index input");
   triangle_input.triangleArray.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
   triangle_input.triangleArray.numIndexTriplets = static_cast<unsigned int>(ntris);
-  triangle_input.triangleArray.indexBuffer = reinterpret_cast<CUdeviceptr>(devTriangles + begin); // TODO check if this works
+  //dbg("before indexbuffer");
+  triangle_input.triangleArray.indexBuffer = state.d_block_triangles[idx]; // TODO check if this works
+  //dbg("after triangle input");
 
-        printf("here 1\n"); fflush(stdout);
   OptixAccelBufferSizes gas_buffer_sizes;
   OPTIX_CHECK( optixAccelComputeMemoryUsage(state.context, &accel_options, &triangle_input, 1, &gas_buffer_sizes) );
+  //dbg("after compute mem usage");
 
-        printf("here 2\n"); fflush(stdout);
 
   CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&state.d_temp_buffer), gas_buffer_sizes.tempSizeInBytes) );
-        printf("here 3\n"); fflush(stdout);
 
   // non-compact output
   CUdeviceptr d_buffer_temp_output_gas_and_compacted_size;
@@ -411,6 +420,7 @@ void buildBlockGeometry(GASstate &state, int idx, int begin, int ntris, float3 *
   emitProperty.type = OPTIX_PROPERTY_TYPE_AABBS;
   emitProperty.result = (CUdeviceptr)((char *)d_buffer_temp_output_gas_and_compacted_size + compactedSizeOffset);
 
+  //dbg("before accelbuild");
   OPTIX_CHECK( optixAccelBuild(
         state.context,
         0, 
@@ -424,22 +434,42 @@ void buildBlockGeometry(GASstate &state, int idx, int begin, int ntris, float3 *
         state.handles + idx,
         &emitProperty, 1) 
   );  
+  //dbg("after accelbuild");
 }
 
 void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles, int bs, int nb) {
-
+  //dbg("start build AS");
   state.handles = (OptixTraversableHandle*)malloc(sizeof(OptixTraversableHandle)*(nb+1));
+  state.d_block_vertices = (CUdeviceptr*)malloc(sizeof(CUdeviceptr)*(nb+1));
+  state.d_block_triangles = (CUdeviceptr*)malloc(sizeof(CUdeviceptr)*(nb+1));
+  //dbg("after d_blokc mallocs");
+  state.d_block_vertices[0] = reinterpret_cast<CUdeviceptr>(devVertices);
+  state.d_block_triangles[0] = reinterpret_cast<CUdeviceptr>(devTriangles);
+  //dbg("afte block 0");
+  for (int i = 1; i < nb; ++i) {
+    state.d_block_vertices[i] = reinterpret_cast<CUdeviceptr>(devVertices + (nb+bs*(i-1))*3);
+    state.d_block_triangles[i] = reinterpret_cast<CUdeviceptr>(devTriangles + nb+bs*(i-1));
+  }
+  //dbg("after intermediate block");
+  int idx_last = nb + bs*(nb-1);
+  printf("bs: %i,  nb: %i,  idx_last: %i, ntris: %i\n", bs, nb, idx_last, ntris); 
+  state.d_block_vertices[nb] = reinterpret_cast<CUdeviceptr>(devVertices + idx_last*3);
+  state.d_block_triangles[nb] = reinterpret_cast<CUdeviceptr>(devTriangles + idx_last);
+  //dbg("after creating cudeviceptr");
 
   // geometry for minimums per block
-  buildBlockGeometry(state, 0, 0, nb, devVertices, devTriangles);
+  buildBlockGeometry(state, 0, nb, devVertices, devTriangles);
+  //dbg("after geometry block 1");
 
   // geomtery for each block
-  for (int i = 1; i < nb; ++i)
-    buildBlockGeometry(state, i, nb+bs*(i-1), bs, devVertices, devTriangles);
+  for (int i = 1; i < nb; ++i) {
+    buildBlockGeometry(state, i, bs, devVertices, devTriangles);
+  }
+  //dbg("after geometry block 2");
 
   // geometry for last block
-  int idx_last = nb + bs*(nb-1);
-  buildBlockGeometry(state, nb, idx_last, ntris-idx_last, devVertices, devTriangles);
+  buildBlockGeometry(state, nb, ntris-idx_last, devVertices, devTriangles);
+  //dbg("after geometry block 3");
 
   // IAS
   OptixInstance instance = { { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0 } };
@@ -452,11 +482,17 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
     instances[i].flags = OPTIX_INSTANCE_FLAG_DISABLE_ANYHIT;
     instances[i].traversableHandle = state.handles[i];
     memcpy(instances[i].transform, instance.transform, sizeof(float) * 12);
-
   }
+  //dbg("before copying instances");
   size_t instances_size_in_bytes = sizeof( OptixInstance ) * (nb+1);
   CUDA_CHECK( cudaMalloc( ( void** )&state.d_instances, instances_size_in_bytes ) );
+  //dbg("asd");
+  OptixInstance* d_inst;
+  CUDA_CHECK( cudaMalloc(&d_inst, instances_size_in_bytes ) );
+  CUDA_CHECK( cudaMemcpy(d_inst, instances, instances_size_in_bytes, cudaMemcpyHostToDevice ) );
+  //dbg("asd1");
   CUDA_CHECK( cudaMemcpy( ( void* )state.d_instances, instances, instances_size_in_bytes, cudaMemcpyHostToDevice ) );
+  //dbg("after copying instances");
 
   state.ias_instance_input.type = OPTIX_BUILD_INPUT_TYPE_INSTANCES;
   state.ias_instance_input.instanceArray.instances = state.d_instances;

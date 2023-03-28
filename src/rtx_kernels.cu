@@ -89,7 +89,7 @@ extern "C" __global__ void __raygen__rmq_blocks() {
   int lB = q.x / block_size;
   int rB = q.y / block_size;
 
-    //printf("Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n", idx.x, q.x, q.y, lB, rB);
+  printf("Ray %i, query (%i,%i)\n    lB = %i,  rB = %i\n", idx.x, q.x, q.y, lB, rB);
   int bx, by;
   float x, y;
   float3 ray_origin, ray_direction;
