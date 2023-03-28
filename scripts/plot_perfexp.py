@@ -68,7 +68,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
     #plt.xscale('log')
     ax.xaxis.set_major_formatter(FormatStrFormatter(r"$2^{%.0f}$"))
     if saveFlag:
-        plt.savefig(f"{plot_dir}time-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
+        plt.savefig(f"{plot_dir}time-exp-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
     else:
         plt.show()
     plt.close()
@@ -83,7 +83,6 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     plt.xlabel("Array size (n)",fontsize=12)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
 
-    #ax.xaxis.set_major_formatter(FormatStrFormatter(r"$2^{%.0f}$"))
     # Create a second y-axis on the right
     ax2 = ax.twinx()
 
@@ -94,25 +93,25 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     # AQUI VOY REVISAR ERROR
     hrmq = data_frame[0]
     hrmq = hrmq[hrmq['lr'] == lr]
-    hrmq = hrmq[hrmq['n-exp'] >= 14]
     for i, df in enumerate(data_frame[1:], start=1):
         df = df[df['lr'] == lr]
-        df = df[df['n-exp'] >= 15]
         df_array = np.array(df['mean_ns/q'])
         hrmq_array = np.array(hrmq['mean_ns/q'])[:df_array.size]
         #print(f"{df_array.shape=} {labels[i]=}  {hrmq_array.shape=}")
-        plt.plot(np.power(2, df['n-exp']), hrmq_array/df_array, label=labels[i], linestyle=linestyles[i], color=colors[i])
+        plt.plot(df['n-exp'], hrmq_array/df_array, label=labels[i], linestyle=linestyles[i], color=colors[i])
 
 
-    #plt.xticks(range(0,26,5), fontsize=12)
+    ax.xaxis.set_major_formatter(FormatStrFormatter(r"$2^{%.0f}$"))
+    plt.xticks(range(0,26,5), fontsize=12)
     #plt.yticks([5, 10, 15, 20, 25, 30, 35, 40, 45, 60])
     #plt.xlim(2**15,2**26)
     #plt.ylim(0, 40)
     plt.legend(fontsize=6)
+    #plt.xscale('log')
     #plt.yscale('log')
 
     if saveFlag:
-        plt.savefig(f"{plot_dir}speedup-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
+        plt.savefig(f"{plot_dir}speedup-exp-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
     else:
         plt.show()
     plt.close()
