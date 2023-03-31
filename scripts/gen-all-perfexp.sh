@@ -58,21 +58,3 @@ python ${SCRIPT} speedup 1 RTX4090 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRM
                                  ${CSVPATH}/perfexp-RTX4090-constBS-ALG5.csv 'RTXRMQ-B ($B=2^{15}$)'\
                                  ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA-GPU'
 printf "\n"
-
-
-# A100
-echo "A100 Plots"
-python ${SCRIPT} time 1 A100 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
-                                 ${CSVPATH}/perfexp-A100-ALG3.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-A100-ALG5.csv 'RTXRMQ-B (optimal)'\
-                                 ${CSVPATH}/perfexp-A100-constNB-ALG5.csv 'RTXRMQ-B ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-A100-constBS-ALG5.csv 'RTXRMQ-B ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-A100-ALG7.csv 'LCA-GPU'
-
-python ${SCRIPT} speedup 1 A100 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
-                                 ${CSVPATH}/perfexp-A100-ALG3.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-A100-ALG5.csv 'RTXRMQ-B (optimal)'\
-                                 ${CSVPATH}/perfexp-A100-constNB-ALG5.csv 'RTXRMQ-B ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-A100-constBS-ALG5.csv 'RTXRMQ-B ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-A100-ALG7.csv 'LCA-GPU'
-printf "\n"
