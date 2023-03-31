@@ -52,7 +52,6 @@ def plot_time(data_frame, lr, dev, saveFlag):
     ax = fig.add_subplot(111)
     plt.title(f"{dev}, {lrLabels[-lr]}")
     plt.xlabel("Array size (n)",fontsize=12)
-    plt.xticks(range(0,26,5), fontsize=12)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
     # Create a second y-axis on the right
     ax2 = ax.twinx()
@@ -61,12 +60,10 @@ def plot_time(data_frame, lr, dev, saveFlag):
     plt.ylabel("$\\frac{ns}{q}$",fontsize=12, rotation=0)
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
-        plt.plot(df['n-exp'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i])
+        plt.plot(df['n'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i])
 
     plt.legend(fontsize=6)
     plt.yscale('log')
-    #plt.xscale('log')
-    ax.xaxis.set_major_formatter(FormatStrFormatter(r"$2^{%.0f}$"))
     if saveFlag:
         plt.savefig(f"{plot_dir}time-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
     else:
@@ -83,7 +80,6 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     plt.xlabel("Array size (n)",fontsize=12)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
 
-    #ax.xaxis.set_major_formatter(FormatStrFormatter(r"$2^{%.0f}$"))
     # Create a second y-axis on the right
     ax2 = ax.twinx()
 
@@ -97,11 +93,11 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     hrmq = hrmq[hrmq['n-exp'] >= 14]
     for i, df in enumerate(data_frame[1:], start=1):
         df = df[df['lr'] == lr]
-        df = df[df['n-exp'] >= 15]
+        df = df[df['n'] >= 10*10**6]
         df_array = np.array(df['mean_ns/q'])
         hrmq_array = np.array(hrmq['mean_ns/q'])[:df_array.size]
         #print(f"{df_array.shape=} {labels[i]=}  {hrmq_array.shape=}")
-        plt.plot(np.power(2, df['n-exp']), hrmq_array/df_array, label=labels[i], linestyle=linestyles[i], color=colors[i])
+        plt.plot(df['n'], hrmq_array/df_array, label=labels[i], linestyle=linestyles[i], color=colors[i])
 
 
     #plt.xticks(range(0,26,5), fontsize=12)
