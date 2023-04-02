@@ -30,9 +30,11 @@ CONSTANT_NB = 9
 SIZE_MULT = 1.3
 plot_dir = "../plots/"
 lrLabels = ["","Large $(l,r)$ Range","Medium $(l,r)$ Range", "Small $(l,r)$ Range", "Medium $(l,r)$ Range", "Small $(l,r)$ Range"]
-linestyles=[ls['densely dotted'], ls['densely dashed'], ls['solid'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
+linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
-colors=[ "#EC0B43", "darkslategrey"  , "#0099ff", "#763b82", "#44AF69","#ECA400"]
+colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
+orders=[10, 10, 0.0, 0.0, 5.0, 0.0]
+alphas=[ 1,  1, 0.4, 0.4, 1.0, 0.4]
 
 def get_data(file):
     hc = pd.read_csv(file)
@@ -60,10 +62,12 @@ def plot_time(data_frame, lr, dev, saveFlag):
     plt.ylabel("$\\frac{ns}{q}$",fontsize=12, rotation=0)
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
-        plt.plot(df['n'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i])
+        plt.plot(df['n'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])
 
     plt.legend(fontsize=6)
     plt.yscale('log')
+    if ylim1 >= 0 and ylim2 >= 0:
+        plt.ylim(ylim1, ylim2)
     if saveFlag:
         plt.savefig(f"{plot_dir}time-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
     else:
@@ -97,7 +101,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
         df_array = np.array(df['mean_ns/q'])
         hrmq_array = np.array(hrmq['mean_ns/q'])[:df_array.size]
         #print(f"{df_array.shape=} {labels[i]=}  {hrmq_array.shape=}")
-        plt.plot(df['n'], hrmq_array/df_array, label=labels[i], linestyle=linestyles[i], color=colors[i])
+        plt.plot(df['n'], hrmq_array/df_array, label=labels[i], linestyle=linestyles[i], color=colors[i], zorder=orders[i], alpha=alphas[i])
 
 
     #plt.xticks(range(0,26,5), fontsize=12)
@@ -106,6 +110,8 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     #plt.ylim(0, 40)
     plt.legend(fontsize=6)
     #plt.yscale('log')
+    if ylim1 >= 0 and ylim2 >= 0:
+        plt.ylim(ylim1, ylim2)
 
     if saveFlag:
         plt.savefig(f"{plot_dir}speedup-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
@@ -115,8 +121,9 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 8:
-        print("Run with arguments <metric> <save_1_0> <outname> <ref_file> <ref_label> <file1> <label1> <file2> <label2> .. <filen>")
+    if len(sys.argv) < 11:
+        print("Run with arguments <lr> <metric> <save_1_0> <ylim1> <ylim2> <outname> <ref_file> <ref_label> <file1> <label1> <file2> <label2> .. <filen>")
+        print("lr: -1 (large), -2 (medium), -3 (small)")
         print("metric: time or speedup")
         print("save_1_0:  1: save file,  0: just show")
         print(f"Example: \npython {sys.argv[0]} speedup 0 'RTX4090' ../csv-finales/perf-THREADRIPPER-5975WX-ALG1.csv  'HRMQ'\x5c")
@@ -128,18 +135,21 @@ if __name__ == "__main__":
 
         exit()
 
-    metric = sys.argv[1]
-    saveFlag = int(sys.argv[2])
-    outName = sys.argv[3]
+    lr = int(sys.argv[1])
+    metric = sys.argv[2]
+    saveFlag = int(sys.argv[3])
+    ylim1 = float(sys.argv[4])
+    ylim2 = float(sys.argv[5])
+    outName = sys.argv[6]
     files=[]
     labels=[]
-    for i in range(4,len(sys.argv),2):
+    for i in range(7,len(sys.argv),2):
         files.append(sys.argv[i])
         labels.append(sys.argv[i+1])
 
     #print("Files:", files)
     #print("Labels", labels)
-    print(f"Generating {metric} plots for {outName}.......",end="")
+    print(f"Generating {lr=} {metric} plots for {outName}.......",end="")
     sys.stdout.flush()
 
     df = []
@@ -149,9 +159,8 @@ if __name__ == "__main__":
 
 
     # generate plots
-    for lr in range(-1,-4,-1):
-        if metric=="time":
-            plot_time(df, lr, outName, saveFlag)
-        if metric=="speedup":
-            plot_speedup(df, lr, outName, saveFlag)
+    if metric=="time":
+        plot_time(df, lr, outName, saveFlag)
+    if metric=="speedup":
+        plot_speedup(df, lr, outName, saveFlag)
     print("done")
