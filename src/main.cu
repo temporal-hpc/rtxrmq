@@ -119,13 +119,14 @@ int main(int argc, char *argv[]) {
         args.reps = 1;
         args.save_time = 0;
         args.save_power = 0;
-        float *expected = gpu_rmq_basic(n, q, dA, dQ, args);
+        int *indices;
+        float *expected = gpu_rmq_basic(n, q, dA, dQ, args, indices);
         //float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         //float *expected = reinterpret_cast<float*>(outi);
         printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
-        int pass = check_result(hA, hQ, q, expected, out);
+        int pass = check_result(hA, hQ, q, expected, out, indices);
         printf(AC_YELLOW "%s\n" AC_RESET, pass ? "pass" : "failed");
         //for (int i = 0; i < 101; ++i) {
             //printf("%f ", hA[i+33554332]);

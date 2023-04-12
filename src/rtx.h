@@ -1,4 +1,5 @@
 #pragma once
+
 float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs args) {
     int dev = args.dev;
     int reps = args.reps;
@@ -36,7 +37,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     timer.restart();
     GASstate state;
     createOptixContext(state);
-    loadAppModule(state);
+    loadAppModule(state, args);
     if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS)
         createGroupsClosestHit_Blocks(state);
     else if (alg == ALG_GPU_RTX_LUP)
@@ -93,6 +94,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     CUDA_CHECK(cudaMemcpy(device_params, &params, sizeof(Params), cudaMemcpyHostToDevice));
     timer.stop();
     printf("done: %f ms\n", timer.get_elapsed_ms());
+    CUDA_CHECK(cudaDeviceSynchronize());
 
     // 5) Computation
     printf(AC_BOLDCYAN "Computing RMQs (%-16s,r=%-3i)..." AC_RESET, algStr[alg], reps); fflush(stdout);

@@ -33,6 +33,20 @@ __global__ void kernel_print_vertices_dev(int ntris, float3 *v){
     }
 }
 
+__global__ void kernel_print_triangles_dev(int ntris, uint3 *v){
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    int i;
+    if(tid != 0){
+        return;
+    }
+    for(i=0; i<ntris && i<PRINT_LIMIT; ++i){
+        printf("tid %i --> triangle[%i] = (%i, %i, %i)\n", tid, i, v[i].x, v[i].y, v[i].z);
+    }
+    if(i < ntris){
+        printf("...\n");
+    }
+}
+
 void print_array_dev(int n, float *darray){
     printf("Printing random array:\n");
     kernel_print_array_dev<<<1,1>>>(n, darray);
@@ -44,6 +58,13 @@ void print_vertices_dev(int ntris, float3 *devVertices){
     kernel_print_vertices_dev<<<1,1>>>(ntris, devVertices);
     cudaDeviceSynchronize();
 }
+
+void print_triangles_dev(int ntris, uint3 *devTriangles){
+    printf("Printing vertices:\n");
+    kernel_print_triangles_dev<<<1,1>>>(ntris, devTriangles);
+    cudaDeviceSynchronize();
+}
+
 
 __device__ float transformLR(int alg, int x, int N) {
     switch (alg) {

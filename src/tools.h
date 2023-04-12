@@ -175,12 +175,12 @@ bool is_equal(float a, float b) {
     return abs(a - b) < epsilon;
 }
 
-bool check_result(float *hA, int2 *hQ, int q, float *expected, float *result){
+bool check_result(float *hA, int2 *hQ, int q, float *expected, float *result, int *indices){
     bool pass = true;
     for (int i = 0; i < q; ++i) {
         //if (expected[i] != result[i]) { // RT-cores don't introduce floating point errors
         if (!is_equal(expected[i], result[i])) {
-            printf("Error on %i-th query: got %f, expected %f\n", i, result[i], expected[i]);
+            printf("Error on %i-th query: got %f, expected %f at idx %i\n", i, result[i], expected[i], indices[i]);
             printf("  [%i,%i]\n", hQ[i].x, hQ[i].y);
             pass = false;
             //for (int j = hQ[i].x; j <= hQ[i].y; ++j) {
