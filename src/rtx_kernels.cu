@@ -1,7 +1,7 @@
 #include <optix.h>
 #include <math.h>
 
-#define DBG_RAY 3
+//#define DBG_RAY 3
 
 struct Params {
   OptixTraversableHandle handle;
@@ -79,8 +79,11 @@ extern "C" __global__ void __raygen__rmq_blocks() {
   float tmax = max - min;
   float ray_time = 0;
   OptixVisibilityMask visibilityMask = 255;
-  //unsigned int rayFlags = OPTIX_RAY_FLAG_DISABLE_ANYHIT;
+#ifdef DBG_RAY
+  unsigned int rayFlags = OPTIX_RAY_FLAG_DISABLE_ANYHIT;
+#else
   unsigned int rayFlags = OPTIX_RAY_FLAG_ENFORCE_ANYHIT;
+#endif
   unsigned int SBToffset = 0;
   unsigned int SBTstride = 0;
   unsigned int missSBTindex = 0;
@@ -259,6 +262,7 @@ extern "C" __global__ void __raygen__rmq_lup() {
 }
 
 extern "C" __global__ void __anyhit__rmq() {
+#ifdef DBG_RAY
   uint3 idx = optixGetLaunchIndex();
   int Pidx = optixGetPrimitiveIndex();
   int Iidx = optixGetInstanceIndex();
@@ -283,4 +287,5 @@ extern "C" __global__ void __anyhit__rmq() {
     //printf("ray %i - Any hit idx: %i,  primitive: %i,  instance: %i,  tmax: %f, tval: %f,  svtidx %i\n"
     //    , idx.x, i, Pidx, Iidx, curr_tmax, tval, sbtidx);
   }
+#endif
 }

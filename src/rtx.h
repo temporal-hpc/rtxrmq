@@ -15,7 +15,13 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     int orig_n;
     float *LUP = nullptr;
     int num_blocks;
-    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS) {
+    if (alg == ALG_GPU_RTX_BLOCKS) {
+        devVertices = gen_vertices_blocks_dev(n, bs, darray);
+        num_blocks = (n+bs-1) / bs;
+        orig_n = n;
+        n += num_blocks;
+    }
+    else if (alg == ALG_GPU_RTX_IAS) {
         devVertices = gen_vertices_blocks_dev(n, bs, darray);
         num_blocks = (n+bs-1) / bs;
         orig_n = n;

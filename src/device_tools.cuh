@@ -127,6 +127,35 @@ __global__ void kernel_gen_vertices_blocks(int num_blocks, int N, int bs, float 
     }
 }
 
+__global__ void kernel_gen_vertices_blocks_ias(int num_blocks, int N, int bs, float *min_blocks, float *array, float3 *vertices){
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    int n_blocks = ceil(sqrt((double)num_blocks+1));
+    int k = 3*idx;
+    if(idx < num_blocks){
+        float val = min_blocks[idx];
+        // ray hits min on coord (val, l, r)
+        float l = (float)(idx+1)/(1<<23);
+        float r = (float)(idx-1)/(1<<23);
+        float n = 1;
+
+        vertices[k+0] = make_float3(val, l, r);
+        vertices[k+1] = make_float3(val, l, 2*n);
+        vertices[k+2] = make_float3(val, -1*n, r);
+    } else if (idx < N) {
+        int sub_idx = idx - num_blocks;
+        int lid = sub_idx % bs;
+        float val = array[sub_idx];
+
+        float l = (float)(lid+1)/bs;
+        float r = (float)(lid-1)/bs;
+
+        vertices[k+0] = make_float3(val, l, r);
+        vertices[k+1] = make_float3(val, l, 2);
+        vertices[k+2] = make_float3(val, -1, r);
+        //printf("%i-th element %f  at  %f,  %f\n", sub_idx, val, l, r);
+    }
+}
+
 __global__ void kernel_transform_querys(int alg, float2 *Qf, int2 *Qi, int q, int N) {
     int tid = blockIdx.x*blockDim.x + threadIdx.x;
     if (tid >= q) return;
@@ -209,6 +238,32 @@ float3* gen_vertices_blocks_dev(int N, int bs, float *darray){
     // setup states
     dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 
     kernel_gen_vertices_blocks<<<grid, block>>>(num_blocks, ntris, bs, min_blocks, darray, devVertices);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+    return devVertices;
+}
+
+float3* gen_vertices_blocks_dev_ias(int N, int bs, float *darray){
+    // create array with mins of each block
+    int num_blocks = (N+bs-1) / bs;
+    int ntris = N + num_blocks;
+
+    float *min_blocks;
+    cudaMalloc(&min_blocks, sizeof(float)*num_blocks);
+    dim3 block(BSIZE, 1, 1);
+    dim3 grid_mins((num_blocks+BSIZE-1)/BSIZE,1,1);
+    kernel_min_blocks<<<grid_mins, block>>>(min_blocks, darray, num_blocks, N, bs);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+    //print_darray<<<1,1>>>(min_blocks, num_blocks);
+        //printf("inside gen bl 2\n");
+
+    // vertices data
+    float3 *devVertices;
+    cudaMalloc(&devVertices, sizeof(float3)*3*ntris);
+        //printf("inside gen bl 3\n");
+
+    // setup states
+    dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 
+    kernel_gen_vertices_blocks_ias<<<grid, block>>>(num_blocks, ntris, bs, min_blocks, darray, devVertices);
     CUDA_CHECK( cudaDeviceSynchronize() );
     return devVertices;
 }

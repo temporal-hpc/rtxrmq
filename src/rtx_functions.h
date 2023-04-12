@@ -1,6 +1,6 @@
 #pragma once
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 #define dbg(msg) do {printf(msg "\n"); fflush(stdout);} while (0)
 #else
@@ -492,7 +492,7 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   dbg("malloc intermediate blocks");
   for (int i = 1; i < nb; ++i) {
     CUDA_CHECK(cudaMalloc((void**)&state.block_vertices[i], bs*sizeof(float3)*3));
-    CUDA_CHECK(cudaMemcpy((void*)state.block_vertices[i], devVertices + nb + i*bs*3,
+    CUDA_CHECK(cudaMemcpy((void*)state.block_vertices[i], devVertices + nb*3 + (i-1)*bs*3,
           bs*sizeof(float3)*3, cudaMemcpyDeviceToDevice));
     CUDA_CHECK(cudaMalloc((void**)&state.block_triangles[i], bs*sizeof(uint3)));
     CUDA_CHECK(cudaMemcpy((void*)state.block_triangles[i], devTriangles,
@@ -517,6 +517,7 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   //CUDA_CHECK(cudaMemcpy((void*)state.d_block_triangles, (void*)state.block_triangles, sizeof(CUdeviceptr)*(nb+1), cudaMemcpyHostToDevice));
   //dbg("build geometry");
   
+#ifdef DEBUG
   print_vertices_dev(nb, state.block_vertices[0]);
   print_vertices_dev(bs, state.block_vertices[1]);
   print_vertices_dev(size_last, state.block_vertices[nb]);
@@ -524,6 +525,7 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   print_triangles_dev(nb, state.block_triangles[0]);
   print_triangles_dev(bs, state.block_triangles[1]);
   print_triangles_dev(size_last, state.block_triangles[nb]);
+#endif
 
   cudaDeviceSynchronize();
   buildBlockGeometry(state, 0, nb);
@@ -534,17 +536,40 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
 
   // IAS
   OptixInstance instance = { { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0 } };
+  // 1 0 0 0
+  // 0 1 0 0
+  // 0 0 1 0
   dbg("start ias");
-
+  bool original=true;
+  int x,y;
+  int n_blocks = ceil(sqrt((double)nb+1));
   OptixInstance* instances = (OptixInstance*)malloc(sizeof(OptixInstance)*(nb+1));
-  for (int i = 0; i <= nb; ++i) {
-    instances[i].instanceId = i;
-    instances[i].sbtOffset = 0;
-    instances[i].visibilityMask = 255;
-    //instances[i].flags = OPTIX_INSTANCE_FLAG_DISABLE_ANYHIT;
-    instances[i].flags = OPTIX_INSTANCE_FLAG_NONE;
-    instances[i].traversableHandle = state.handles[i];
-    memcpy(instances[i].transform, instance.transform, sizeof(float) * 12);
+  if(original){
+      for (int i = 0; i <= nb; ++i) {
+        instances[i].instanceId = i;
+        instances[i].sbtOffset = 0;
+        instances[i].visibilityMask = 255;
+        //instances[i].flags = OPTIX_INSTANCE_FLAG_DISABLE_ANYHIT;
+        instances[i].flags = OPTIX_INSTANCE_FLAG_NONE;
+        instances[i].traversableHandle = state.handles[i];
+        memcpy(instances[i].transform, instance.transform, sizeof(float) * 12);
+      }
+  }
+  else{
+      for (int i = 0; i <= nb; ++i) {
+        instances[i].instanceId = i;
+        instances[i].sbtOffset = 0;
+        instances[i].visibilityMask = 255;
+        //instances[i].flags = OPTIX_INSTANCE_FLAG_DISABLE_ANYHIT;
+        instances[i].flags = OPTIX_INSTANCE_FLAG_NONE;
+        instances[i].traversableHandle = state.handles[i];
+        x = i % n_blocks;
+        y = i / n_blocks;
+        OptixInstance inst =     {{1.0f,    0,    0, 0,
+                                      0, 1.0f,    0, 2.0f*x, 
+                                      0,    0, 1.0f, 2.0f*y}};
+        memcpy(instances[i].transform, inst.transform, sizeof(float) * 12);
+      }
   }
   //dbg("before copying instances");
   size_t instances_size_in_bytes = sizeof( OptixInstance ) * (nb+1);
