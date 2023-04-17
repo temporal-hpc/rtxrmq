@@ -442,6 +442,9 @@ void buildBlockGeometry(GASstate &state, int idx, int ntris) {
         &emitProperty, 1) 
   );  
   //dbg("after accelbuild");
+
+  CUDA_CHECK(cudaFree((void*)state.d_temp_buffer));
+  //CUDA_CHECK(cudaFree((void*)d_buffer_temp_output_gas_and_compacted_size));
 }
 
 void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles, int bs, int nb, int alg) {
@@ -511,6 +514,9 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   CUDA_CHECK(cudaMemcpy((void*)state.block_triangles[nb], devTriangles,
         size_last*sizeof(uint3), cudaMemcpyDeviceToDevice));
   dbg("after geometry block 3");
+
+  CUDA_CHECK(cudaFree(devVertices));
+  CUDA_CHECK(cudaFree(devTriangles));
 
   //dbg("copy cudevptr to host");
   //CUDA_CHECK(cudaMemcpy((void*)state.d_block_vertices, (void*)state.block_vertices, sizeof(CUdeviceptr)*(nb+1), cudaMemcpyHostToDevice));
@@ -633,6 +639,7 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   {
     CUDA_CHECK( cudaFree( (void*)d_ias_temp_buffer ) );
   }
+  CUDA_CHECK( cudaFree((void*)d_buffer_temp_output_ias_and_compacted_size) );
 
   //state.d_ias_output_buffer = d_buffer_temp_output_ias_and_compacted_size;
   //state.ias_output_buffer_size = ias_buffer_sizes.outputSizeInBytes;
