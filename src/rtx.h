@@ -26,6 +26,11 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
         num_blocks = (n+bs-1) / bs;
         orig_n = n;
         n += num_blocks;
+    } else if (alg == ALG_GPU_RTX_IAS_TRANS) {
+        devVertices = gen_vertices_blocks_dev_ias(n, bs, darray);
+        num_blocks = (n+bs-1) / bs;
+        orig_n = n;
+        n += num_blocks;
     } else if (alg == ALG_GPU_RTX_LUP) {
         devVertices = gen_vertices_lup_dev(n, bs, darray, LUP);
     } else {
@@ -44,7 +49,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     GASstate state;
     createOptixContext(state);
     loadAppModule(state, args);
-    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS)
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS)
         createGroupsClosestHit_Blocks(state);
     else if (alg == ALG_GPU_RTX_LUP)
         createGroupsClosestHit_LUP(state);
@@ -58,8 +63,8 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     // 3) Build Acceleration Structure 
     printf("%sBuild AS on GPU...........................", AC_MAGENTA); fflush(stdout);
     timer.restart();
-    if (alg == ALG_GPU_RTX_IAS)
-        buildIAS(state, 3*n, n, devVertices, devTriangles, bs, num_blocks);
+    if (alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS)
+        buildIAS(state, 3*n, n, devVertices, devTriangles, bs, num_blocks,alg);
     else
         buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
     cudaDeviceSynchronize();
@@ -78,7 +83,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     params.min = -1.0f;
     params.max = 2.0f;
     params.output = d_output;
-    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS) {
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS) {
         params.query = nullptr;
         params.iquery = dquery;
         params.num_blocks = ceil(sqrt(num_blocks + 1));

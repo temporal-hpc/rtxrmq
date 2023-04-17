@@ -99,7 +99,7 @@ void loadAppModule(GASstate &state, CmdArgs args) {
 #endif
 
   state.pipeline_compile_options.usesMotionBlur = false;
-  if (args.alg != ALG_GPU_RTX_IAS) {
+  if (args.alg != ALG_GPU_RTX_IAS && args.alg != ALG_GPU_RTX_IAS_TRANS) {
     state.pipeline_compile_options.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
   } else {
     state.pipeline_compile_options.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_LEVEL_INSTANCING;
@@ -444,7 +444,7 @@ void buildBlockGeometry(GASstate &state, int idx, int ntris) {
   //dbg("after accelbuild");
 }
 
-void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles, int bs, int nb) {
+void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles, int bs, int nb, int alg) {
   //dbg("start build AS");
   state.d_temp_vertices = reinterpret_cast<CUdeviceptr>(devVertices);
   state.d_temp_triangles = reinterpret_cast<CUdeviceptr>(devTriangles);
@@ -503,7 +503,7 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   // geometry for last block
   //dbg("malloc last block");
   int size_last = ntris - idx_last;
-  printf("idx_last: %d, nb: %i\n", idx_last, nb);
+  //printf("idx_last: %d, nb: %i\n", idx_last, nb);
   CUDA_CHECK(cudaMalloc((void**)&state.block_vertices[nb], size_last*sizeof(float3)*3));
   CUDA_CHECK(cudaMemcpy((void*)state.block_vertices[nb], devVertices + idx_last*3,
         size_last*sizeof(float3)*3, cudaMemcpyDeviceToDevice));
@@ -535,16 +535,18 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   cudaDeviceSynchronize();
 
   // IAS
-  OptixInstance instance = { { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0 } };
+  OptixInstance instance = { { 1, 0, 0, 0, 
+	  		       0, 1, 0, 0, 
+			       0, 0, 1, 0 } };
   // 1 0 0 0
   // 0 1 0 0
   // 0 0 1 0
   dbg("start ias");
-  bool original=true;
   int x,y;
   int n_blocks = ceil(sqrt((double)nb+1));
   OptixInstance* instances = (OptixInstance*)malloc(sizeof(OptixInstance)*(nb+1));
-  if(original){
+  if(alg == ALG_GPU_RTX_IAS){
+      printf("USING GLOBAL COORDS");
       for (int i = 0; i <= nb; ++i) {
         instances[i].instanceId = i;
         instances[i].sbtOffset = 0;
@@ -555,7 +557,8 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
         memcpy(instances[i].transform, instance.transform, sizeof(float) * 12);
       }
   }
-  else{
+  else if(alg == ALG_GPU_RTX_IAS_TRANS){
+      printf("USING BLOCK LOCAL COORDS + MATRIX TRANSFORMS");
       for (int i = 0; i <= nb; ++i) {
         instances[i].instanceId = i;
         instances[i].sbtOffset = 0;
@@ -565,9 +568,17 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
         instances[i].traversableHandle = state.handles[i];
         x = i % n_blocks;
         y = i / n_blocks;
-        OptixInstance inst =     {{1.0f,    0,    0, 0,
-                                      0, 1.0f,    0, 2.0f*x, 
-                                      0,    0, 1.0f, 2.0f*y}};
+	OptixInstance inst;
+	if(i == 0){
+  		inst = {{ 1, 0, 0, 0, 
+	  		   0, 1, 0, 0, 
+			   0, 0, 1, 0 } };
+	}
+	else{
+        	inst = {{1.0f,    0,    0,      0,
+                            0, 1.0f,    0, 2.0f*x, 
+                            0,    0, 1.0f, 2.0f*y}};
+	}
         memcpy(instances[i].transform, inst.transform, sizeof(float) * 12);
       }
   }

@@ -149,7 +149,8 @@ CmdArgs get_args(int argc, char *argv[]) {
             args.alg != ALG_GPU_RTX_TRANS &&
             args.alg != ALG_GPU_RTX_BLOCKS &&
             args.alg != ALG_GPU_RTX_LUP &&
-            args.alg != ALG_GPU_RTX_IAS) {
+            args.alg != ALG_GPU_RTX_IAS &&
+	    args.alg != ALG_GPU_RTX_IAS_TRANS) {
         args.bs = 0;
         args.nb = 0;
     }

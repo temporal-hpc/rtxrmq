@@ -136,6 +136,8 @@ __global__ void kernel_gen_vertices_blocks_ias(int num_blocks, int N, int bs, fl
         // ray hits min on coord (val, l, r)
         float l = (float)(idx+1)/(1<<23);
         float r = (float)(idx-1)/(1<<23);
+        //float l = (float)(idx)/(1<<23);
+        //float r = (float)(idx)/(1<<23);
         float n = 1;
 
         vertices[k+0] = make_float3(val, l, r);
@@ -148,6 +150,8 @@ __global__ void kernel_gen_vertices_blocks_ias(int num_blocks, int N, int bs, fl
 
         float l = (float)(lid+1)/bs;
         float r = (float)(lid-1)/bs;
+        //float l = (float)(lid)/bs;
+        //float r = (float)(lid)/bs;
 
         vertices[k+0] = make_float3(val, l, r);
         vertices[k+1] = make_float3(val, l, 2);
@@ -244,6 +248,7 @@ float3* gen_vertices_blocks_dev(int N, int bs, float *darray){
 
 float3* gen_vertices_blocks_dev_ias(int N, int bs, float *darray){
     // create array with mins of each block
+    printf("hola 1\n"); fflush(stdout);
     int num_blocks = (N+bs-1) / bs;
     int ntris = N + num_blocks;
 
@@ -253,13 +258,14 @@ float3* gen_vertices_blocks_dev_ias(int N, int bs, float *darray){
     dim3 grid_mins((num_blocks+BSIZE-1)/BSIZE,1,1);
     kernel_min_blocks<<<grid_mins, block>>>(min_blocks, darray, num_blocks, N, bs);
     CUDA_CHECK( cudaDeviceSynchronize() );
+    //printf("hola 2\n"); fflush(stdout);
     //print_darray<<<1,1>>>(min_blocks, num_blocks);
-        //printf("inside gen bl 2\n");
+    //printf("inside gen bl 2\n");
 
     // vertices data
     float3 *devVertices;
     cudaMalloc(&devVertices, sizeof(float3)*3*ntris);
-        //printf("inside gen bl 3\n");
+    //printf("inside gen bl 3\n");
 
     // setup states
     dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 
