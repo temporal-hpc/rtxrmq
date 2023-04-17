@@ -195,86 +195,6 @@ void populateSBT(GASstate &state) {
   state.sbt.hitgroupRecordCount = 1;
 }
 
-void buildAccelerationStructure(GASstate &state, std::vector<float3> vertices, std::vector<uint3> triangles) {
-
-  const size_t vertices_size = sizeof(float3) * vertices.size();
-  CUDA_CHECK( cudaMalloc(reinterpret_cast<void**>(&state.d_temp_vertices), vertices_size) );
-  CUDA_CHECK( cudaMemcpy(reinterpret_cast<void*>(state.d_temp_vertices), vertices.data(), vertices_size, cudaMemcpyHostToDevice) );
-
-  uint3* d_triangles;
-  const size_t triangles_size = sizeof(uint3) * triangles.size();
-  CUDA_CHECK( cudaMalloc(&d_triangles, triangles_size) );
-  CUDA_CHECK( cudaMemcpy(d_triangles, triangles.data(), triangles_size, cudaMemcpyHostToDevice) );
-
-  state.triangle_input.type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
-  state.triangle_input.triangleArray.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
-  state.triangle_input.triangleArray.numVertices = static_cast<unsigned int>(vertices.size());
-  state.triangle_input.triangleArray.vertexBuffers = &state.d_temp_vertices;
-  state.triangle_input.triangleArray.flags = &state.triangle_flags;
-  state.triangle_input.triangleArray.numSbtRecords = 1;
-  state.triangle_input.triangleArray.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
-  state.triangle_input.triangleArray.numIndexTriplets = static_cast<unsigned int>(triangles.size());
-  state.triangle_input.triangleArray.indexBuffer = reinterpret_cast<CUdeviceptr>(d_triangles);
-
-  OptixAccelBuildOptions accel_options = {};
-  //accel_options.buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION | OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
-  accel_options.buildFlags = OPTIX_BUILD_FLAG_ALLOW_UPDATE;
-  accel_options.operation = OPTIX_BUILD_OPERATION_BUILD;
-
-  OptixAccelBufferSizes gas_buffer_sizes;
-  OPTIX_CHECK( optixAccelComputeMemoryUsage(state.context, &accel_options, &state.triangle_input, 1, &gas_buffer_sizes) );
-
-  //void *d_temp_buffer_gas;
-  state.temp_buffer_size = gas_buffer_sizes.tempSizeInBytes;
-
-  //CUDA_CHECK( cudaMalloc(&d_temp_buffer_gas, temp_size) );
-  CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&state.d_temp_buffer), gas_buffer_sizes.tempSizeInBytes) );
-
-  // non-compact output
-  CUdeviceptr d_buffer_temp_output_gas_and_compacted_size;
-  size_t compactedSizeOffset = roundUp<size_t>(gas_buffer_sizes.outputSizeInBytes, 8ull);
-  CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&d_buffer_temp_output_gas_and_compacted_size), compactedSizeOffset + 8) );
-
-  OptixAccelEmitDesc emitProperty = {};
-  //emitProperty.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
-  emitProperty.type = OPTIX_PROPERTY_TYPE_AABBS;
-  emitProperty.result = (CUdeviceptr)((char *)d_buffer_temp_output_gas_and_compacted_size + compactedSizeOffset);
-
-  OPTIX_CHECK( optixAccelBuild(
-        state.context,
-        0, 
-        &accel_options, 
-        &state.triangle_input,
-        1,
-        //state.d_temp_vertices,
-        state.d_temp_buffer,
-        gas_buffer_sizes.tempSizeInBytes,
-	    d_buffer_temp_output_gas_and_compacted_size,
-	    gas_buffer_sizes.outputSizeInBytes,
-        &state.gas_handle,
-        &emitProperty, 1) 
-  );  
- 
-  //CUDA_CHECK( cudaFree(d_temp_buffer_gas) );
-  //size_t compacted_gas_size;
-  //CUDA_CHECK( cudaMemcpy(&compacted_gas_size, (void *)emitProperty.result, sizeof(size_t), cudaMemcpyDeviceToHost) );
-
-  /*
-  if (compacted_gas_size < gas_buffer_sizes.outputSizeInBytes) {
-    CUDA_CHECK( cudaMalloc(&d_gas_output_buffer, compacted_gas_size) );
-
-    // use handle as input and output
-    OPTIX_CHECK( optixAccelCompact(optix_context, 0, gas_handle, reinterpret_cast<CUdeviceptr>(d_gas_output_buffer), compacted_gas_size, &gas_handle));
-
-    CUDA_CHECK(cudaFree(d_buffer_temp_output_gas_and_compacted_size));
-  } else {
-    */
-    state.d_gas_output_buffer = d_buffer_temp_output_gas_and_compacted_size;
-    state.gas_output_buffer_size = gas_buffer_sizes.outputSizeInBytes;
-  //}
-  //CUDA_CHECK(cudaFree(d_vertices));
-}
-
 void buildASFromDeviceData(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles) {
 
   //const size_t vertices_size = sizeof(float3) * vertices.size();
@@ -317,6 +237,10 @@ void buildASFromDeviceData(GASstate &state, int nverts, int ntris, float3 *devVe
   CUdeviceptr d_buffer_temp_output_gas_and_compacted_size;
   size_t compactedSizeOffset = roundUp<size_t>(gas_buffer_sizes.outputSizeInBytes, 8ull);
   CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&d_buffer_temp_output_gas_and_compacted_size), compactedSizeOffset + 8) );
+
+  float out_size = (float)gas_buffer_sizes.outputSizeInBytes / 1e9;
+  float temp_size = (float)gas_buffer_sizes.tempSizeInBytes / 1e9;
+  printf("Memory usage (GB): output_buffer %f,  temp_buffer %f\n", out_size, temp_size); 
 
   OptixAccelEmitDesc emitProperty = {};
   //emitProperty.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
