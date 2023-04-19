@@ -33,6 +33,20 @@ __global__ void kernel_print_vertices_dev(int ntris, float3 *v){
     }
 }
 
+__global__ void kernel_print_triangles_dev(int ntris, uint3 *v){
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    int i;
+    if(tid != 0){
+        return;
+    }
+    for(i=0; i<ntris && i<PRINT_LIMIT; ++i){
+        printf("tid %i --> triangle[%i] = (%i, %i, %i)\n", tid, i, v[i].x, v[i].y, v[i].z);
+    }
+    if(i < ntris){
+        printf("...\n");
+    }
+}
+
 void print_array_dev(int n, float *darray){
     printf("Printing random array:\n");
     kernel_print_array_dev<<<1,1>>>(n, darray);
@@ -44,6 +58,13 @@ void print_vertices_dev(int ntris, float3 *devVertices){
     kernel_print_vertices_dev<<<1,1>>>(ntris, devVertices);
     cudaDeviceSynchronize();
 }
+
+void print_triangles_dev(int ntris, uint3 *devTriangles){
+    printf("Printing vertices:\n");
+    kernel_print_triangles_dev<<<1,1>>>(ntris, devTriangles);
+    cudaDeviceSynchronize();
+}
+
 
 __device__ float transformLR(int alg, int x, int N) {
     switch (alg) {
@@ -102,6 +123,39 @@ __global__ void kernel_gen_vertices_blocks(int num_blocks, int N, int bs, float 
         vertices[k+0] = make_float3(val, l, r);
         vertices[k+1] = make_float3(val, l, 2*y+2);
         vertices[k+2] = make_float3(val, 2*x-1, r);
+        //printf("%i-th element %f  at  %f,  %f\n", sub_idx, val, l, r);
+    }
+}
+
+__global__ void kernel_gen_vertices_blocks_ias(int num_blocks, int N, int bs, float *min_blocks, float *array, float3 *vertices){
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    int n_blocks = ceil(sqrt((double)num_blocks+1));
+    int k = 3*idx;
+    if(idx < num_blocks){
+        float val = min_blocks[idx];
+        // ray hits min on coord (val, l, r)
+        float l = (float)(idx+1)/(1<<23);
+        float r = (float)(idx-1)/(1<<23);
+        //float l = (float)(idx)/(1<<23);
+        //float r = (float)(idx)/(1<<23);
+        float n = 1;
+
+        vertices[k+0] = make_float3(val, l, r);
+        vertices[k+1] = make_float3(val, l, 2*n);
+        vertices[k+2] = make_float3(val, -1*n, r);
+    } else if (idx < N) {
+        int sub_idx = idx - num_blocks;
+        int lid = sub_idx % bs;
+        float val = array[sub_idx];
+
+        float l = (float)(lid+1)/bs;
+        float r = (float)(lid-1)/bs;
+        //float l = (float)(lid)/bs;
+        //float r = (float)(lid)/bs;
+
+        vertices[k+0] = make_float3(val, l, r);
+        vertices[k+1] = make_float3(val, l, 2);
+        vertices[k+2] = make_float3(val, -1, r);
         //printf("%i-th element %f  at  %f,  %f\n", sub_idx, val, l, r);
     }
 }
@@ -186,6 +240,34 @@ float3* gen_vertices_blocks_dev(int N, int bs, float *darray){
     // setup states
     dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 
     kernel_gen_vertices_blocks<<<grid, block>>>(num_blocks, ntris, bs, min_blocks, darray, devVertices);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+    return devVertices;
+}
+
+float3* gen_vertices_blocks_dev_ias(int N, int bs, float *darray){
+    // create array with mins of each block
+    printf("hola 1\n"); fflush(stdout);
+    int num_blocks = (N+bs-1) / bs;
+    int ntris = N + num_blocks;
+
+    float *min_blocks;
+    cudaMalloc(&min_blocks, sizeof(float)*num_blocks);
+    dim3 block(BSIZE, 1, 1);
+    dim3 grid_mins((num_blocks+BSIZE-1)/BSIZE,1,1);
+    kernel_min_blocks<<<grid_mins, block>>>(min_blocks, darray, num_blocks, N, bs);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+    //printf("hola 2\n"); fflush(stdout);
+    //print_darray<<<1,1>>>(min_blocks, num_blocks);
+    //printf("inside gen bl 2\n");
+
+    // vertices data
+    float3 *devVertices;
+    cudaMalloc(&devVertices, sizeof(float3)*3*ntris);
+    //printf("inside gen bl 3\n");
+
+    // setup states
+    dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 
+    kernel_gen_vertices_blocks_ias<<<grid, block>>>(num_blocks, ntris, bs, min_blocks, darray, devVertices);
     CUDA_CHECK( cudaDeviceSynchronize() );
     return devVertices;
 }

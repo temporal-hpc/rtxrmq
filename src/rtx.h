@@ -1,4 +1,5 @@
 #pragma once
+
 float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs args) {
     int dev = args.dev;
     int reps = args.reps;
@@ -13,13 +14,25 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     float3 *devVertices;
     int orig_n;
     float *LUP = nullptr;
+    int num_blocks;
     if (alg == ALG_GPU_RTX_BLOCKS) {
-        devVertices = gen_vertices_blocks_dev(n, bs, darray); // TODO implement
-        int num_blocks = (n+bs-1) / bs;
+        devVertices = gen_vertices_blocks_dev(n, bs, darray);
+        num_blocks = (n+bs-1) / bs;
+        orig_n = n;
+        n += num_blocks;
+    }
+    else if (alg == ALG_GPU_RTX_IAS) {
+        devVertices = gen_vertices_blocks_dev(n, bs, darray);
+        num_blocks = (n+bs-1) / bs;
+        orig_n = n;
+        n += num_blocks;
+    } else if (alg == ALG_GPU_RTX_IAS_TRANS) {
+        devVertices = gen_vertices_blocks_dev_ias(n, bs, darray);
+        num_blocks = (n+bs-1) / bs;
         orig_n = n;
         n += num_blocks;
     } else if (alg == ALG_GPU_RTX_LUP) {
-        devVertices = gen_vertices_lup_dev(n, bs, darray, LUP); // TODO implement
+        devVertices = gen_vertices_lup_dev(n, bs, darray, LUP);
     } else {
         devVertices = gen_vertices_dev(alg, n, darray);
     }
@@ -35,8 +48,8 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     timer.restart();
     GASstate state;
     createOptixContext(state);
-    loadAppModule(state);
-    if (alg == ALG_GPU_RTX_BLOCKS)
+    loadAppModule(state, args);
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS)
         createGroupsClosestHit_Blocks(state);
     else if (alg == ALG_GPU_RTX_LUP)
         createGroupsClosestHit_LUP(state);
@@ -50,7 +63,10 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     // 3) Build Acceleration Structure 
     printf("%sBuild AS on GPU...........................", AC_MAGENTA); fflush(stdout);
     timer.restart();
-    buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
+    if (alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS)
+        buildIAS(state, 3*n, n, devVertices, devTriangles, bs, num_blocks,alg);
+    else
+        buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
     cudaDeviceSynchronize();
     timer.stop();
     float AS_time = timer.get_elapsed_ms();
@@ -67,16 +83,15 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     params.min = -1.0f;
     params.max = 2.0f;
     params.output = d_output;
-    if (alg == ALG_GPU_RTX_BLOCKS) {
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS) {
         params.query = nullptr;
         params.iquery = dquery;
-        int num_blocks = (orig_n + bs - 1) / bs;
         params.num_blocks = ceil(sqrt(num_blocks + 1));
         params.block_size = bs;
     } else if (alg == ALG_GPU_RTX_LUP) {
         params.query = nullptr;
         params.iquery = dquery;
-        int num_blocks = (n + bs - 1) / bs;
+        num_blocks = (n + bs - 1) / bs;
         params.num_blocks = ceil(sqrt(num_blocks));
         params.nb = num_blocks;
         params.block_size = bs;
@@ -90,6 +105,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     CUDA_CHECK(cudaMemcpy(device_params, &params, sizeof(Params), cudaMemcpyHostToDevice));
     timer.stop();
     printf("done: %f ms\n", timer.get_elapsed_ms());
+    CUDA_CHECK(cudaDeviceSynchronize());
 
     // 5) Computation
     printf(AC_BOLDCYAN "Computing RMQs (%-16s,r=%-3i)..." AC_RESET, algStr[alg], reps); fflush(stdout);
