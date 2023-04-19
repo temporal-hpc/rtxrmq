@@ -476,7 +476,7 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   int n_blocks = ceil(sqrt((double)nb+1));
   OptixInstance* instances = (OptixInstance*)malloc(sizeof(OptixInstance)*(nb+1));
   if(alg == ALG_GPU_RTX_IAS){
-      printf("USING GLOBAL COORDS");
+      //printf("USING GLOBAL COORDS");
       for (int i = 0; i <= nb; ++i) {
         instances[i].instanceId = i;
         instances[i].sbtOffset = 0;
@@ -488,7 +488,7 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
       }
   }
   else if(alg == ALG_GPU_RTX_IAS_TRANS){
-      printf("USING BLOCK LOCAL COORDS + MATRIX TRANSFORMS");
+      //printf("USING BLOCK LOCAL COORDS + MATRIX TRANSFORMS");
       for (int i = 0; i <= nb; ++i) {
         instances[i].instanceId = i;
         instances[i].sbtOffset = 0;

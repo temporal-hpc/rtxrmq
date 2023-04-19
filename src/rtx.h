@@ -12,24 +12,24 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     printf("Generating geometry......................."); fflush(stdout);
     timer.restart();
     float3 *devVertices;
-    int orig_n;
+    //int orig_n;
     float *LUP = nullptr;
     int num_blocks;
     if (alg == ALG_GPU_RTX_BLOCKS) {
         devVertices = gen_vertices_blocks_dev(n, bs, darray);
         num_blocks = (n+bs-1) / bs;
-        orig_n = n;
+        //orig_n = n;
         n += num_blocks;
     }
     else if (alg == ALG_GPU_RTX_IAS) {
         devVertices = gen_vertices_blocks_dev(n, bs, darray);
         num_blocks = (n+bs-1) / bs;
-        orig_n = n;
+        //orig_n = n;
         n += num_blocks;
     } else if (alg == ALG_GPU_RTX_IAS_TRANS) {
         devVertices = gen_vertices_blocks_dev_ias(n, bs, darray);
         num_blocks = (n+bs-1) / bs;
-        orig_n = n;
+        //orig_n = n;
         n += num_blocks;
     } else if (alg == ALG_GPU_RTX_LUP) {
         devVertices = gen_vertices_lup_dev(n, bs, darray, LUP);

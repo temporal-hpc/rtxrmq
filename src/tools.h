@@ -37,6 +37,9 @@ void print_help(){
                     "   4 -> %s\n"
                     "   5 -> %s\n"
                     "   6 -> %s\n\n"
+                    "   7 -> %s\n\n"
+                    "   8 -> %s\n\n"
+                    "   9 -> %s\n\n"
                     "Options:\n"
                     "   --bs <block size>         block size for RTX_blocks (default: 2^15)\n"
                     "   --nb <#blocks>            number of blocks for RTX_blocks (overrides --bs)\n"
@@ -53,7 +56,10 @@ void print_help(){
                     algStr[3],
                     algStr[4],
                     algStr[5],
-                    algStr[6]
+                    algStr[6],
+                    algStr[7],
+                    algStr[8],
+                    algStr[9]
                 );
 }
 
