@@ -53,10 +53,8 @@ else
 
 	# LR=-2  LOGNORMAL DISTRIBUTION (medium values)
 	#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>       <n1>         <n2>          <dn>    <q1>   <q2>   <dq>   <bs|nb>  <block>    <lr>   <name>
-    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16   $(( 1*${N1}))  $(( 3*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**1))   -2   ${name}
-    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16   $(( 4*${N1}))  $((33*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**1))   -2   ${name}
-    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16   $((34*${N1}))  $((67*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**1))   -2   ${name}
-    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16   $((68*${N1})) $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**9))   -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16   $(( 1*${N1}))  $(( 6*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**1))   -2   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16   $(( 7*${N1}))  $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**9))   -2   ${name}
 	# constant BS and NB
 	./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16        ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     bs   ${const_bs}  -2   ${name}-constBS
 	./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16        ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     nb   ${const_nb}  -2   ${name}-constNB
@@ -66,8 +64,7 @@ else
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16    $(( 1*${N1}))  $(( 1*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**11))   -3   ${name}
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16    $(( 2*${N1}))  $(( 3*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**12))   -3   ${name}
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16    $(( 4*${N1}))  $((33*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**13))   -3   ${name}
-    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16    $((34*${N1}))  $((67*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**14))   -3   ${name}
-    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16    $((68*${N1})) $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**16))   -3   ${name}
+    ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16    $((34*${N1}))  $((100*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb   $((2**14))   -3   ${name}
 	# constant BS and NB
 	./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16        ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     bs   ${const_bs}  -3   ${name}-constBS
 	./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16        ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     nb   ${const_nb}  -3   ${name}-constNB
