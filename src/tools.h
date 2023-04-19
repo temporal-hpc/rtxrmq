@@ -14,6 +14,11 @@
 #define ARG_TIME 8
 #define ARG_POWER 9
 
+struct VBHMem {
+    size_t out_buffer;
+    size_t temp_buffer;
+};
+
 struct CmdArgs {
     int n, q, lr, alg, bs, nb, reps, dev, nt, seed, check, save_time, save_power;
     std::string time_file, power_file;
@@ -273,10 +278,31 @@ void write_results(float time_ms, int q, float construction_time, int reps, CmdA
     float time_it = time_ms/reps;
     FILE *fp;
     fp = fopen(filename.c_str(), "a");
-    fprintf(fp, ",%f,%f,%f,%f\n",
+    fprintf(fp, ",%f,%f,%f,%f,0,0\n",
             time_ms/1000.0,
             (double)q/(time_it/1000.0),
             (double)time_it*1e6/q,
             construction_time);
     fclose(fp);
 }
+void write_results(float time_ms, int q, float construction_time, int reps, CmdArgs args, VBHMem mem) {
+    if (!args.save_time) return;
+    std::string filename;
+    if (args.time_file.empty())
+        filename = std::string("../results/data.csv");
+    else
+        filename = args.time_file;
+
+    float time_it = time_ms/reps;
+    FILE *fp;
+    fp = fopen(filename.c_str(), "a");
+    fprintf(fp, ",%f,%f,%f,%f,%f,%f\n",
+            time_ms/1000.0,
+            (double)q/(time_it/1000.0),
+            (double)time_it*1e6/q,
+            construction_time,
+            mem.out_buffer/1e6,
+            mem.temp_buffer/1e6);
+    fclose(fp);
+}
+

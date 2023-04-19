@@ -62,15 +62,16 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
 
     // 3) Build Acceleration Structure 
     printf("%sBuild AS on GPU...........................", AC_MAGENTA); fflush(stdout);
+    VBHMem mem = {0, 0};
     timer.restart();
     if (alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS)
-        buildIAS(state, 3*n, n, devVertices, devTriangles, bs, num_blocks,alg);
+        buildIAS(mem, state, 3*n, n, devVertices, devTriangles, bs, num_blocks,alg);
     else
-        buildASFromDeviceData(state, 3*n, n, devVertices, devTriangles);
+        buildASFromDeviceData(mem, state, 3*n, n, devVertices, devTriangles);
     cudaDeviceSynchronize();
     timer.stop();
     float AS_time = timer.get_elapsed_ms();
-    printf("done: %f ms%s\n", AS_time, AC_RESET);
+    printf("done: %f ms [output: %f MB, temp %f MB]\n" AC_RESET, AS_time, mem.out_buffer/1e6, mem.temp_buffer/1e6);
 
     // 4) Populate and move parameters to device (ONCE)
     printf("device params to GPU "); fflush(stdout);
@@ -124,7 +125,7 @@ float* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdAr
     CUDA_CHECK( cudaMemcpy(output, d_output, q*sizeof(float), cudaMemcpyDeviceToHost) );
     float avg_time = timems/(1000.0*reps);
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, avg_time, (double)q/avg_time, (double)avg_time*1e9/q);
-    write_results(timems, q, geom_time + AS_time, reps, args);
+    write_results(timems, q, geom_time + AS_time, reps, args, mem);
         
     // 6) clean up
     printf("cleaning up RTX environment..............."); fflush(stdout);

@@ -227,7 +227,7 @@ void populateSBT(GASstate &state) {
   state.sbt.hitgroupRecordCount = 1;
 }
 
-void buildASFromDeviceData(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles) {
+void buildASFromDeviceData(VBHMem &mem, GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles) {
 
   //const size_t vertices_size = sizeof(float3) * vertices.size();
   //CUDA_CHECK( cudaMalloc(reinterpret_cast<void**>(&state.d_temp_vertices), vertices_size) );
@@ -271,9 +271,9 @@ void buildASFromDeviceData(GASstate &state, int nverts, int ntris, float3 *devVe
   size_t compactedSizeOffset = roundUp<size_t>(gas_buffer_sizes.outputSizeInBytes, 8ull);
   CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&d_buffer_temp_output_gas_and_compacted_size), compactedSizeOffset + 8) );
 
-  float out_size = (float)gas_buffer_sizes.outputSizeInBytes / 1e9;
-  float temp_size = (float)gas_buffer_sizes.tempSizeInBytes / 1e9;
-  printf("Memory usage (GB): output_buffer %f,  temp_buffer %f\n", out_size, temp_size); 
+  mem.out_buffer = gas_buffer_sizes.outputSizeInBytes;
+  mem.temp_buffer = gas_buffer_sizes.tempSizeInBytes;
+  //printf("Memory usage (GB): output_buffer %f,  temp_buffer %f\n", out_size, temp_size); 
 
   OptixAccelEmitDesc emitProperty = {};
   //emitProperty.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
@@ -314,7 +314,7 @@ void buildASFromDeviceData(GASstate &state, int nverts, int ntris, float3 *devVe
   //CUDA_CHECK(cudaFree(d_vertices));
 }
 
-void buildBlockGeometry(GASstate &state, int idx, int ntris) {
+void buildBlockGeometry(VBHMem &mem, GASstate &state, int idx, int ntris) {
   OptixAccelBuildOptions accel_options = {};
   //accel_options.buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION | OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
   state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
@@ -335,6 +335,10 @@ void buildBlockGeometry(GASstate &state, int idx, int ntris) {
 
   OptixAccelBufferSizes gas_buffer_sizes;
   OPTIX_CHECK( optixAccelComputeMemoryUsage(state.context, &accel_options, &triangle_input, 1, &gas_buffer_sizes) );
+
+  mem.out_buffer += gas_buffer_sizes.outputSizeInBytes;
+  mem.temp_buffer = max(mem.temp_buffer, gas_buffer_sizes.tempSizeInBytes);
+  //printf("Memory usage (GB): output_buffer %f,  temp_buffer %f\n", mem.out_buffer/1e9, mem.temp_buffer/1e9); 
 
 
   CUDA_CHECK( cudaMalloc( reinterpret_cast<void**>(&state.d_temp_buffer), gas_buffer_sizes.tempSizeInBytes) );
@@ -367,10 +371,9 @@ void buildBlockGeometry(GASstate &state, int idx, int ntris) {
   //dbg("after accelbuild");
 
   CUDA_CHECK(cudaFree((void*)state.d_temp_buffer));
-  //CUDA_CHECK(cudaFree((void*)d_buffer_temp_output_gas_and_compacted_size));
 }
 
-void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles, int bs, int nb, int alg) {
+void buildIAS(VBHMem &mem, GASstate &state, int nverts, int ntris, float3 *devVertices, uint3 *devTriangles, int bs, int nb, int alg) {
   //dbg("start build AS");
   state.d_temp_vertices = reinterpret_cast<CUdeviceptr>(devVertices);
   state.d_temp_triangles = reinterpret_cast<CUdeviceptr>(devTriangles);
@@ -457,10 +460,10 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
 #endif
 
   cudaDeviceSynchronize();
-  buildBlockGeometry(state, 0, nb);
+  buildBlockGeometry(mem, state, 0, nb);
   for (int i = 1; i < nb; ++i)
-    buildBlockGeometry(state, i, bs);
-  buildBlockGeometry(state, nb, ntris-idx_last);
+    buildBlockGeometry(mem, state, i, bs);
+  buildBlockGeometry(mem, state, nb, ntris-idx_last);
   cudaDeviceSynchronize();
 
   // IAS
@@ -534,6 +537,10 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
   OptixAccelBufferSizes ias_buffer_sizes;
   OPTIX_CHECK( optixAccelComputeMemoryUsage( state.context, &ias_accel_options, &state.ias_instance_input, 1, &ias_buffer_sizes ) );
 
+  mem.out_buffer += ias_buffer_sizes.outputSizeInBytes;
+  mem.temp_buffer = max(mem.temp_buffer, ias_buffer_sizes.tempSizeInBytes);
+  //printf("Memory usage (GB): output_buffer %f,  temp_buffer %f\n", out_size/1e9, temp_size/1e9); 
+
   // non-compacted output
   CUdeviceptr d_buffer_temp_output_ias_and_compacted_size;
   size_t compactedSizeOffset = roundUp<size_t>( ias_buffer_sizes.outputSizeInBytes, 8ull );
@@ -558,11 +565,12 @@ void buildIAS(GASstate &state, int nverts, int ntris, float3 *devVertices, uint3
         ias_buffer_sizes.tempSizeInBytes, d_buffer_temp_output_ias_and_compacted_size,
         ias_buffer_sizes.outputSizeInBytes, &state.gas_handle, &emitProperty, 1 ) );
 
-  if( needIASTempBuffer )
-  {
+  if( needIASTempBuffer ) {
     CUDA_CHECK( cudaFree( (void*)d_ias_temp_buffer ) );
+  } else {
+    CUDA_CHECK( cudaFree( (void*)state.d_temp_buffer) );
   }
-  CUDA_CHECK( cudaFree((void*)d_buffer_temp_output_ias_and_compacted_size) );
+  //CUDA_CHECK( cudaFree((void*)d_buffer_temp_output_ias_and_compacted_size) );
 
   //state.d_ias_output_buffer = d_buffer_temp_output_ias_and_compacted_size;
   //state.ias_output_buffer_size = ias_buffer_sizes.outputSizeInBytes;
