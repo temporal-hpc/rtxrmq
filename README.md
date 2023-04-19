@@ -2,7 +2,7 @@
 
 ## Dependencies
 - CUDA 11 or later
-- OptiX 7.5 or later
+- OptiX 7.7 or later
 
 ## Compile and run
 ```
