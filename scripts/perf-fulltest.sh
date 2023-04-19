@@ -68,7 +68,6 @@ else
 	# constant BS and NB
 	./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16        ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     bs   ${const_bs}  -3   ${name}-constBS
 	./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16        ${N1}         ${N2}         ${DN}   ${Q1} ${Q2}   ${DQ}     nb   ${const_nb}  -3   ${name}-constNB
-
 fi
 DATEEND=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 printf "FULL BENCHMARK FINISHED: args dev=${dev} nt=${nt} alg=${alg} name=${name}\n"

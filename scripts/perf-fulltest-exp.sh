@@ -52,9 +52,8 @@ else
 
 	# LOGNORMAL DISTRIBUTION (medium values) EXP 0.6
 	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   20     26   26       nb         0      -2   ${name}
-	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      21   25     26   26       nb         1      -2   ${name}
-	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      26   26     26   26       nb         9      -2   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   22     26   26       nb         1      -2   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      23   26     26   26       nb         9      -2   ${name}
 	# constant BS and NB
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -2   ${name}-constBS
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -2   ${name}-constNB
@@ -74,8 +73,7 @@ else
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      19   20     26   26       nb        11      -3   ${name}
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      21   21     26   26       nb        12      -3   ${name}
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      22   24     26   26       nb        13      -3   ${name}
-	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      25   25     26   26       nb        14      -3   ${name}
-	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      26   26     26   26       nb        13      -3   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      25   26     26   26       nb        14      -3   ${name}
 	# constant BS and NB
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -3   ${name}-constBS
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -3   ${name}-constNB
