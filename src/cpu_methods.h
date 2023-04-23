@@ -1,6 +1,7 @@
 #pragma once
 #include <omp.h>
 #include "../hrmq/includes/RMQRMM64.h"
+#include "tools.h"
 
 template <typename T>
 T cpu_min(T *A, int l, int r) {
@@ -52,7 +53,7 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, CmdArgs args) {
     uint size = rmq->getSize();
     timer.stop();
     float struct_time = timer.get_elapsed_ms();
-    printf("done: %f ms (%f MB)\n", struct_time, (double)size/1e9);
+    printf("done: %f ms (%f MB)\n", struct_time, (double)size/1e6);
 
     //printf("%sAnswering Querys [%2i threads]......", AC_BOLDCYAN, nt); fflush(stdout);
     printf(AC_BOLDCYAN "Computing RMQs (%-11s,nt=%2i,r=%-3i).." AC_RESET, algStr[ALG_CPU_HRMQ], nt, reps); fflush(stdout);
@@ -72,6 +73,6 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, CmdArgs args) {
     double timems = timer.get_elapsed_ms();
     float time_it = timems/reps;
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, timems/(1000.0*reps), (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
-    write_results(timems, nq, struct_time, reps, args);
+    write_results(timems, nq, struct_time, reps, args, {size, 0});
     return out;
 }
