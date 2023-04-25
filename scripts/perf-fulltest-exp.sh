@@ -31,7 +31,7 @@ if [ "$alg" -ne 5 ]; then
 			./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   24      26   26       nb       0      ${lr}  ${name}
 		fi
 	done
-else
+elif [ "$alg" -eq 5 ]; then
 	# UNIFORM DISTRIBUTION (large values)
 	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   12     26   26       nb         0      -1   ${name}
@@ -73,29 +73,31 @@ else
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      19   20     26   26       nb        11      -3   ${name}
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      21   21     26   26       nb        12      -3   ${name}
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      22   24     26   26       nb        13      -3   ${name}
-	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      25   26     26   26       nb        14      -3   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      25   26     26   26       nb        13      -3   ${name}
 	# constant BS and NB
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -3   ${name}-constBS
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -3   ${name}-constNB
 
-
-
-
-
-	# LOGNORMAL V2
+elif [ "$alg" -eq 8 ]; then
+	# UNIFORM DISTRIBUTION (large values)
 	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   24      26   26       nb        1      -4    ${name}
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      25   26      26   26       nb        7      -4    ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   21     26   26       bs        9      -1   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      22   26     26   26       bs       18      -1   ${name}
+	# constant BS and NB
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -1   ${name}-constBS
 
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0    9      26   26       nb        0      -5    ${name}
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      10   19      26   26       nb       11      -5    ${name}
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      20   24      26   26       nb       11      -5    ${name}
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      25   26      26   26       nb       13      -5    ${name}
-	## constant BS and NB
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -4   ${name}-constBS
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -5   ${name}-constBS
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -4   ${name}-constNB
-	#./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb   ${const_nb}  -5   ${name}-constNB
+	# LOGNORMAL DISTRIBUTION (medium values) EXP 0.6
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   22     26   26       bs        20      -2   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      23   26     26   26       bs        18      -2   ${name}
+	# constant BS and NB
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -2   ${name}-constBS
+
+	# LOGNORMAL DISTRIBUTION (small values) EXP 0.3
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   21     26   26       bs        10      -3   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      22   26     26   26       bs        18      -3   ${name}
+	# constant BS and NB
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       bs   ${const_bs}  -3   ${name}-constBS
+
 fi
 DATEEND=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 printf "FULL BENCHMARK EXP FINISHED: args dev=${dev} nt=${nt} alg=${alg} name=${name}\n"

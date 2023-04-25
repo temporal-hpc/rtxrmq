@@ -24,7 +24,7 @@ if [ "$alg" -ne 5 ]; then
 			#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
 			./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       nb       0      ${lr}  ${name}-QPERF
 	done
-else
+elif [ "$alg" -eq 5 ]; then
 	# UNIFORM DISTRIBUTION (large values)
 	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       nb         9      -1   ${name}-QPERF
@@ -42,6 +42,21 @@ else
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       nb        13      -3   ${name}-QPERF
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       bs   ${const_bs}  -3   ${name}-QPERF-constBS
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       nb   ${const_nb}  -3   ${name}-QPERF-constNB
+elif [ "$alg" -eq 8 ]; then
+	# UNIFORM DISTRIBUTION (large values)
+	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       bs        18      -1   ${name}-QPERF
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       bs   ${const_bs}  -1   ${name}-QPERF-constBS
+
+	# LOGNORMAL DISTRIBUTION (medium values) EXP 0.6
+	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       bs        18      -2   ${name}-QPERF
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       bs   ${const_bs}  -2   ${name}-QPERF-constBS
+
+	# LOGNORMAL DISTRIBUTION (small values) EXP 0.3
+	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       bs        13      -3   ${name}-QPERF
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      24   24     0   26       bs   ${const_bs}  -3   ${name}-QPERF-constBS
 fi
 DATEEND=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 printf "FULL BENCHMARK EXP FINISHED: args dev=${dev} nt=${nt} alg=${alg} name=${name}\n"
