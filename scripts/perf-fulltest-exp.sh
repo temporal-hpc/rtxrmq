@@ -21,7 +21,7 @@ echo "START #DATE = ${DATEBEGIN}"
 
 printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
 
-if [ "$alg" -ne 5 ]; then
+if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ]; then
 	for lr in {-1..-3}
 	do
 		if [ "$alg" -ne 3 ]; then
