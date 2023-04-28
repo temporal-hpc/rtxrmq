@@ -1367,7 +1367,6 @@ ulong RMQRMM64::rmqi_rmm(ulong x1, ulong x2, long int *min, long int *currSum, u
 
 // always return a position of open parenthesis with the minimum value
 ulong RMQRMM64::rmqi(ulong i, ulong j){
-    printf("BEGIN rmqi(..)\n"); fflush(stdout);
 	long int min, sum;
 	min = sum = 0;
 	if(j < nBin)
@@ -1385,7 +1384,6 @@ ulong RMQRMM64::rmqi(ulong i, ulong j){
 			}
 		}
 	}
-    printf("END rmqi(..)\n"); fflush(stdout);
 	return 0;
 }
 

@@ -52,7 +52,7 @@ find_library(RMQRMM rmqrmmBP.a hrmq/)
 
 add_executable(rtxrmq src/main.cu common/common.cpp common/Rapl.cpp common/nvmlPower.cpp)
 target_link_libraries(rtxrmq PRIVATE CUDA::cudart CUDA::nvml OptiX7 OpenMP::OpenMP_CXX ${RMQRMM})
-set_target_properties(rtxrmq PROPERTIES CUDA_ARCHITECTURES native)
+set_target_properties(rtxrmq PROPERTIES CUDA_ARCHITECTURES 89)
 
 # ==============================================================================
 # Add any needed PTX compilations here

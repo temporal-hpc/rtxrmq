@@ -103,12 +103,6 @@ int main(int argc, char *argv[]) {
             break;
         case ALG_CPU_HRMQ:
             hAi = reinterpret_cast<int*>(hA);
-            for(int i=0; i<n; ++i){
-                printf("hAi[%i] = %i\n", i, hAi[i]);
-            }
-            for(int i=0; i<q; ++i){
-                printf("hQ[%i] = [%i, %i]\n", i, hQ[i].x, hQ[i].y);
-            }
             outi = rmq_rmm_par(n, q, hAi, hQ, nt, args);
             out = reinterpret_cast<float*>(outi);
             break;

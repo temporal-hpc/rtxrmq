@@ -1,5 +1,6 @@
-CC=g++-10
-CFLAGS=-std=c++11 -O3 -DNDEBUG -march=native
+CC=g++-12
+#CFLAGS=-std=c++11 -O3 -DNDEBUG -march=native
+CFLAGS=-std=c++11 -O3 -DNDEBUG -Ofast -march=znver3 -mtune=znver3 -ftree-vectorize
 
 all: index
 
@@ -18,4 +19,4 @@ test:
 clean:
 	-rm *~ *.o *.bak 
 cleanall:
-	-rm *~ *.o *.bak .a
+	-rm *~ *.o *.bak *.a
