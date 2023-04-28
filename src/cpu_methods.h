@@ -61,10 +61,13 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, CmdArgs args) {
         CPUPowerBegin("HRMQ", 100, args.time_file);
     timer.restart();
     for (int i = 0; i < reps; ++i) {
+        printf("REP %i\n", i); fflush(stdout);
         #pragma omp parallel for shared(rmq, out, A, Q)
-        for (int i = 0; i < nq; ++i) {
-            int idx = rmq->queryRMQ(Q[i].x, Q[i].y);
-            out[i] = A[idx];
+        for (int j = 0; j < nq; ++j) {
+            printf("query %i  [%i, %i]\n", j, Q[j].x, Q[j].y); fflush(stdout);
+            int idx = rmq->queryRMQ(Q[j].x, Q[j].y);
+            printf("A[%i] = %i\n", idx, A[idx]); fflush(stdout);
+            out[j] = A[idx];
         }
     }
     timer.stop();
