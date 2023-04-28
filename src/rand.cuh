@@ -122,12 +122,12 @@ void fill_queries_constant(int2 *query, int q, int lr, int n, int nt, int seed){
         int begin = chunk*tid;
         int end   = begin + chunk;
         int qsize = lr;
-        for(int i=begin; i<end; ++i){
+        for(int i=begin; i<q && i<end; ++i){
             std::uniform_int_distribution<int> lrand(0, n-1 - (qsize-1));
             int l = lrand(gen);
             query[i].x = l;
             query[i].y = l + (qsize - 1);
-            //printf("thread %i (l,r) -> (%i, %i)\n\n", tid, query[i].x, query[i].y);
+            printf("thread %i (l,r) -> (%i, %i)\n\n", tid, query[i].x, query[i].y);
         }
     }
 }

@@ -1,4 +1,4 @@
-CC=g++
+CC=g++-10
 CFLAGS=-std=c++11 -O3 -DNDEBUG -march=native
 
 all: index
