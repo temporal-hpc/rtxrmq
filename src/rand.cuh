@@ -127,7 +127,7 @@ void fill_queries_constant(int2 *query, int q, int lr, int n, int nt, int seed){
             int l = lrand(gen);
             query[i].x = l;
             query[i].y = l + (qsize - 1);
-            printf("thread %i (l,r) -> (%i, %i)\n\n", tid, query[i].x, query[i].y);
+            //printf("thread %i (l,r) -> (%i, %i)\n\n", tid, query[i].x, query[i].y);
         }
     }
 }

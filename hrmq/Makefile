@@ -1,6 +1,7 @@
 CC=g++-12
 #CFLAGS=-std=c++11 -O3 -DNDEBUG -march=native
-CFLAGS=-std=c++11 -O3 -DNDEBUG -Ofast -march=znver3 -mtune=znver3 -ftree-vectorize
+#CFLAGS=-std=c++11 -O3 -DNDEBUG -Ofast -march=znver3 -mtune=znver3 -ftree-vectorize
+CFLAGS=-std=c++11 -O3 -DNDEBUG
 
 all: index
 
