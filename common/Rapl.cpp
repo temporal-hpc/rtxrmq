@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <cstring>
 
 
 #include "Rapl.h"
@@ -58,6 +59,15 @@
 
 #define SIGNATURE_MASK                 0xFFFF0
 
+/* AMD MSR DEFINES */
+#define AMD_MSR_PWR_UNIT 	       0xC0010299
+#define AMD_MSR_CORE_ENERGY 	       0xC001029A
+#define AMD_MSR_PACKAGE_ENERGY         0xC001029B
+
+#define AMD_TIME_UNIT_MASK             0xF0000
+#define AMD_ENERGY_UNIT_MASK           0x1F00
+#define AMD_POWER_UNIT_MASK            0xF
+
 // CPU signature codes, useful for filtering uncompatible measures
 #define IVYBRIDGE_E                    0x306F0
 #define SANDYBRIDGE_E                  0x206D0
@@ -69,21 +79,39 @@
 Rapl::Rapl() {
 
 	open_msr();
+	vendor = get_vendor();
+	n_sockets = get_n_sockets();
+	smt = get_smt();
+	n_logical_cores = get_n_logical_cores();
 	pp1_supported = detect_pp1();
 
+
 	/* Read MSR_RAPL_POWER_UNIT Register */
-	uint64_t raw_value = read_msr(MSR_RAPL_POWER_UNIT);
+	uint64_t raw_value;
+	//printf("trying vendor units %u\n", vendor);
+	if (vendor == 0){
+		raw_value = read_msr(MSR_RAPL_POWER_UNIT);
+	} else if (vendor == 1){
+		raw_value = read_msr(AMD_MSR_PWR_UNIT);
+	}
 	power_units = pow(0.5,	(double) (raw_value & 0xf));
 	energy_units = pow(0.5,	(double) ((raw_value >> 8) & 0x1f));
 	time_units = pow(0.5,	(double) ((raw_value >> 16) & 0xf));
 
 	/* Read MSR_PKG_POWER_INFO Register */
-	raw_value = read_msr(MSR_PKG_POWER_INFO);
-	thermal_spec_power = power_units * ((double)(raw_value & 0x7fff));
-	minimum_power = power_units * ((double)((raw_value >> 16) & 0x7fff));
-	maximum_power = power_units * ((double)((raw_value >> 32) & 0x7fff));
-	time_window = time_units * ((double)((raw_value >> 48) & 0x7fff));
-
+	if (vendor==0){
+		raw_value = read_msr(MSR_PKG_POWER_INFO);
+		thermal_spec_power = power_units * ((double)(raw_value & 0x7fff));
+		minimum_power = power_units * ((double)((raw_value >> 16) & 0x7fff));
+		maximum_power = power_units * ((double)((raw_value >> 32) & 0x7fff));
+		time_window = time_units * ((double)((raw_value >> 48) & 0x7fff));
+	} else if (vendor == 1){
+		thermal_spec_power = 0; 
+		minimum_power = 0;
+		maximum_power = 0;
+		time_window = 0;
+	
+	}
 	reset();
 }
 
@@ -103,6 +131,67 @@ void Rapl::reset() {
 	running_total.dram = 0;
 	gettimeofday(&(running_total.tsc), NULL);
 }
+int Rapl::get_n_logical_cores(){
+	uint32_t eax, ebx, ecx, edx;
+	__asm__("mov $0x0000000B, %%eax;" // set eax to 0x0000000B
+		"mov $0x01, %%ecx;" // set ecx to 0x01
+		"cpuid;" // execute cpuid
+		:"=a"(eax), "=b"(ebx), "=d"(edx), "=c"(ecx) // output operands
+		: // no input operand
+		);
+	//printf("Logical cores = %u\n", ebx & 0xFF);
+	return ebx & 0xFF; // print the string
+}
+int Rapl::get_smt(){
+
+	uint32_t eax, ebx, ecx, edx;
+	if (vendor==1){
+		__asm__("mov $0x8000001E, %%eax;" // set eax to 0x0000000B
+			"cpuid;" // execute cpuid
+			:"=a"(eax), "=b"(ebx), "=d"(edx), "=c"(ecx) // output operands
+			: // no input operand
+			);
+		if ((ebx & 0xFF00) >> 8 == 0){
+			//printf("SMT disabled\n");
+		}else {
+			//printf("SMT enabled\n");
+		}
+
+		return (ebx & 0xFF00) >> 8;
+	} else {
+		//printf("Get hyperthreading not yet implemented for intel. Assuming disabled\n");
+		return 0;
+	}
+}
+int Rapl::get_vendor(){
+	int v = 0;
+	uint32_t eax = 0;
+	union {
+	    struct {
+		uint32_t ebx;
+		uint32_t edx;
+		uint32_t ecx;
+	    };
+	    char vendor[13];
+	} u;
+	__asm__("cpuid;"
+		:"=a"(eax), "=b"(u.ebx), "=d"(u.edx), "=c"(u.ecx) // output operands
+		:"0"(eax) // input operand
+		);
+	u.vendor[12] = '\0'; // add the null terminator
+
+	//printf("vendor = %s\n", u.vendor); // print the string
+	if (strcmp(u.vendor, "AuthenticAMD") == 0) {
+	    v = 1;
+	} else {
+	    v = 0;
+	}
+
+	
+	return v;
+
+}
+
 
 bool Rapl::detect_pp1() {
 	uint32_t eax_input = 1;
@@ -145,7 +234,7 @@ void Rapl::open_msr() {
 	}
 }
 
-uint64_t Rapl::read_msr(int msr_offset) {
+uint64_t Rapl::read_msr(uint32_t msr_offset) {
 	uint64_t data;
 	if (pread(fd, &data, sizeof(data), msr_offset) != sizeof(data)) {
 		perror("read_msr():pread");
@@ -156,17 +245,31 @@ uint64_t Rapl::read_msr(int msr_offset) {
 
 void Rapl::sample() {
 	uint32_t max_int = ~((uint32_t) 0);
+	next_state->pkg = 0;
+	next_state->pp0 = 0;
+	next_state->pp1 = 0;
+	next_state->dram = 0;
 
-	next_state->pkg = read_msr(MSR_PKG_ENERGY_STATUS) & max_int;
-	next_state->pp0 = read_msr(MSR_PP0_ENERGY_STATUS) & max_int;
-
-	if (pp1_supported) {
-		next_state->pp1 = read_msr(MSR_PP1_ENERGY_STATUS) & max_int;
-		next_state->dram = 0;
-	} else {
-		next_state->pp1 = 0;
-		next_state->dram = read_msr(MSR_DRAM_ENERGY_STATUS) & max_int;
+	for (int i=0; i<n_sockets; i++){
+		core = first_lcoreid[i];
+		if (vendor==0) {
+			next_state->pkg += read_msr(MSR_PKG_ENERGY_STATUS) & max_int;
+			next_state->pp0 += read_msr(MSR_PP0_ENERGY_STATUS) & max_int;
+			if (pp1_supported) {
+				next_state->pp1 += read_msr(MSR_PP1_ENERGY_STATUS) & max_int;
+				next_state->dram += 0;
+			} else {
+				next_state->pp1 += 0;
+				next_state->dram += read_msr(MSR_DRAM_ENERGY_STATUS) & max_int;
+			}
+		} else if (vendor==1) {
+			next_state->pkg += read_msr(AMD_MSR_PACKAGE_ENERGY) & max_int;
+			next_state->pp0 += 0;
+			next_state->pp1 += 0;
+			next_state->dram += 0;
+		}
 	}
+
 
 	gettimeofday(&(next_state->tsc), NULL);
 
@@ -265,4 +368,98 @@ double Rapl::total_time() {
 
 double Rapl::current_time() {
 	return time_delta(&(prev_state->tsc), &(current_state->tsc));
+}
+
+int Rapl::get_n_sockets(){
+    FILE *fp;
+    char line[MAX_LINE];
+    int cpu[MAX_CPU];
+    int i, n, id, count;
+
+    // initialize cpu array to -1
+    for (i = 0; i < MAX_CPU; i++) {
+        cpu[i] = -1;
+    }
+
+    // open the file
+    fp = fopen("/sys/devices/system/cpu/online", "r");
+    if (fp == NULL) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
+
+    // read the first line
+    if (fgets(line, MAX_LINE, fp) == NULL) {
+        perror("fgets");
+        exit(EXIT_FAILURE);
+    }
+
+    // close the file
+    fclose(fp);
+
+    // parse the line and store the online cpu numbers in cpu array
+    // This assumes that cpus are listed as "0-3,4-8,3-5"
+    n = 0; // number of online cpus
+    char *token = strtok(line, ",");
+    while (token != NULL) {
+        if (strchr(token, '-') != NULL) {
+            // range of cpus
+            int start, end;
+            sscanf(token, "%d-%d", &start, &end);
+            for (i = start; i <= end; i++) {
+                cpu[n++] = i;
+            }
+        } else {
+            // single cpu
+            cpu[n++] = atoi(token);
+        }
+        token = strtok(NULL, ",");
+    }
+
+    // count the number of unique physical ids for online cpus
+    count = 0; // number of sockets
+    int curr_id = 0;
+    for (i=0; i<MAX_SOCKETS; i++){
+    	sockets[i] = -1;
+	first_lcoreid[i] = -1;
+    }
+    for (i = 0; i < n; i++) {
+        // construct the file name for each cpu
+        char filename[MAX_LINE];
+        sprintf(filename, "/sys/devices/system/cpu/cpu%d/topology/physical_package_id", cpu[i]);
+
+        // open the file
+        fp = fopen(filename, "r");
+        if (fp == NULL) {
+            perror("fopen");
+            exit(EXIT_FAILURE);
+        }
+
+        // read the physical id
+        if (fscanf(fp, "%d", &id) != 1) {
+            perror("fscanf");
+            exit(EXIT_FAILURE);
+        }
+
+        // close the file
+        fclose(fp);
+	if (sockets[id] == -1){
+		sockets[id] = 1;
+		first_lcoreid[id] = i;
+	}
+    }
+
+
+    count = 0;
+    for (i=0; i<MAX_SOCKETS; i++){
+	    if (sockets[i] == 1){
+	    	count++;
+	    }
+    }
+
+    // print the result
+//printf("Number of sockets: %d\n", count);
+
+    return count;
+
 }

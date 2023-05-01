@@ -266,11 +266,11 @@ void* CPUpowerPollingFunc(void *ptr){
 
 		// Write current value of CPU PKG
 		fprintf(fp, "%-15i %-15f %-15f %-15f %-15f %-15f\n", timestep, rapl->pkg_current_power(), rapl->pkg_total_energy(), rapl->pkg_average_power(), rapl->current_time(), rapl->total_time());
-		printf("\r [CPU = %-10.5f (W)  DRAM = %-10.5f (W)]   [GPU = %-10.5f (W)]",
+		/*printf("\r [CPU = %-10.5f (W)  DRAM = %-10.5f (W)]   [GPU = %-10.5f (W)]",
 				rapl->pkg_current_power(), 
 				rapl->dram_current_power(), 
 				gpuCurrentPower);
-		fflush(stdout);
+		fflush(stdout);*/
 		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
 	}
 	fclose(fp);

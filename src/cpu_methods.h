@@ -69,7 +69,7 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, CmdArgs args) {
     }
     timer.stop();
     if (args.save_power)
-        GPUPowerEnd();
+        CPUPowerEnd();
     double timems = timer.get_elapsed_ms();
     float time_it = timems/reps;
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, timems/(1000.0*reps), (double)nq/(time_it/1000.0), (double)time_it*1e6/nq);
