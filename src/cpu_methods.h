@@ -58,7 +58,8 @@ int *rmq_rmm_par(int n, int nq, int *A, int2 *Q, int nt, CmdArgs args) {
     //printf("%sAnswering Querys [%2i threads]......", AC_BOLDCYAN, nt); fflush(stdout);
     printf(AC_BOLDCYAN "Computing RMQs (%-11s,nt=%2i,r=%-3i).." AC_RESET, algStr[ALG_CPU_HRMQ], nt, reps); fflush(stdout);
     if (args.save_power)
-        CPUPowerBegin("HRMQ", 100, args.time_file);
+        //CPUPowerBegin("HRMQ", 100, args.time_file);
+        CPUPowerBegin("HRMQ", 100, args.power_file);
     timer.restart();
     for (int i = 0; i < reps; ++i) {
         #pragma omp parallel for shared(rmq, out, A, Q)
