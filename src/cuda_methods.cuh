@@ -49,6 +49,7 @@ float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, CmdArgs args){
     dim3 block(BSIZE, 1, 1);
     dim3 grid((q+BSIZE-1)/BSIZE, 1, 1);
     float *hout, *dout;
+    size_t bytesUsed = sizeof(int)*n;
     printf("Creating out array........................"); fflush(stdout);
     Timer timer;
     hout = (float*)malloc(sizeof(float)*q);
@@ -69,7 +70,7 @@ float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, CmdArgs args){
     CUDA_CHECK(cudaMemcpy(hout, dout, sizeof(float)*q, cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaFree(dout));
     printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
-    write_results(timems, q, 0, reps, args);
+    write_results(timems, q, 0, reps, args, {bytesUsed, 0});
     return hout;
 }
 
