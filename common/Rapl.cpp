@@ -88,7 +88,7 @@ Rapl::Rapl() {
 	}
 	/* Read MSR_RAPL_POWER_UNIT Register */
 	uint64_t raw_value;
-	printf("trying vendor units %u\n", vendor);
+	//printf("trying vendor units %u\n", vendor);
 	if (vendor == 0){
 		raw_value = read_msr(0, MSR_RAPL_POWER_UNIT);
 	} else if (vendor == 1){
@@ -142,7 +142,7 @@ int Rapl::get_n_logical_cores(){
 		:"=a"(eax), "=b"(ebx), "=d"(edx), "=c"(ecx) // output operands
 		: // no input operand
 		);
-	printf("Logical cores = %u\n", ebx & 0xFF);
+	//printf("Logical cores = %u\n", ebx & 0xFF);
 	return ebx & 0xFF; // print the string
 }
 int Rapl::get_smt(){
@@ -178,7 +178,7 @@ int Rapl::get_vendor(){
 		);
 	u.vendor[12] = '\0'; // add the null terminator
 
-	printf("vendor = %s\n", u.vendor); // print the string
+	//printf("vendor = %s\n", u.vendor); // print the string
 	if (strcmp(u.vendor, "AuthenticAMD") == 0) {
 	    v = 1;
 	} else {
@@ -198,7 +198,7 @@ bool Rapl::detect_pp1() {
 			:"0"(eax_input)          // 1 into EAX (input)
 			:"%ebx","%ecx","%edx");  // clobbered registers
 	
-	printf("eax = %X\n", eax);
+	//printf("eax = %X\n", eax);
 
 	uint32_t cpu_signature = eax & SIGNATURE_MASK;
     	#ifdef POWER_DEBUG
@@ -332,6 +332,7 @@ double Rapl::pp1_current_power() {
 		double t = time_delta(&(prev_state[i]->tsc), &(current_state[i]->tsc));
 		p += power(prev_state[i]->pp1, current_state[i]->pp1, t);
 	}
+    return p;
 }
 
 double Rapl::dram_current_power() {
@@ -487,7 +488,7 @@ int Rapl::get_n_sockets(){
     }
 
     // print the result
-    printf("Number of sockets: %d\n", count);
+    //printf("Number of sockets: %d\n", count);
 
     return count;
 
