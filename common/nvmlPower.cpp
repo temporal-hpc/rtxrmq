@@ -255,7 +255,7 @@ void* CPUpowerPollingFunc(void *ptr){
 	int timestep = 0;
 	double dt = 0.0, acctime = 0.0, accenergy = 0.0, power = 0.0;
 	FILE *fp = fopen(CPUfilename.c_str(), "w+");
-	//fprintf(fp, "%-15s %-15s %-15s %-15s %-15s %-15s\n", "#timestep", "power", "acc-energy", "avg-power", "dt", "acc-time");
+	fprintf(fp, "%-15s %-15s %-15s %-15s %-15s %-15s\n", "#timestep", "power", "acc-energy", "avg-power", "dt", "acc-time");
 	while(CPUpollThreadStatus){
 		timestep++;
 		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);

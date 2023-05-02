@@ -1,4 +1,4 @@
-dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction
+dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction,outbuffer,tempbuffer
 NVIDIA TITAN RTX,[GPU] RTX_blocks,32,1,1,67108864,-1,0.221042,9715272568.881401,0.102931,0.223010
 NVIDIA TITAN RTX,[GPU] RTX_blocks,32,1,1,67108864,-1,0.225110,9539687840.126240,0.104825,0.224861
 NVIDIA TITAN RTX,[GPU] RTX_blocks,32,1,1,67108864,-1,0.224232,9577080601.093184,0.104416,0.231931

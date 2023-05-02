@@ -1,4 +1,4 @@
-dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction
+dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction,outbuffer,tempbuffer
 NVIDIA GeForce RTX 4090,[GPU] RTX_blocks,32,1,1,67108864,-1,0.091701,23418355208.963631,0.042702,0.164535
 NVIDIA GeForce RTX 4090,[GPU] RTX_blocks,32,1,1,67108864,-1,0.091699,23418902715.690712,0.042701,0.167245
 NVIDIA GeForce RTX 4090,[GPU] RTX_blocks,32,1,1,67108864,-1,0.091701,23418446783.039043,0.042701,0.165465

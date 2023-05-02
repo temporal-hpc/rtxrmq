@@ -1,4 +1,4 @@
-dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction
+dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction,outbuffer,tempbuffer
 NVIDIA RTX 6000 Ada Generation,[GPU] RTX_blocks,32,1,1,67108864,-1,0.086239,24901469150.145321,0.040158,0.181153,0.003200,0.001408
 NVIDIA RTX 6000 Ada Generation,[GPU] RTX_blocks,32,1,1,67108864,-1,0.087451,24556487140.954292,0.040722,0.184233,0.003200,0.001408
 NVIDIA RTX 6000 Ada Generation,[GPU] RTX_blocks,32,1,1,67108864,-1,0.086163,24923529470.523689,0.040123,0.182353,0.003200,0.001408

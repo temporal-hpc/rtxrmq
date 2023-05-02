@@ -1,4 +1,4 @@
-dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction
+dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction,outbuffer,tempbuffer
 NVIDIA GeForce RTX 3090 Ti,[GPU] RTX_blocks,32,16777216,32768,1,-1,0.000804,39776.309446,25140.592828,61.343376
 NVIDIA GeForce RTX 3090 Ti,[GPU] RTX_blocks,32,16777216,32768,1,-1,0.000876,36517.798885,27383.906767,61.415794
 NVIDIA GeForce RTX 3090 Ti,[GPU] RTX_blocks,32,16777216,32768,1,-1,0.000733,43670.029308,22898.999974,61.369190

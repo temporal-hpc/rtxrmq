@@ -1,4 +1,4 @@
-dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction
+dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction,outbuffer,tempbuffer
 CPU logen,[CPU] HRMQ,32,1,0,67108864,-1,1.120738,1916133873.126093,0.521884,0.017112
 CPU logen,[CPU] HRMQ,32,1,0,67108864,-1,1.118617,1919766990.027291,0.520897,0.015630
 CPU logen,[CPU] HRMQ,32,1,0,67108864,-1,1.119928,1917519629.180564,0.521507,0.018054

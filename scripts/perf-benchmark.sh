@@ -27,7 +27,7 @@ outfile_path=../data/perf-${15}-ALG${alg}.csv
 binary=./rtxrmq
 
 printf "args:\ndev=${dev} nt=${nt} alg=${alg} rea=${rea} reps=${reps} n=${n1}-${n2} (dn=${dn}) q=${q1}-${q2} (dq=${dq}) bs|nb=${bsize} lr=${lr}   outfile_path=${outfile_path}\n\n"
-[ ! -f ${outfile_path} ] && echo "dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction" > ${outfile_path}
+[ ! -f ${outfile_path} ] && echo "dev,alg,reps,n,bs,q,lr,t,q/s,ns/q,construction,outbuffer,tempbuffer" > ${outfile_path}
 DATEBEGIN=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 echo "START #DATE = ${DATEBEGIN}"
 
