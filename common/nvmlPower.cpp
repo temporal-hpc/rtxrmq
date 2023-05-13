@@ -138,6 +138,7 @@ void GPUPowerBegin(const char *alg, int ms, int dev, std::string filename){
 	// This statement assumes that the first indexed GPU will be used.
 	// If there are multiple GPUs that can be used by the system, this needs to be done with care.
 	// Test thoroughly and ensure the correct device ID is being used.
+    //printf("nvmlPower.cpp measuring power dev=%i\n", dev);
 	nvmlResult = nvmlDeviceGetHandleByIndex(dev, &nvmlDeviceID);
 	GPUpollThreadStatus = true;
 	if (filename.empty())

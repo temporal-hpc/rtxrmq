@@ -56,12 +56,16 @@ float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, CmdArgs args){
     CUDA_CHECK(cudaMalloc(&dout, sizeof(float)*q));
     printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
     printf(AC_BOLDCYAN "Computing RMQs (%-16s,r=%-3i)..." AC_RESET, algStr[ALG_GPU_BASE], reps); fflush(stdout);
+    if (args.save_power)
+        GPUPowerBegin(algStr[args.alg], 100, args.dev, args.power_file);
     timer.restart();
     for (int i = 0; i < reps; ++i) {
         kernel_rmq_basic<<<grid, block>>>(n, q, devx, devrmq, dout);
         CUDA_CHECK(cudaDeviceSynchronize());
     }
     timer.stop();
+    if (args.save_power)
+        GPUPowerEnd();
     float timems = timer.get_elapsed_ms();
     float avg_time = timems/(1000.0*reps);
     printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, avg_time, (double)q/(timems/1000.0), (double)timems*1e6/q);
