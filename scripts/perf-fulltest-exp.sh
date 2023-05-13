@@ -16,6 +16,7 @@ name=${4}
 
 const_bs=15
 const_nb=9
+
 DATEBEGIN=$(exec date +"%T-%m-%d-%Y (%:z %Z)")
 echo "START #DATE = ${DATEBEGIN}"
 
@@ -24,7 +25,11 @@ printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
 if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ]; then
 	for lr in {-1..-3}
 	do
-		if [ "$alg" -ne 3 ]; then
+		if [ "$alg" -eq 2 ]; then
+			#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
+			./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   18     26   26       nb       0      ${lr}  ${name}
+			./perf-benchmark-exp.sh ${dev} ${nt} ${alg}   2      2      19   26     26   26       nb       0      ${lr}  ${name}
+        elif [ "$alg" -ne 3 ]; then
 			#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
 			./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   26     26   26       nb       0      ${lr}  ${name}
 		else

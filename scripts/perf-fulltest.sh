@@ -33,11 +33,13 @@ printf "args dev=${dev} nt=${nt} alg=${alg} name=${name}, N1=${N1}, N2=${N2}, N2
 if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ]; then
 	for lr in {-1..-3}
 	do
-		if [ "$alg" -ne 3 ]; then
-			#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>  <n1>   <n2>   <dn>      <q1>  <q2>   <dq> <bs|nb> <block> <lr>   <name>
-			./perf-benchmark.sh     ${dev} ${nt} ${alg}  16    16    ${N1} ${N2}   ${DN}       ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
+		if [ "$alg" -eq 2 ]; then
+			#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>  <n1>   <n2>     <dn>      <q1>  <q2>   <dq> <bs|nb> <block> <lr>   <name>
+			./perf-benchmark.sh     ${dev} ${nt} ${alg}   2     2    ${N1} ${N2}     ${DN}      ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
+		elif [ "$alg" -eq 3 ]; then
+			./perf-benchmark.sh     ${dev} ${nt} ${alg}  16     16    ${N1} ${N2A3}  ${DN}      ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
 		else
-			./perf-benchmark.sh     ${dev} ${nt} ${alg}  16    16    ${N1} ${N2A3} ${DN}       ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
+			./perf-benchmark.sh     ${dev} ${nt} ${alg}  16     16    ${N1} ${N2}    ${DN}      ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
 		fi
 	done
 elif [ "$alg" -eq 5 ]; then
