@@ -21,7 +21,7 @@ q2=${9}
 bs_or_nb=${10}
 bsize=${11}
 lr=${12}
-outfile_path=../data/perfexp-${13}-ALG${alg}.csv
+outfile_path=../data/${13}-ALG${alg}.csv
 binary=./rtxrmq
 
 printf "args:\ndev=${dev} nt=${nt} alg=${alg} rea=${rea} reps=${reps} n=${n1}-${n2} q=${q1}-${q2} bsize=${bsize} lr=${lr}   outfile_path=${outfile_path}\n\n"

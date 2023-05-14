@@ -12,7 +12,7 @@ fi
 dev=${1}
 nt=${2}
 alg=${3}
-name=${4}
+name="perfexp-${4}"
 
 const_bs=15
 const_nb=9
