@@ -22,7 +22,7 @@ if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ]; then
 	for lr in {-1..-3}
 	do
 			#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1>  <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-			./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32    ${N1} ${N2}   0   26       nb       0      ${lr}  ${name}
+			./perf-benchmark-exp.sh ${dev} ${nt} ${alg}    2     2    ${N1} ${N2}   0   26       nb       0      ${lr}  ${name}
 	done
 elif [ "$alg" -eq 5 ]; then
 	# UNIFORM DISTRIBUTION (large values)
