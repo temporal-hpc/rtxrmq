@@ -73,7 +73,7 @@ def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
 
     minval = df_nb['mean_ns/q'].min()
     maxval = df_nb['mean_ns/q'].max()
-    print(f"{minval=}   {maxval=}")
+    #print(f"{minval=}   {maxval=}")
     #plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=.5, vmax=vmax))
     plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval), rasterized=True)
     #plt.colorbar()
@@ -82,7 +82,7 @@ def heat_map(x, y, plane, df, title, filename, saveFlag, vmax=100):
     plt.xticks(range(0,26,5), fontsize=10)
     plt.xlim(0,27)
     plt.yticks(range(0,-26,-5), fontsize=10)
-    
+
     # plt.yticks([i for i in range(5,26,2)])
     plt.title(get_title(title, x, y, col, plane))
     if saveFlag:
@@ -97,14 +97,14 @@ if __name__ == "__main__":
         exit()
     data_path = sys.argv[1]
     fname=Path(data_path).stem
-    print(f"{fname=}")
+    #print(f"{fname=}")
     try:
         nb = int(sys.argv[2])
     except ValueError:
         nb = None
     title = sys.argv[3]
     saveFlag= int(sys.argv[4])
-    print(f"ARGS:\n\t{data_path=}\n\t{nb=}\n\t{saveFlag}")
+    #print(f"ARGS:\n\t{data_path=}\n\t{nb=}\n\t{saveFlag}")
     df_3d = get3Ddata(data_path)
     nmin = int(df_3d['n-exp'].min())
     nmax = int(df_3d['n-exp'].max())
@@ -113,8 +113,8 @@ if __name__ == "__main__":
     #    print(f"Error:\n\t'n-exp' must be between the file's range: {nmin}..{nmax}\n")
     #    exit()
 
-    print("n:", sorted(df_3d['n-exp'].unique()))
-    print("nb:", sorted(df_3d['nb'].unique()))
-    print("lr:", sorted(df_3d['lr-ratio'].unique()))
+    #print("n:", sorted(df_3d['n-exp'].unique()))
+    #print("nb:", sorted(df_3d['nb'].unique()))
+    #print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
     heat_map('n-exp', 'lr-ratio', nb, df_3d, title,fname,saveFlag, vmax=30)

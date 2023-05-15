@@ -23,7 +23,7 @@ def heat_map(x, y, df, title, filename, saveFlag, vmax=100):
                 'lr-ratio' : sorted(df_nb['lr-ratio'].unique())}
 
     pl = df_nb.pivot(values = 'mean_ns/q', index = y, columns = x)
-    print(pl.shape)
+    #print(pl.shape)
 
     fig = plt.figure()
     k=0.5
@@ -32,7 +32,7 @@ def heat_map(x, y, df, title, filename, saveFlag, vmax=100):
 
     minval = df_nb['mean_ns/q'].min()
     maxval = df_nb['mean_ns/q'].max()
-    print(f"{minval=}   {maxval=}")
+    #print(f"{minval=}   {maxval=}")
     plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval), rasterized=True)
     #plt.colorbar()
     plt.xlabel("Array Size ($n=2^x$)", fontsize=12)
@@ -54,15 +54,15 @@ if __name__ == "__main__":
         exit()
     data_path = sys.argv[1]
     fname=Path(data_path).stem
-    print(f"{fname=}")
+    #print(f"{fname=}")
     title = sys.argv[2]
     saveFlag= int(sys.argv[3])
-    print(f"ARGS:\n\t{data_path=}\n\t{saveFlag}")
+    #print(f"ARGS:\n\t{data_path=}\n\t{saveFlag}")
     df_3d = get3Ddata(data_path)
     nmin = int(df_3d['n-exp'].min())
     nmax = int(df_3d['n-exp'].max())
 
-    print("n:", sorted(df_3d['n-exp'].unique()))
-    print("lr:", sorted(df_3d['lr-ratio'].unique()))
+    #print("n:", sorted(df_3d['n-exp'].unique()))
+    #print("lr:", sorted(df_3d['lr-ratio'].unique()))
 
     heat_map('n-exp', 'lr-ratio', df_3d, title,fname,saveFlag, vmax=30)
