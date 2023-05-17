@@ -57,7 +57,8 @@ elif [ "$alg" -eq 5 ]; then
 
 	# LOGNORMAL DISTRIBUTION (small values) EXP 0.3
 	#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
-	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32       0   20     26   26       nb        11      -3   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      14   17     26   26       nb        9      -3   ${name}
+	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      18   20     26   26       nb        11      -3   ${name}
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      21   21     26   26       nb        12      -3   ${name}
 	./perf-benchmark-exp.sh ${dev} ${nt} ${alg}  16     32      22   26     26   26       nb        13      -3   ${name}
 	# constant BS and NB
