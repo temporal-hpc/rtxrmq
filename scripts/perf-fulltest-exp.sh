@@ -23,7 +23,7 @@ echo "START #DATE = ${DATEBEGIN}"
 printf "args dev=${dev} nt=${nt} alg=${alg} bsize=${bsize} name=${name}\n\n"
 
 if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ]; then
-	for lr in {-1..-3}
+	for lr in {-2..-3}
 	do
 		if [ "$alg" -eq 2 ]; then
 			#./perf-benchmark-exp.sh <dev> <nt>  <alg>  <rea> <reps>   <n1> <n2>  <q1> <q2>  <bs-or-nb> <bsize>   <lr> <filename>
