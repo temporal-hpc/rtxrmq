@@ -5,124 +5,116 @@ SCRIPT=plot_perfexp.py
 # TIME
 echo "TIME plots"
 # **** large (l,r) range ****
-python ${SCRIPT} -1 time 1 1e-2 1e2 TITANRTX ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -1 time 1 1e-2 1e2 TITANRTX ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-TITANRTX-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA'
 
-python ${SCRIPT} -1 time 1 1e-2 1e2 RTX3090Ti ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -1 time 1 1e-2 1e2 RTX3090Ti ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -1 time 1 1e-2 1e2 RTX4090 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -1 time 1 1e-2 1e2 RTX4090 ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX4090-constNB-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-constBS-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
+
+python ${SCRIPT} -1 time 1 1e-2 1e2 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
 
 
 # **** medium (l,r) range ****
-python ${SCRIPT} -2 time 1 1e-2 1e2 TITANRTX ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -2 time 1 1e-2 1e2 TITANRTX ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-TITANRTX-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA'
 
-python ${SCRIPT} -2 time 1 1e-2 1e2 RTX3090Ti ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -2 time 1 1e-2 1e2 RTX3090Ti ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -2 time 1 1e-2 1e2 RTX4090 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -2 time 1 1e-2 1e2 RTX4090 ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX4090-constNB-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-constBS-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
+
+python ${SCRIPT} -2 time 1 1e-2 1e2 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
 
 
 # **** small (l,r) range ****
-python ${SCRIPT} -3 time 1 1e-2 1e2 TITANRTX ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -3 time 1 1e-2 1e2 TITANRTX ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-TITANRTX-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA'
 
-python ${SCRIPT} -3 time 1 1e-2 1e2 RTX3090Ti ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -3 time 1 1e-2 1e2 RTX3090Ti ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -3 time 1 1e-2 1e2 RTX4090 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -3 time 1 1e-2 1e2 RTX4090 ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX4090-constNB-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-constBS-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
 
+python ${SCRIPT} -3 time 1 1e-2 1e2 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
 
 
 
 # SPEEDUP
 echo "SPEEDUP plots"
 # **** large (l,r) range ****
-python ${SCRIPT} -1 speedup 1 0 200 TITANRTX ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -1 speedup 1 0 200 TITANRTX ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-TITANRTX-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA'
 
-python ${SCRIPT} -1 speedup 1 0 200 RTX3090Ti ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -1 speedup 1 0 200 RTX3090Ti ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -1 speedup 1 0 200 RTX4090 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -1 speedup 1 0 200 RTX4090 ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX4090-constNB-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-constBS-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
+
+python ${SCRIPT} -1 time 1 0 20 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
 
 
 # **** medium (l,r) range ****
-python ${SCRIPT} -2 speedup 1 0 150 TITANRTX ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -2 speedup 1 0 150 TITANRTX ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-TITANRTX-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA'
 
-python ${SCRIPT} -2 speedup 1 0 150 RTX3090Ti ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -2 speedup 1 0 150 RTX3090Ti ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -2 speedup 1 0 150 RTX4090 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -2 speedup 1 0 150 RTX4090 ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX4090-constNB-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-constBS-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
 
+python ${SCRIPT} -2 time 1 0 20 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
 
 # **** small (l,r) range ****
-python ${SCRIPT} -3 speedup 1 0 200 TITANRTX ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -3 speedup 1 0 200 TITANRTX ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-TITANRTX-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-TITANRTX-ALG7.csv 'LCA'
 
-python ${SCRIPT} -3 speedup 1 0 200 RTX3090Ti ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -3 speedup 1 0 200 RTX3090Ti ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constBS-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-constNB-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -3 speedup 1 0 200 RTX4090 ${CSVPATH}/perfexp-TRPRO-5975WX-ALG1.csv 'HRMQ'\
+python ${SCRIPT} -3 speedup 1 0 200 RTX4090 ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
                                  ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
-                                 ${CSVPATH}/perfexp-RTX4090-constNB-ALG5.csv 'RTXRMQ ($n_b=2^{9}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-constBS-ALG5.csv 'RTXRMQ ($B=2^{15}$)'\
-                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA-GPU'
+                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
+
+python ${SCRIPT} -3 time 1 0 20 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ-CPU@192c'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
+                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
