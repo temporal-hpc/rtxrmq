@@ -34,7 +34,7 @@ linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
 colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
 orders=[10, 10, 0.0, 0.0, 5.0, 0.0]
-alphas=[ 1,  1, 0.4, 0.4, 1.0, 0.4]
+alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
 
 def get_data(file):
     hc = pd.read_csv(file)
@@ -54,6 +54,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
     ax = fig.add_subplot(111)
     plt.title(f"{dev}, {lrLabels[-lr]}")
     plt.xlabel("Array size (n)",fontsize=12)
+    plt.set_axisbelow(True)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
     # Create a second y-axis on the right
     ax2 = ax.twinx()
@@ -88,6 +89,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     ax2 = ax.twinx()
 
     ax.yaxis.set_visible(False)
+    ax.set_axisbelow(True)
     plt.ylabel("Speedup",fontsize=12)
 
     ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
