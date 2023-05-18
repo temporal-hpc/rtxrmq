@@ -33,7 +33,7 @@ lrLabels = ["","Large $(l,r)$ Range","Medium $(l,r)$ Range", "Small $(l,r)$ Rang
 linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
 colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
-orders=[10, 10, 0.0, 0.0, 5.0, 0.0]
+orders=[10, 10, 10, 10, 10, 10]
 alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
 
 def get_data(file):
@@ -59,7 +59,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
     # Create a second y-axis on the right
     ax2 = ax.twinx()
     ax.yaxis.set_visible(False)
-    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
+    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major',zorder=0)
     plt.ylabel("$\\frac{ns}{q}$",fontsize=12, rotation=0)
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
@@ -83,7 +83,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     plt.ylabel("Speedup",fontsize=12)
     plt.title(f"{dev}, {lrLabels[-lr]}")
     plt.xlabel("Array size (n)",fontsize=12)
-    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
+    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major', zorder=0)
 
     # Create a second y-axis on the right
     ax2 = ax.twinx()
@@ -92,7 +92,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     ax.set_axisbelow(True)
     plt.ylabel("Speedup",fontsize=12)
 
-    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
+    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major', zorder=0)
     # AQUI VOY REVISAR ERROR
     hrmq = data_frame[0]
     hrmq = hrmq[hrmq['lr'] == lr]
@@ -112,8 +112,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     #plt.ylim(0, 40)
     plt.legend(fontsize=6)
     #plt.yscale('log')
-    if ylim1 >= 0 and ylim2 >= 0:
-        plt.ylim(ylim1, ylim2)
+    plt.ylim(ylim1, ylim2)
 
     if saveFlag:
         plt.savefig(f"{plot_dir}speedup-{dev}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')
