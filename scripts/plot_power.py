@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from collections import OrderedDict
 from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import LogLocator
 
 ls = OrderedDict(
     [('solid',               (0, ())),
@@ -62,30 +63,36 @@ if __name__ == "__main__":
     print("Files:", files)
     print("Labels", labels)
     print("Reps", reps)
-    print(f"Generating power plots for {outName}.......",end="")
+    print(f"Generating power plots for {outName} {lr=}.......",end="")
     sys.stdout.flush()
 
     # common plot settings
     k=0.5
     fig = plt.figure(figsize=(6*k*SIZE_MULT,4*k*SIZE_MULT))
     ax = fig.add_subplot(111)
-    plt.title(f"Power Consumption, {outName}")
+    plt.title(f"Power Consumption, {lrLabels[-lr]}")
     plt.xlabel("Time [s]",fontsize=12)
     #plt.set_axisbelow(True)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
     # Create a second y-axis on the right
-    ax2 = ax.twinx()
-    ax.yaxis.set_visible(False)
-    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major',zorder=0)
+    #ax.yaxis.set_visible(False)
+    #ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major',zorder=0)
     plt.ylabel("W",fontsize=12, rotation=0, labelpad=10)
+    #plt.xticks([0, 1,10,100,10000, 40000])
     plt.xscale('log')
+    plt.xlim(0.0001,10**5)
     for i,file in enumerate(files):
         #print(f"Processing {file=}")
         df = pd.read_csv(file, sep='\s+')
-        print(df['acc-time'])
-        df["acc-time"] = df["acc-time"] - df['acc-time'].min()
+        #print("DATA FILE BEFORE ", i)
+        #print(df['acc-time'])
+        df["acc-time"] = df["acc-time"]/reps[i]
+        minval = df['acc-time'].min()
+        df["acc-time"] = df["acc-time"] - minval
+        print("DATA FILE AFTER ", i)
         print(df['acc-time'])
         plt.plot(df['acc-time'], df['power'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])
+        #print(f"\n\n")
     plt.legend(fontsize=6)
     plt.ylim(ylim1, ylim2)
     if saveFlag:
