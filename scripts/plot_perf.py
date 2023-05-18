@@ -34,7 +34,7 @@ linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
 colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
 orders=[10, 10, 10, 10, 10, 10]
-alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
+alphas=[ 1,  1.0, 0.6, 0.6, 1.0, 0.8]
 
 def get_data(file):
     hc = pd.read_csv(file)
