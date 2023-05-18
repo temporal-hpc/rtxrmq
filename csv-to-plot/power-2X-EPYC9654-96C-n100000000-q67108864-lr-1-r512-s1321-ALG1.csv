@@ -1,4 +1,4 @@
-#timestep       power           acc-energy      avg-power       dt              acc-time       
+timestep       power           acc-energy      avg-power       dt              acc-time       
 1               66.949952       33.527969       66.950425       0.500788        0.500788       
 2               60.775823       65.094574       64.215591       0.512900        1.013688       
 3               631.973651      384.864731      252.241796      0.512089        1.525777       
