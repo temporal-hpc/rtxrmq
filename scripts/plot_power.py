@@ -65,12 +65,15 @@ if __name__ == "__main__":
     print("Reps", reps)
     print(f"Generating power plots for {outName} {lr=}.......",end="")
     sys.stdout.flush()
+    title_string = "Power Consumption"
+    subtitle_string = "$n=10^8,q=2^{26}$," + f"{lrLabels[-lr]}"
 
     # common plot settings
     k=0.5
     fig = plt.figure(figsize=(6*k*SIZE_MULT,4*k*SIZE_MULT))
     ax = fig.add_subplot(111)
-    plt.title(f"Power Consumption, {lrLabels[-lr]}")
+    plt.suptitle(title_string, y=1.05, fontsize=12)
+    plt.title(subtitle_string, fontsize=10)
     plt.xlabel("Time [s]",fontsize=12)
     #plt.set_axisbelow(True)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
@@ -80,7 +83,8 @@ if __name__ == "__main__":
     plt.ylabel("W",fontsize=12, rotation=0, labelpad=10)
     #plt.xticks([0, 1,10,100,10000, 40000])
     plt.xscale('log')
-    plt.xlim(0.0001,10**5)
+    plt.xlim(10**-3.5,10**5)
+    #plt.xticks([10**-3, 10**-2, 10**-1, 10**0, 10**4])
     for i,file in enumerate(files):
         #print(f"Processing {file=}")
         df = pd.read_csv(file, sep='\s+')
@@ -88,9 +92,9 @@ if __name__ == "__main__":
         #print(df['acc-time'])
         df["acc-time"] = df["acc-time"]/reps[i]
         minval = df['acc-time'].min()
-        df["acc-time"] = df["acc-time"] - minval
-        print("DATA FILE AFTER ", i)
-        print(df['acc-time'])
+        df["acc-time"] = df["acc-time"] - minval + 0.001
+        #print("DATA FILE AFTER ", i)
+        #print(df['acc-time'])
         plt.plot(df['acc-time'], df['power'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])
         #print(f"\n\n")
     plt.legend(fontsize=6)
