@@ -39,12 +39,12 @@ if __name__ == "__main__":
     k=0.7
     fig = plt.figure(figsize=(5*k*SIZE_MULT,4*k*SIZE_MULT))
     ax = fig.add_subplot(111)
-    title_string = "Scaling Accross GPU Architectures"
+    title_string = "Scaling Accross SMs (Lovelace Arch)"
     subtitle_string = "$n=10^8,q=2^{26}$"
     plt.suptitle(title_string,x=0.58,y=0.93, fontsize=14)
     plt.title(subtitle_string, fontsize=12)
     plt.xlim(0.9,4.3)
-    plt.xlabel("GPU Architectures", fontsize=12)
+    plt.xlabel("Number of SMs in GPU", fontsize=12)
     plt.ylabel("Speedup over HRMQ", fontsize=14)
     plt.tight_layout()
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     width = 0.4
 
     xvals = np.array([1,2,3,4])
-    xticks_labels = ['TITAN RTX\n(Turing, 2018)','RTX 3090Ti\n(Ampere, 2020)','RTX 6000\n(Lovelace, 2022)', 'Future GPU\n(~2024)']
+    xticks_labels = ['RTX 4070\n(46 SMs)','RTX 4080\n(76 SMs)','RTX 4090\n(128 SMs)', 'RTX6000 Ada\n(142 SMs)']
     RTXRMQ_LR1      = np.array([13.479947, 8.013742, 2.726711, 0.85])
     LCA_LR1         = np.array([1.163021, 0.532804, 0.586491, 0.40])
     HRMQ_LR1        = 7.085396
