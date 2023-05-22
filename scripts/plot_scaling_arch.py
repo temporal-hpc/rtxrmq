@@ -39,30 +39,48 @@ if __name__ == "__main__":
     k=0.7
     fig = plt.figure(figsize=(5*k*SIZE_MULT,4*k*SIZE_MULT))
     ax = fig.add_subplot(111)
-    title_string = "Energy Efficiency"
+    title_string = "Scaling Accross GPU Architectures"
     subtitle_string = "$n=10^8,q=2^{26}$"
     plt.suptitle(title_string,x=0.58,y=0.93, fontsize=14)
     plt.title(subtitle_string, fontsize=12)
-    plt.xlabel("$(l,r)$ Ranges", fontsize=12)
-    plt.ylabel(r'$\frac{RMQs}{Joule}$', rotation=0, fontsize=14, labelpad=13)
-    plt.ylim(0.1, 10**12)
+    plt.xlim(0.9,3.3)
+    plt.xlabel("GPU Architectures", fontsize=12)
+    plt.ylabel("Speedup over HRMQ", fontsize=14)
     plt.tight_layout()
 
     # array size and number of queries
     n = 10**8
     q = 2**26
 
-    gpus = 4
+    gpus = 3
     ind = np.arange(gpus)
     width = 0.4
 
-    # TITANRTX, RTX3090Ti, RTX6000ADA
-    RTXRMQ = np.array([2.67962,1.191996, 0.521385])
-    bar1 = plt.bar(ind, q*HRMQreps/HRMQe, width/2, color = colors[0])
+    xvals = np.array([1,2,3,4])
+    xticks_labels = ['TITAN RTX\n(Turing, 2018)','RTX 3090Ti\n(Ampere, 2020)','RTX 6000\n(Lovelace, 2022)', 'Future GPU\n(~2024)']
+    RTXRMQ_LR1      = np.array([13.479947, 8.013742, 2.726711, 1.0])
+    LCA_LR1         = np.array([1.163021, 0.532804, 0.586491, 0.55])
+    HRMQ_LR1        = 7.085396
 
-    LCA = np.array([2.714679, 1.253711, 1.226598])
-    bar2 = plt.bar(ind+width/2, q*RTXRMQreps/RTXRMQe, width/2, color=colors[1])
+    RTXRMQ_LR2      = np.array([5.090665, 2.735219, 1.191996, 0.6])
+    LCA_LR2         = np.array([1.331928, 0.646864, 0.594543, 0.5])
+    HRMQ_LR2        = 5.341278
 
-    plt.xticks(ind+width*3/4,["TITAN RTX (Turing)", "RTX 3090Ti (Ampere)", "RTX 6000 Ada (Lovelace)", "Future GPU Arch"])
-    plt.legend( (bar1, bar2), ('RTXRMQ', 'LCA'), fontsize=8)
+    RTXRMQ_LR3      = np.array([2.679623, 1.203320, 0.521385, 0.2])
+    LCA_LR3         = np.array([2.714679, 1.253711, 1.226598, 1.20])
+    HRMQ_LR3        = 2.656792
+
+    plt.axhline(y=1, color=(0.1, 0.1, 0.1, 0.2), linestyle=':')
+    plt.plot(xvals[:3], HRMQ_LR1/LCA_LR1[:3], label="LCA@L", linestyle='-', marker="o", color=colors[3])
+    plt.plot(xvals[:3], HRMQ_LR2/LCA_LR2[:3], label="LCA@M", linestyle='-', marker="^", color=colors[3])
+    plt.plot(xvals[:3], HRMQ_LR3/LCA_LR3[:3], label="LCA@S", linestyle='-', marker="v", color=colors[3])
+
+    plt.plot(xvals[:3], HRMQ_LR1/RTXRMQ_LR1[:3], label="RTXRMQ@L", marker="o", color=colors[1])
+    plt.plot(xvals[:3], HRMQ_LR2/RTXRMQ_LR2[:3], label="RTXRMQ@M", marker="^", color=colors[1])
+    plt.plot(xvals[:3], HRMQ_LR3/RTXRMQ_LR3[:3], label="RTXRMQ@S", marker="v", color=colors[1])
+
+    plt.legend(fontsize=7, ncol=2)
+    plt.yscale('log', base=2)
+
+    plt.xticks(xvals, xticks_labels, fontsize=8)
     plt.show()
