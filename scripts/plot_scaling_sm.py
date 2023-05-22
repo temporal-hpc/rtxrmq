@@ -58,16 +58,16 @@ if __name__ == "__main__":
 
     xvals = np.array([1,2,3,4])
     xticks_labels = ['RTX 4070\n(46 SMs)','RTX 4080\n(76 SMs)','RTX 4090\n(128 SMs)', 'RTX6000 Ada\n(142 SMs)']
-    RTXRMQ_LR1      = np.array([13.479947, 8.013742, 2.726711, 0.85])
-    LCA_LR1         = np.array([1.163021, 0.532804, 0.586491, 0.40])
+    RTXRMQ_LR1      = np.array([, 4.589968, ,])
+    LCA_LR1         = np.array([, 0.786467, ,])
     HRMQ_LR1        = 7.085396
 
-    RTXRMQ_LR2      = np.array([5.090665, 2.735219, 1.191996, 0.45])
-    LCA_LR2         = np.array([1.331928, 0.646864, 0.594543, 0.45])
+    RTXRMQ_LR2      = np.array([, 2.087687, ,])
+    LCA_LR2         = np.array([, 0.802718, ,])
     HRMQ_LR2        = 5.341278
 
-    RTXRMQ_LR3      = np.array([2.679623, 1.203320, 0.521385, 0.2])
-    LCA_LR3         = np.array([2.714679, 1.253711, 1.226598, 0.85])
+    RTXRMQ_LR3      = np.array([, 0.918145, ,])
+    LCA_LR3         = np.array([, 1.698885, ,])
     HRMQ_LR3        = 2.656792
 
     plt.axhline(y=1, color=(0.1, 0.1, 0.1, 0.2), linestyle=':')
