@@ -60,9 +60,9 @@ if __name__ == "__main__":
         labels.append(sys.argv[i+1])
         reps.append(int(sys.argv[i+2]))
 
-    print("Files:", files)
-    print("Labels", labels)
-    print("Reps", reps)
+    #print("Files:", files)
+    #print("Labels", labels)
+    #print("Reps", reps)
     print(f"Generating power plots for {outName} {lr=}.......",end="")
     sys.stdout.flush()
     title_string = "Power Consumption"

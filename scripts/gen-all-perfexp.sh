@@ -3,7 +3,7 @@ CSVPATH=../csv-to-plot
 SCRIPT=plot_perfexp.py
 
 # TIME
-echo "TIME plots"
+echo "*** TIME ***"
 # **** large (l,r) range ****
 #python ${SCRIPT} -1 time 1 1e-2 1e2 TITANRTX ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
 #                                 ${CSVPATH}/perfexp-TITANRTX-ALG5.csv 'RTXRMQ'\
@@ -118,3 +118,5 @@ python ${SCRIPT} -3 time 1 1e-2 1e2 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96
 #                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
 #                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
+
+printf "done\n\n"

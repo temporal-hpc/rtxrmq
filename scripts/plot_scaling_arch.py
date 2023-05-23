@@ -94,4 +94,6 @@ if __name__ == "__main__":
     plt.yscale('log', base=2)
 
     plt.xticks(xvals, xticks_labels, fontsize=8)
-    plt.show()
+    #plt.show()
+    plot_dir = "../plots/"
+    plt.savefig(f"{plot_dir}scaling-arch.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')

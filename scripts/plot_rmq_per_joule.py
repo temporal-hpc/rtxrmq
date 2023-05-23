@@ -80,4 +80,6 @@ if __name__ == "__main__":
     plt.yscale('log')
     plt.xticks(ind+width*3/4,[f"{lrLabels[0]}", f"{lrLabels[1]}", f"{lrLabels[2]}"])
     plt.legend( (bar1, bar2, bar3, bar4), ('HRMQ@192c', 'RTXRMQ', 'LCA', 'Exhaustive'), fontsize=8)
-    plt.show()
+    #plt.show()
+    plot_dir = "../plots/"
+    plt.savefig(f"{plot_dir}rmq-per-joule.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')

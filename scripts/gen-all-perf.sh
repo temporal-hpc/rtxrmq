@@ -71,7 +71,7 @@ SCRIPT=plot_perf.py
 
 
 # SPEEDUP
-echo "SPEEDUP plots"
+echo "*** SPEEDUP ***"
 # **** large (l,r) range ****
 #python ${SCRIPT} -1 speedup 1 0 25 TITANRTX ${CSVPATH}/perf-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
 #                                 ${CSVPATH}/perf-TITANRTX-ALG5.csv 'RTXRMQ'\
@@ -89,7 +89,6 @@ python ${SCRIPT} -1 speedup 1 -0.2 15 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C
                                  ${CSVPATH}/perf-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG2.csv 'Exhaustive'
-echo ""
 
 
 
@@ -112,7 +111,6 @@ python ${SCRIPT} -2 speedup 1 -0.2 9 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-
                                  ${CSVPATH}/perf-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG2.csv 'Exhaustive'
-echo ""
 
 
 
@@ -137,4 +135,5 @@ python ${SCRIPT} -3 speedup 1 0 6 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG
                                  ${CSVPATH}/perf-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG2.csv 'Exhaustive'
-echo ""
+
+printf "done\n\n"
