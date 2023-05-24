@@ -77,9 +77,9 @@ if __name__ == "__main__":
 
     plt.axhline(y=1, color=(0.1, 0.1, 0.1, 0.2), linestyle=':')
     #LCA experimental
-    plt.plot(xvals, LCA_LR1_REF/LCA_LR1, label="LCA@L", linestyle='-', marker="o", color=colors[3])
-    plt.plot(xvals, LCA_LR2_REF/LCA_LR2, label="LCA@M", linestyle='-', marker="^", color=colors[3])
-    plt.plot(xvals, LCA_LR3_REF/LCA_LR3, label="LCA@S", linestyle='-', marker="v", color=colors[3])
+    plt.plot(xvals, LCA_LR1_REF/LCA_LR1, label="LCA@L", linestyle='-', marker="o", color=colors[2])
+    plt.plot(xvals, LCA_LR2_REF/LCA_LR2, label="LCA@M", linestyle='-', marker="^", color=colors[2])
+    plt.plot(xvals, LCA_LR3_REF/LCA_LR3, label="LCA@S", linestyle='-', marker="v", color=colors[2])
 
     #RTXRMQ experimental
     plt.plot(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, label="RTXRMQ@L", marker="o", color=colors[1])

@@ -81,7 +81,8 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     fig = plt.figure(figsize=(6*k*SIZE_MULT,4*k*SIZE_MULT))
     ax = fig.add_subplot(111)
     plt.ylabel("Speedup over HRMQ",fontsize=12)
-    plt.title(f"{dev}, {lrLabels[-lr]}")
+    #plt.title(f"{dev}, {lrLabels[-lr]}")
+    plt.title(f"Speedup, {lrLabels[-lr]}")
     plt.xlabel("Array size (n)",fontsize=12)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major', zorder=0)
 
