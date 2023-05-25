@@ -52,7 +52,8 @@ def plot_time(data_frame, lr, dev, saveFlag):
     k=0.5
     fig = plt.figure(figsize=(6*k*SIZE_MULT,4*k*SIZE_MULT))
     ax = fig.add_subplot(111)
-    plt.title(f"{dev}, {lrLabels[-lr]}")
+    #plt.title(f"{dev}, {lrLabels[-lr]}")
+    plt.title(f"Time per RMQ, {lrLabels[-lr]}")
     plt.xlabel("Array size (n)",fontsize=12)
     plt.xticks(range(0,26,5), fontsize=12)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major', zorder=0)
@@ -60,7 +61,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
     ax2 = ax.twinx()
     ax.yaxis.set_visible(False)
     ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major', zorder=0)
-    plt.ylabel("$\\frac{ns}{q}$",fontsize=12, rotation=0)
+    plt.ylabel("$\\frac{ns}{RMQ}$",fontsize=12, rotation=0)
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
         plt.plot(df['n-exp'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])

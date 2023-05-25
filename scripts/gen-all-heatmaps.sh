@@ -4,11 +4,11 @@ PATH_CSV=../csv-to-plot
 printf "*** HEATMAPS ***\n"
 # HRMQ (CPU)
 printf "Generating CPU heatmap for: hmap-TRPRO-5975WX-ALG1.csv.........."
-python plot_heat_map.py $PATH_CSV/hmap-TRPRO-5975WX-ALG1.csv    None "HRMQ-CPU" 1
+python plot_heat_map.py $PATH_CSV/hmap-TRPRO-5975WX-ALG1.csv    None "HRMQ" 1
 printf "done\n"
 
 printf "Generating CPU heatmap for: hmap-2X-EPYC9654-96C-ALG1.csv......."
-python plot_heat_map.py $PATH_CSV/hmap-2X-EPYC9654-96C-ALG1.csv None "HRMQ-CPU" 1
+python plot_heat_map.py $PATH_CSV/hmap-2X-EPYC9654-96C-ALG1.csv None "HRMQ" 1
 printf "done\n"
 
 # RTX 6000 ADA

@@ -36,7 +36,7 @@ def heat_map(x, y, df, title, filename, saveFlag, vmax=100):
     plt.pcolor(ax_ticks[x], ax_ticks[y], pl, norm=matplotlib.colors.LogNorm(vmin=minval, vmax=maxval), rasterized=True)
     #plt.colorbar()
     plt.xlabel("Array Size ($n=2^x$)", fontsize=12)
-    plt.ylabel("Query length ($|q|=n2^y$)", fontsize=12)
+    plt.ylabel("(l,r) range = ($n\cdot 2^y$)", fontsize=12)
     plt.xticks(range(0,26,5), fontsize=10)
     plt.xlim(0,27)
     plt.yticks(range(0,-26,-5), fontsize=10)

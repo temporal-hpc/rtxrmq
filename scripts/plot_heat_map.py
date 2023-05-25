@@ -33,7 +33,7 @@ def get_label(col, ax):
         case 'nb' :
             label += f"Number of blocks ($n_b={unit}$)"
         case 'lr-ratio' :
-            label += f"Query Range ($|q| = n{unit}$)"
+            label += f"(l,r) range ($n\cdot{unit}$)"
     return label
 
 def get_title(title, x, y, col, plane):

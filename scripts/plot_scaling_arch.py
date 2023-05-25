@@ -72,13 +72,13 @@ if __name__ == "__main__":
 
     plt.axhline(y=1, color=(0.1, 0.1, 0.1, 0.2), linestyle=':')
     #LCA experimental
-    plt.plot(xvals[:3], HRMQ_LR1/LCA_LR1[:3], label="LCA@L", linestyle='-', marker="o", color=colors[3])
-    plt.plot(xvals[:3], HRMQ_LR2/LCA_LR2[:3], label="LCA@M", linestyle='-', marker="^", color=colors[3])
-    plt.plot(xvals[:3], HRMQ_LR3/LCA_LR3[:3], label="LCA@S", linestyle='-', marker="v", color=colors[3])
+    plt.plot(xvals[:3], HRMQ_LR1/LCA_LR1[:3], label="LCA@L", linestyle='-', marker="o", color=colors[2])
+    plt.plot(xvals[:3], HRMQ_LR2/LCA_LR2[:3], label="LCA@M", linestyle='-', marker="^", color=colors[2])
+    plt.plot(xvals[:3], HRMQ_LR3/LCA_LR3[:3], label="LCA@S", linestyle='-', marker="v", color=colors[2])
     #LCA proyejted
-    plt.plot(xvals[2:4], HRMQ_LR1/LCA_LR1[2:4], linestyle='--', marker="o", color=colors[3])
-    plt.plot(xvals[2:4], HRMQ_LR2/LCA_LR2[2:4], linestyle='--', marker="^", color=colors[3])
-    plt.plot(xvals[2:4], HRMQ_LR3/LCA_LR3[2:4], linestyle='--', marker="v", color=colors[3])
+    plt.plot(xvals[2:4], HRMQ_LR1/LCA_LR1[2:4], linestyle='--', marker="o", color=colors[2])
+    plt.plot(xvals[2:4], HRMQ_LR2/LCA_LR2[2:4], linestyle='--', marker="^", color=colors[2])
+    plt.plot(xvals[2:4], HRMQ_LR3/LCA_LR3[2:4], linestyle='--', marker="v", color=colors[2])
 
 
     #RTXRMQ experimental
