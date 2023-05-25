@@ -118,5 +118,4 @@ python ${SCRIPT} -3 time 1 1e-2 1e2 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96
 #                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
 #                                 ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
-
-printf "done\n\n"
+printf "\n"

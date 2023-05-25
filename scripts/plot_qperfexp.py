@@ -52,15 +52,15 @@ def plot_time(data_frame, lr, dev, saveFlag):
     k=0.5
     fig = plt.figure(figsize=(6*k*SIZE_MULT,4*k*SIZE_MULT))
     ax = fig.add_subplot(111)
-    plt.title(f"{dev}, "+r"$n=2^{24}$"+f", {lrLabels[-lr]}")
-    plt.xlabel("Number of Queries",fontsize=12)
+    plt.title("Parallel Saturation\n"+r"$n=2^{24}$"+f", {lrLabels[-lr]}")
+    plt.xlabel("RMQ Batch size",fontsize=12)
     plt.xticks(range(0,26,5), fontsize=12)
     plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
     # Create a second y-axis on the right
     ax2 = ax.twinx()
     ax.yaxis.set_visible(False)
     ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
-    plt.ylabel("$\\frac{ns}{q}$",fontsize=12, rotation=0)
+    plt.ylabel("$\\frac{ns}{RMQ}$",fontsize=12, rotation=0)
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
         plt.plot(df['q-exp'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])

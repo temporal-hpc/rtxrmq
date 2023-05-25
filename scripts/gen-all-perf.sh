@@ -136,4 +136,4 @@ python ${SCRIPT} -3 speedup 1 0 6 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG
                                  ${CSVPATH}/perf-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG2.csv 'Exhaustive'
 
-printf "done\n\n"
+printf "\n"
