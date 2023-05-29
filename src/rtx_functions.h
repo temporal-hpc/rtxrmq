@@ -1,5 +1,6 @@
 #pragma once
 
+#define COMPACT 0
 //#define DEBUG
 #ifdef DEBUG
 #define dbg(msg) do {printf(msg "\n"); fflush(stdout);} while (0)
@@ -251,9 +252,12 @@ void buildASFromDeviceData(VBHMem &mem, GASstate &state, int nverts, int ntris, 
   state.triangle_input.triangleArray.indexBuffer = reinterpret_cast<CUdeviceptr>(devTriangles);
 
   OptixAccelBuildOptions accel_options = {};
-  //accel_options.buildFlags = OPTIX_BUILD_FLAG_ALLOW_COMPACTION | OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
+  //state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_COMPACTION | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE;
   //state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE;
-  state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
+  if (COMPACT)
+    state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS | OPTIX_BUILD_FLAG_ALLOW_COMPACTION;
+  else
+    state.gas_build_options = OPTIX_BUILD_FLAG_ALLOW_UPDATE | OPTIX_BUILD_FLAG_PREFER_FAST_TRACE | OPTIX_BUILD_FLAG_ALLOW_RANDOM_VERTEX_ACCESS;
   accel_options.buildFlags = state.gas_build_options;
   accel_options.operation = OPTIX_BUILD_OPERATION_BUILD;
 
@@ -273,11 +277,12 @@ void buildASFromDeviceData(VBHMem &mem, GASstate &state, int nverts, int ntris, 
 
   mem.out_buffer = gas_buffer_sizes.outputSizeInBytes;
   mem.temp_buffer = gas_buffer_sizes.tempSizeInBytes;
-  //printf("Memory usage (GB): output_buffer %f,  temp_buffer %f\n", out_size, temp_size); 
 
   OptixAccelEmitDesc emitProperty = {};
-  //emitProperty.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
-  emitProperty.type = OPTIX_PROPERTY_TYPE_AABBS;
+  if (COMPACT)
+    emitProperty.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
+  else
+    emitProperty.type = OPTIX_PROPERTY_TYPE_AABBS;
   emitProperty.result = (CUdeviceptr)((char *)d_buffer_temp_output_gas_and_compacted_size + compactedSizeOffset);
 
   OPTIX_CHECK( optixAccelBuild(
@@ -294,23 +299,24 @@ void buildASFromDeviceData(VBHMem &mem, GASstate &state, int nverts, int ntris, 
         &emitProperty, 1) 
   );  
  
-  //CUDA_CHECK( cudaFree(d_temp_buffer_gas) );
-  //size_t compacted_gas_size;
-  //CUDA_CHECK( cudaMemcpy(&compacted_gas_size, (void *)emitProperty.result, sizeof(size_t), cudaMemcpyDeviceToHost) );
+  size_t compacted_gas_size;
+  if (COMPACT) {
+    CUDA_CHECK( cudaFree((void*)state.d_temp_buffer) );
+    CUDA_CHECK( cudaMemcpy(&compacted_gas_size, (void *)emitProperty.result, sizeof(size_t), cudaMemcpyDeviceToHost) );
+    printf("Memory usage (MB): output_buffer %f,  temp_buffer %f,  compacted %f\n", mem.out_buffer/1e6, mem.temp_buffer/1e6, compacted_gas_size/1e6); 
+  }
 
-  /*
-  if (compacted_gas_size < gas_buffer_sizes.outputSizeInBytes) {
-    CUDA_CHECK( cudaMalloc(&d_gas_output_buffer, compacted_gas_size) );
+  if (COMPACT && compacted_gas_size < gas_buffer_sizes.outputSizeInBytes) {
+    CUDA_CHECK( cudaMalloc((void**)&state.d_gas_output_buffer, compacted_gas_size) );
 
     // use handle as input and output
-    OPTIX_CHECK( optixAccelCompact(optix_context, 0, gas_handle, reinterpret_cast<CUdeviceptr>(d_gas_output_buffer), compacted_gas_size, &gas_handle));
+    OPTIX_CHECK( optixAccelCompact(state.context, 0, state.gas_handle, reinterpret_cast<CUdeviceptr>(state.d_gas_output_buffer), compacted_gas_size, &state.gas_handle));
 
-    CUDA_CHECK(cudaFree(d_buffer_temp_output_gas_and_compacted_size));
+    CUDA_CHECK(cudaFree((void*)d_buffer_temp_output_gas_and_compacted_size));
   } else {
-    */
     state.d_gas_output_buffer = d_buffer_temp_output_gas_and_compacted_size;
     state.gas_output_buffer_size = gas_buffer_sizes.outputSizeInBytes;
-  //}
+  }
   //CUDA_CHECK(cudaFree(d_vertices));
 }
 
