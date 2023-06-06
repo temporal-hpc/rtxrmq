@@ -66,7 +66,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
         df = df[df['lr'] == lr]
         plt.plot(df['n-exp'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])
 
-    plt.legend(fontsize=6)
+    plt.legend(fontsize=8)
     plt.yscale('log')
     #plt.xscale('log')
     if ylim1 >= 0 and ylim2 >= 0:

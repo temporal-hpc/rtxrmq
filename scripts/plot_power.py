@@ -97,7 +97,7 @@ if __name__ == "__main__":
         #print(df['acc-time'])
         plt.plot(df['acc-time'], df['power'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])
         #print(f"\n\n")
-    plt.legend(fontsize=6)
+    plt.legend(fontsize=8)
     plt.ylim(ylim1, ylim2)
     if saveFlag:
         plt.savefig(f"{plot_dir}power-{outName}-lr{lr}.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')

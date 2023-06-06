@@ -41,10 +41,10 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111)
     title_string = "Energy Efficiency"
     subtitle_string = "$n=10^8,q=2^{26}$"
-    plt.suptitle(title_string,x=0.58,y=0.93, fontsize=14)
-    plt.title(subtitle_string, fontsize=12)
-    plt.xlabel("$(l,r)$ Ranges", fontsize=12)
-    plt.ylabel(r'$\frac{RMQs}{Joule}$', rotation=0, fontsize=14, labelpad=13)
+    plt.suptitle(title_string,x=0.58,y=0.93, fontsize=12)
+    plt.title(subtitle_string, fontsize=10)
+    plt.xlabel("$(l,r)$ Ranges", fontsize=10)
+    plt.ylabel(r'$\frac{RMQs}{Joule}$', rotation=0, fontsize=12, labelpad=13)
     plt.ylim(0.1, 10**12)
     plt.tight_layout()
 

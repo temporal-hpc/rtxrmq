@@ -65,7 +65,7 @@ def plot_time(data_frame, lr, dev, saveFlag):
         df = df[df['lr'] == lr]
         plt.plot(df['n'], df['mean_ns/q'], label=labels[i], linestyle=linestyles[i],color=colors[i], zorder=orders[i], alpha=alphas[i])
 
-    plt.legend(fontsize=6)
+    plt.legend(fontsize=8)
     plt.yscale('log')
     if ylim1 >= 0 and ylim2 >= 0:
         plt.ylim(ylim1, ylim2)
@@ -111,7 +111,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     #plt.yticks([5, 10, 15, 20, 25, 30, 35, 40, 45, 60])
     #plt.xlim(2**15,2**26)
     #plt.ylim(0, 40)
-    plt.legend(fontsize=6)
+    plt.legend(fontsize=8)
     #plt.yscale('log')
     plt.ylim(ylim1, ylim2)
 

@@ -44,16 +44,16 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111)
     title_string = "Scaling Accross Lovelace Architecture"
     subtitle_string = r"$n=60$M, $q=2^{26}$"
-    plt.suptitle(title_string,x=0.58,y=0.93, fontsize=14)
-    plt.title(subtitle_string, fontsize=12)
+    plt.suptitle(title_string,x=0.58,y=0.93, fontsize=12)
+    plt.title(subtitle_string, fontsize=10)
     plt.xlim(59,143)
-    plt.xlabel("# SMs in GPU", fontsize=12)
-    plt.ylabel("Relative Speedup", fontsize=14)
+    plt.xlabel("# SMs in GPU", fontsize=10)
+    plt.ylabel("Relative Speedup", fontsize=10)
     plt.tight_layout()
 
 
     xvals = np.array([60,76,128,142])
-    xticks_labels = ['60\nRTX 4070 Ti','76\nRTX 4080','128\nRTX 4090', '142\nRTX 6000 Ada']
+    xticks_labels = ['60\n(RTX 4070 Ti)','76\n(RTX 4080)','128\n(RTX 4090)', '142\n(RTX 6000 Ada)']
     RTXRMQ_LR1      = np.array([5.304304, 4.036054, 2.347052, 2.233117])
     RTXRMQ_LR1_REF  = np.array([5.304304, 5.304304, 5.304304, 5.304304])
 
@@ -75,16 +75,28 @@ if __name__ == "__main__":
     LCA_LR3_REF     = np.array([2.204702, 2.204702, 2.204702, 2.204702])
     HRMQ_LR3        = 2.112656
 
+    width=0.7
+
     plt.axhline(y=1, color=(0.1, 0.1, 0.1, 0.2), linestyle=':')
     #LCA experimental
-    plt.plot(xvals, LCA_LR1_REF/LCA_LR1, label="LCA@L", linestyle='-', marker="o", color=colors[2])
-    plt.plot(xvals, LCA_LR2_REF/LCA_LR2, label="LCA@M", linestyle='-', marker="^", color=colors[2])
-    plt.plot(xvals, LCA_LR3_REF/LCA_LR3, label="LCA@S", linestyle='-', marker="v", color=colors[2])
+    plt.plot(xvals, LCA_LR1_REF/LCA_LR1, label="LCA", linestyle='-', color=colors[2], lw=width)
+    plt.scatter(xvals, LCA_LR1_REF/LCA_LR1, marker="$L$", color="black", zorder=10)
+
+    plt.plot(xvals, LCA_LR2_REF/LCA_LR2, linestyle='-', color=colors[2], lw=width)
+    plt.scatter(xvals, LCA_LR2_REF/LCA_LR2, marker="$M$", color="black", zorder=10)
+
+    plt.plot(xvals, LCA_LR3_REF/LCA_LR3, linestyle='-', color=colors[2], lw=width)
+    plt.scatter(xvals, LCA_LR3_REF/LCA_LR3, marker="$S$", color="black", zorder=10)
 
     #RTXRMQ experimental
-    plt.plot(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, label="RTXRMQ@L", marker="o", color=colors[1])
-    plt.plot(xvals, RTXRMQ_LR2_REF/RTXRMQ_LR2, label="RTXRMQ@M", marker="^", color=colors[1])
-    plt.plot(xvals, RTXRMQ_LR3_REF/RTXRMQ_LR3, label="RTXRMQ@S", marker="v", color=colors[1])
+    plt.plot(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, label="RTXRMQ", color=colors[1], lw=width)
+    plt.scatter(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, marker="$L$", color="black", zorder=10)
+
+    plt.plot(xvals, RTXRMQ_LR2_REF/RTXRMQ_LR2, color=colors[1], lw=width)
+    plt.scatter(xvals, RTXRMQ_LR2_REF/RTXRMQ_LR2, marker="$M$", color="black", zorder=10)
+
+    plt.plot(xvals, RTXRMQ_LR3_REF/RTXRMQ_LR3, color=colors[1], lw=width)
+    plt.scatter(xvals, RTXRMQ_LR3_REF/RTXRMQ_LR3, marker="$S$", color="black", zorder=10)
 
     plt.legend(fontsize=7, ncol=2)
     #plt.yscale('log', base=2)
