@@ -37,10 +37,15 @@ extern "C" __global__ void __raygen__rmq() {
   unsigned int SBTstride = 0;
   unsigned int missSBTindex = 0;
   unsigned int payload = __float_as_uint(max);
-  optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time,
-      visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
 
-  params.output[idx.x] = __uint_as_float(payload) + min;
+  // OPTIX 7.7 and lower, regular mode
+  //optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time, visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+  //params.output[idx.x] = __uint_as_float(payload) + min;
+
+  // OPTIX 8.0 Only (SER)
+  //optixTraverse(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time, visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+  //float t = optixHitObjectGetRayTmax(); 
+  //params.output[idx.x] = min + t;
 }
 
 extern "C" __global__ void  __closesthit__rmq() {
