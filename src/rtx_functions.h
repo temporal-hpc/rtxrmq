@@ -1,7 +1,7 @@
 #pragma once
 
 #define COMPACT 0
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
 #define dbg(msg) do {printf(msg "\n"); fflush(stdout);} while (0)
 #else
@@ -26,6 +26,7 @@ struct Params {
   float2 *query;
   int2 *iquery;
   float *LUP;
+  int *idx_output;
   float min;
   float max;
   int num_blocks;
@@ -113,6 +114,57 @@ void loadAppModule(GASstate &state, CmdArgs args) {
 
   //OPTIX_CHECK(optixModuleCreateFromPTX(state.context, &module_compile_options, &state.pipeline_compile_options, ptx.c_str(), ptx.size(), nullptr, nullptr, &state.ptx_module));
   OPTIX_CHECK(optixModuleCreate(state.context, &module_compile_options, &state.pipeline_compile_options, ptx.c_str(), ptx.size(), nullptr, nullptr, &state.ptx_module));
+}
+
+void createProgramGroups(GASstate &state, int alg) {
+  const char *rg, *ch;
+  switch(alg) {
+    case ALG_GPU_RTX_BLOCKS:
+    case ALG_GPU_RTX_IAS:
+    case ALG_GPU_RTX_IAS_TRANS:
+      rg = "__raygen__rmq_blocks";
+      ch = "__closesthit__rmq_blocks";
+      break;
+    case ALG_GPU_RTX_LUP:
+      rg = "__raygen__rmq_lup";
+      ch = "__closesthit__rmq_blocks";
+      break;
+    case ALG_GPU_RTX_BLOCKS_IDX:
+      rg = "__raygen__rmq_blocks_idx";
+      ch = "__closesthit__rmq_blocks_idx";
+      break;
+    case ALG_GPU_RTX_CAST_IDX:
+      printf("Using cast rtx idx shaders\n");
+      rg = "__raygen__rmq_idx";
+      ch = "__closesthit__rmq_idx";
+    default:
+      rg = "__raygen__rmq";
+      ch = "__closesthit__rmq";
+      break;
+  }
+
+  OptixProgramGroupOptions program_group_options = {}; // Initialize to zeros
+  OptixProgramGroupDesc prog_group_desc[3] = {};
+
+  // raygen
+  prog_group_desc[0].kind = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
+  prog_group_desc[0].raygen.module = state.ptx_module;
+  prog_group_desc[0].raygen.entryFunctionName = rg;
+
+  // we need to create these but the entryFunctionNames are null
+  prog_group_desc[1].kind = OPTIX_PROGRAM_GROUP_KIND_MISS;
+  prog_group_desc[1].miss.module = state.ptx_module;
+  prog_group_desc[1].miss.entryFunctionName = "__miss__rmq";
+
+
+  // closest hit
+  prog_group_desc[2].kind = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
+  prog_group_desc[2].hitgroup.moduleCH = state.ptx_module;
+  prog_group_desc[2].hitgroup.entryFunctionNameCH = ch;
+  prog_group_desc[2].hitgroup.moduleAH = nullptr;
+  prog_group_desc[2].hitgroup.entryFunctionNameAH = nullptr;
+
+  OPTIX_CHECK(optixProgramGroupCreate(state.context, prog_group_desc, 3, &program_group_options, nullptr, nullptr, state.program_groups));
 }
 
 void createGroupsClosestHit(GASstate &state) {

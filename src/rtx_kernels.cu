@@ -9,6 +9,7 @@ struct Params {
   float2 *query;
   int2 *iquery;
   float *LUP;
+  int *idx_output;
   float min;
   float max;
   int num_blocks;
@@ -305,4 +306,42 @@ extern "C" __global__ void __anyhit__rmq() {
 	  printf("ray %i  Translation x %f   y %f  z %f\n", idx.x, m[3], m[7], m[11]);
   }
 #endif
+}
+
+// IDX
+extern "C" __global__ void __raygen__rmq_idx() {
+  printf("Inside idx ray_gen\n");
+  return;
+  const uint3 idx = optixGetLaunchIndex();
+  float &min = params.min;
+  float &max = params.max;
+
+  float2 q = params.query[idx.x];
+  float3 ray_origin = make_float3(min, q.x, q.y);
+  float3 ray_direction = make_float3(1.0, 0.0, 0.0);
+  //printf("ray %i,  (l,r)=(%f, %f)\n", idx.x, (float)q.x, (float)q.y);
+
+  float tmin = 0;
+  float tmax = max - min;
+  float ray_time = 0;
+  OptixVisibilityMask visibilityMask = 255;
+  unsigned int rayFlags = OPTIX_RAY_FLAG_DISABLE_ANYHIT;
+  unsigned int SBToffset = 0;
+  unsigned int SBTstride = 0;
+  unsigned int missSBTindex = 0;
+  unsigned int payload = -1;
+
+  // OPTIX 7.7 and lower, regular mode
+  optixTrace(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time, visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+  params.idx_output[idx.x] = payload;
+
+  // OPTIX 8.0 Only (SER)
+  //optixTraverse(params.handle, ray_origin, ray_direction, tmin, tmax, ray_time, visibilityMask, rayFlags, SBToffset, SBTstride, missSBTindex, payload);
+  //float t = optixHitObjectGetRayTmax(); 
+  //params.output[idx.x] = min + t;
+}
+
+extern "C" __global__ void  __closesthit__rmq_idx() {
+  int idx = optixGetPrimitiveIndex();
+  optixSetPayload_0(idx);
 }

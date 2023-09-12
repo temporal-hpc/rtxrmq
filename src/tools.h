@@ -223,6 +223,27 @@ bool check_result(float *hA, int2 *hQ, int q, int *expected, int *result){
     return true;
 }
 
+bool check_result_idx(float *hA, int2 *hQ, int q, int *expected, int *result){
+    bool pass = true;
+    for (int i = 0; i < q; ++i) {
+        //if (expected[i] != result[i]) { // RT-cores don't introduce floating point errors
+        if (expected[i] !=  result[i]) {
+            printf("Error on %i-th query: got %i, expected %i\n", i, result[i], expected[i]);
+            printf("  [%i,%i]\n", hQ[i].x, hQ[i].y);
+            pass = false;
+            //for (int j = hQ[i].x; j <= hQ[i].y; ++j) {
+            //    printf("%f ", hA[j]);
+            //}
+            //printf("\n");
+            //return false;
+        }
+    }
+    //for (int j = 0; j <= 1<<24; ++j) {
+    //    printf("%f\n", hA[j]);
+    //}
+    return pass;
+}
+
 void print_gpu_specs(int dev){
     cudaDeviceProp prop;
     cudaGetDeviceProperties(&prop, dev);

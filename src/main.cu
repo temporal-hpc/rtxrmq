@@ -14,15 +14,21 @@
 #define BSIZE 1024
 #define WARPSIZE 32
 #define RTX_REPEATS 10
-#define ALG_CPU_BASE        0
-#define ALG_CPU_HRMQ        1
-#define ALG_GPU_BASE        2
-#define ALG_GPU_RTX_CAST    3
-#define ALG_GPU_RTX_TRANS   4
-#define ALG_GPU_RTX_BLOCKS  5
-#define ALG_GPU_RTX_LUP     6
-#define ALG_GPU_RTX_IAS     8
+#define ALG_CPU_BASE              0
+#define ALG_CPU_HRMQ              1
+#define ALG_GPU_BASE              2
+#define ALG_GPU_RTX_CAST          3
+#define ALG_GPU_RTX_TRANS         4
+#define ALG_GPU_RTX_BLOCKS        5
+#define ALG_GPU_RTX_LUP           6
+#define ALG_GPU_RTX_IAS           8
 #define ALG_GPU_RTX_IAS_TRANS     9
+
+#define ALG_CPU_BASE_IDX        100
+#define ALG_CPU_HRMQ_IDX        101
+#define ALG_GPU_BASE_IDX        102
+#define ALG_GPU_RTX_CAST_IDX    103
+#define ALG_GPU_RTX_BLOCKS_IDX  105
 
 // TODO add other state-of-the-art GPU rmq algs
 const char *algStr[10] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks", "[GPU] RTX_lup", "[GPU] LCA (TODO)", "[GPU] RTX_ias", "[GPU] RTX_ias_trans"}; 
@@ -83,7 +89,7 @@ int main(int argc, char *argv[]) {
 
 
     // 1.5 data on CPU
-    if (args.check || alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ) {
+    if (args.check || alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ || alg == ALG_CPU_BASE_IDX || alg == ALG_CPU_HRMQ_IDX) {
         hA = new float[n];
         //hQ = new int2[q];
         cudaMemcpy(hA, p.first, sizeof(float)*n, cudaMemcpyDeviceToHost);
@@ -101,16 +107,29 @@ int main(int argc, char *argv[]) {
         case ALG_CPU_BASE:
             out = cpu_rmq<float>(n, q, hA, hQ, nt, args);
             break;
+        case ALG_CPU_BASE_IDX:
+            outi = cpu_rmq_idx<float>(n, q, hA, hQ, nt, args);
+            break;
         case ALG_CPU_HRMQ:
             hAi = reinterpret_cast<int*>(hA);
             outi = rmq_rmm_par(n, q, hAi, hQ, nt, args);
             out = reinterpret_cast<float*>(outi);
             break;
+        case ALG_CPU_HRMQ_IDX:
+            hAi = reinterpret_cast<int*>(hA);
+            outi = rmq_rmm_par_idx(n, q, hAi, hQ, nt, args);
+            break;
         case ALG_GPU_BASE:
             out = gpu_rmq_basic(n, q, dA, dQ, args);
             break;
+        case ALG_GPU_BASE_IDX:
+            outi = gpu_rmq_basic_idx(n, q, dA, dQ, args);
+            break;
         default:
-            out = rtx_rmq(alg, n, bs, q, dA, dQ, args);
+            if (alg < 100)
+                out = rtx_rmq(alg, n, bs, q, dA, dQ, args);
+            else
+                outi = rtx_rmq_idx(alg, n, bs, q, dA, dQ, args);
             break;
     }
 
@@ -121,13 +140,21 @@ int main(int argc, char *argv[]) {
         args.save_time = 0;
         args.save_power = 0;
         int *indices;
-        float *expected = gpu_rmq_basic(n, q, dA, dQ, args, indices);
         //float *expected = cpu_rmq<float>(n, q, hA, hQ, nt);
         //hAi = reinterpret_cast<int*>(hA);
         //outi = rmq_rmm_par(n, q, hAi, hQ, nt);
         //float *expected = reinterpret_cast<float*>(outi);
-        printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
-        int pass = check_result(hA, hQ, q, expected, out, indices);
+        int pass;
+        if (alg < 100) {
+            float *expected = gpu_rmq_basic(n, q, dA, dQ, args, indices);
+            printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
+            pass = check_result(hA, hQ, q, expected, out, indices);
+        } else {
+            int *expected = gpu_rmq_basic_idx(n, q, dA, dQ, args);
+            printf(AC_YELLOW "Checking result..........................." AC_YELLOW); fflush(stdout);
+            pass = check_result_idx(hA, hQ, q, expected, outi);
+        }
+        
         printf(AC_YELLOW "%s\n" AC_RESET, pass ? "pass" : "failed");
         //for (int i = 0; i < 101; ++i) {
             //printf("%f ", hA[i+33554332]);

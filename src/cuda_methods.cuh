@@ -20,6 +20,28 @@ __global__ void kernel_rmq_basic(int n, int q, float *x, int2 *rmq, float *out){
     out[tid] = min;
 }
 
+__global__ void kernel_rmq_basic_idx(int n, int q, float *x, int2 *rmq, int *out){
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if(tid >= q){
+        return;
+    }
+    // solve the tid-th RMQ query in the x array of size n
+    int l = rmq[tid].x;
+    int r = rmq[tid].y;
+    float min = x[l];
+    float val;
+    int min_idx = l;
+    for(int i=l; i<=r; ++i){
+        val = x[i]; 
+        if(val < min){
+            min = val;
+            min_idx = i;
+        }
+    }
+    //printf("thread %i accessing out[%i] putting min %f\n", tid, tid, min);
+    out[tid] = min_idx;
+}
+
 __global__ void kernel_rmq_basic(int n, int q, float *x, int2 *rmq, float *out, int *indices){
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if(tid >= q){
@@ -72,6 +94,40 @@ float* gpu_rmq_basic(int n, int q, float *devx, int2 *devrmq, CmdArgs args){
     printf("Copying result to host...................."); fflush(stdout);
     timer.restart();
     CUDA_CHECK(cudaMemcpy(hout, dout, sizeof(float)*q, cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaFree(dout));
+    printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
+    write_results(timems, q, 0, reps, args, {bytesUsed, 0});
+    return hout;
+}
+
+int* gpu_rmq_basic_idx(int n, int q, float *devx, int2 *devrmq, CmdArgs args){
+    int reps = args.reps;
+    dim3 block(BSIZE, 1, 1);
+    dim3 grid((q+BSIZE-1)/BSIZE, 1, 1);
+    int *hout, *dout;
+    size_t bytesUsed = sizeof(int)*n;
+    printf("Creating out array........................"); fflush(stdout);
+    Timer timer;
+    hout = (int*)malloc(sizeof(int)*q);
+    CUDA_CHECK(cudaMalloc(&dout, sizeof(int)*q));
+    printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
+    printf(AC_BOLDCYAN "Computing RMQs index (%-16s,r=%-3i)..." AC_RESET, algStr[ALG_GPU_BASE], reps); fflush(stdout);
+    if (args.save_power)
+        GPUPowerBegin(algStr[args.alg], 100, args.dev, args.power_file);
+    timer.restart();
+    for (int i = 0; i < reps; ++i) {
+        kernel_rmq_basic_idx<<<grid, block>>>(n, q, devx, devrmq, dout);
+        CUDA_CHECK(cudaDeviceSynchronize());
+    }
+    timer.stop();
+    if (args.save_power)
+        GPUPowerEnd();
+    float timems = timer.get_elapsed_ms();
+    float avg_time = timems/(1000.0*reps);
+    printf(AC_BOLDCYAN "done: %f secs (avg %f secs): [%.2f RMQs/sec, %f nsec/RMQ]\n" AC_RESET, timems/1000.0, avg_time, (double)q/(timems/1000.0), (double)timems*1e6/q);
+    printf("Copying result to host...................."); fflush(stdout);
+    timer.restart();
+    CUDA_CHECK(cudaMemcpy(hout, dout, sizeof(int)*q, cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaFree(dout));
     printf("done: %f secs\n", timer.get_elapsed_ms()/1000.0f);
     write_results(timems, q, 0, reps, args, {bytesUsed, 0});
