@@ -8,7 +8,7 @@ echo "*** QPERF ***"
 #                                 ${CSVPATH}/qexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/qexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -1 1 1e-2 1e11 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
+python ${SCRIPT} -1 1 1e-2 1e11 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG2.csv 'Exhaustive'
@@ -20,7 +20,7 @@ python ${SCRIPT} -1 1 1e-2 1e11 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.
 #                                 ${CSVPATH}/qexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/qexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -2 1 1e-2 1e7 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
+python ${SCRIPT} -2 1 1e-2 1e7 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG2.csv 'Exhaustive'
@@ -32,7 +32,7 @@ python ${SCRIPT} -2 1 1e-2 1e7 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.c
 #                                 ${CSVPATH}/qexp-RTX3090Ti-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/qexp-RTX3090Ti-ALG7.csv 'LCA'
 
-python ${SCRIPT} -3 1 1e-2 1e5 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
+python ${SCRIPT} -3 1 1e-2 1e5 RTX6000ADA ${CSVPATH}/qexp-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/qexp-RTX6000ADA-ALG2.csv 'Exhaustive'

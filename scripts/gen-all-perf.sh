@@ -85,7 +85,7 @@ echo "*** SPEEDUP ***"
 #                                 ${CSVPATH}/perf-RTX4090-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perf-RTX4090-ALG7.csv 'LCA-GPU'
 
-python ${SCRIPT} -1 speedup 1 -0.2 15 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c@192-cores'\
+python ${SCRIPT} -1 speedup 1 -0.2 15 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG2.csv 'Exhaustive'
@@ -107,7 +107,7 @@ python ${SCRIPT} -1 speedup 1 -0.2 15 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C
 #                                 ${CSVPATH}/perf-RTX4090-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perf-RTX4090-ALG7.csv 'LCA-GPU'
 
-python ${SCRIPT} -2 speedup 1 -0.2 9 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c@192-cores'\
+python ${SCRIPT} -2 speedup 1 -0.2 9 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG2.csv 'Exhaustive'
@@ -131,7 +131,7 @@ python ${SCRIPT} -2 speedup 1 -0.2 9 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-
 #                                 ${CSVPATH}/perf-RTX4090-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perf-RTX4090-ALG7.csv 'LCA-GPU'
 
-python ${SCRIPT} -3 speedup 1 0 6 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
+python ${SCRIPT} -3 speedup 1 0 6 RTX6000ADA ${CSVPATH}/perf-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perf-RTX6000ADA-ALG2.csv 'Exhaustive'

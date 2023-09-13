@@ -17,7 +17,7 @@ echo "*** TIME ***"
 #                                 ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
 
-python ${SCRIPT} -1 time 1 1e-2 1e6 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
+python ${SCRIPT} -1 time 1 1e-2 1e6 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
@@ -36,7 +36,7 @@ python ${SCRIPT} -1 time 1 1e-2 1e6 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96
 #                                 ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
 
-python ${SCRIPT} -2 time 1 1e-2 1e3 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
+python ${SCRIPT} -2 time 1 1e-2 1e3 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
@@ -55,7 +55,7 @@ python ${SCRIPT} -2 time 1 1e-2 1e3 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96
 #                                 ${CSVPATH}/perfexp-RTX4090-ALG5.csv 'RTXRMQ'\
 #                                 ${CSVPATH}/perfexp-RTX4090-ALG7.csv 'LCA'
 
-python ${SCRIPT} -3 time 1 1e-2 1e2 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv 'HRMQ@192c'\
+python ${SCRIPT} -3 time 1 1e-2 1e2 RTX6000ADA ${CSVPATH}/perfexp-2X-EPYC9654-96C-ALG1.csv "\$\\mathrm{REF}_{\\mathrm{CPU}}\$@192c"\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG5.csv 'RTXRMQ'\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG7.csv 'LCA'\
                                  ${CSVPATH}/perfexp-RTX6000ADA-ALG2.csv 'Exhaustive'
