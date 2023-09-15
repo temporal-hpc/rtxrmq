@@ -31,9 +31,14 @@ plot_dir = "../plots/"
 lrLabels = ["Large","Medium", "Small"]
 linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
-colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
-orders=[10, 10, 10, 10, 10, 10]
-alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
+#colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
+#orders=[10, 10, 10, 10, 10, 10]
+#alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
+
+#         HRMQ (blue)        RTXRMQ            LCA (orange)      Ex (green)   light-orange     purple
+colors=["#0099ff",       "darkslategrey",       "darkorange",       "#44AF69",    "#ECA400",    "#763b82"]
+orders=[10, 10, 9.0, 9.0, 9.0, 9.0]
+alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.4]
 
 if __name__ == "__main__":
     k=0.7
@@ -79,7 +84,7 @@ if __name__ == "__main__":
 
     plt.yscale('log')
     plt.xticks(ind+width*3/4,[f"{lrLabels[0]}", f"{lrLabels[1]}", f"{lrLabels[2]}"])
-    plt.legend( (bar1, bar2, bar3, bar4), ('HRMQ@192c', 'RTXRMQ', 'LCA', 'Exhaustive'), fontsize=8)
+    plt.legend( (bar1, bar2, bar3, bar4), ("$\mathrm{REF}_{\mathrm{CPU}}$@192c", 'RTXRMQ', 'LCA', 'Exhaustive'), fontsize=8)
     #plt.show()
     plot_dir = "../plots/"
     plt.savefig(f"{plot_dir}rmq-per-joule.pdf", dpi=500, facecolor="#ffffff", bbox_inches='tight')

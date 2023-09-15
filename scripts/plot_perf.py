@@ -32,9 +32,14 @@ plot_dir = "../plots/"
 lrLabels = ["","Large $(l,r)$ Range","Medium $(l,r)$ Range", "Small $(l,r)$ Range", "Medium $(l,r)$ Range", "Small $(l,r)$ Range"]
 linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
-colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
-orders=[10, 10, 10, 10, 10, 10]
-alphas=[ 1,  1.0, 0.6, 0.6, 1.0, 0.8]
+#colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
+#orders=[10, 10, 10, 10, 10, 10]
+#alphas=[ 1,  1.0, 0.6, 0.6, 1.0, 0.8]
+
+#         HRMQ (blue)        RTXRMQ            LCA (orange)      Ex (green)   light-orange     purple
+colors=["#0099ff",       "darkslategrey",       "darkorange",       "#44AF69",    "#ECA400",    "#763b82"]
+orders=[10, 10, 9.0, 9.0, 9.0, 9.0]
+alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.4]
 
 def get_data(file):
     hc = pd.read_csv(file)
@@ -55,11 +60,11 @@ def plot_time(data_frame, lr, dev, saveFlag):
     plt.title(f"{dev}, {lrLabels[-lr]}")
     plt.xlabel("Array size (n)",fontsize=12)
     plt.set_axisbelow(True)
-    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
+    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.35, axis='both', which='major')
     # Create a second y-axis on the right
     ax2 = ax.twinx()
     ax.yaxis.set_visible(False)
-    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major',zorder=0)
+    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.35, axis='both', which='major',zorder=0)
     plt.ylabel("$\\frac{ns}{q}$",fontsize=12, rotation=0)
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
@@ -84,7 +89,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     #plt.title(f"{dev}, {lrLabels[-lr]}")
     plt.title(f"Speedup, {lrLabels[-lr]}")
     plt.xlabel("Array size (n)",fontsize=12)
-    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major', zorder=0)
+    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.35, axis='both', which='major', zorder=0)
 
     # Create a second y-axis on the right
     ax2 = ax.twinx()
@@ -93,7 +98,7 @@ def plot_speedup(data_frame, lr, dev, saveFlag):
     ax.set_axisbelow(True)
     plt.ylabel("Speedup over HRMQ",fontsize=12)
 
-    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major', zorder=0)
+    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.35, axis='both', which='major', zorder=0)
     # AQUI VOY REVISAR ERROR
     hrmq = data_frame[0]
     hrmq = hrmq[hrmq['lr'] == lr]

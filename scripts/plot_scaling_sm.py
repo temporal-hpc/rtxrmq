@@ -31,9 +31,16 @@ plot_dir = "../plots/"
 lrLabels = ["Large","Medium", "Small"]
 linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
-colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
-orders=[10, 10, 10, 10, 10, 10]
-alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
+#colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
+#orders=[10, 10, 10, 10, 10, 10]
+#alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
+
+#         hrmq (blue)        rtxrmq            lca (orange)      ex (green)   light-orange     purple
+colors=["#0099ff",       "darkslategrey",       "darkorange",       "#44af69",    "#eca400",    "#763b82"]
+orders=[10, 10, 9.0, 9.0, 9.0, 9.0]
+alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.4]
+LCAM="#ad4702"
+RTXM="#253f3f"
 
 if __name__ == "__main__":
     k=0.7
@@ -75,28 +82,34 @@ if __name__ == "__main__":
     LCA_LR3_REF     = np.array([2.204702, 2.204702, 2.204702, 2.204702])
     HRMQ_LR3        = 2.112656
 
-    width=0.7
+    width=1.0
 
     plt.axhline(y=1, color=(0.1, 0.1, 0.1, 0.2), linestyle=':')
     #LCA experimental
     plt.plot(xvals, LCA_LR1_REF/LCA_LR1, label="LCA", linestyle='-', color=colors[2], lw=width)
-    plt.scatter(xvals, LCA_LR1_REF/LCA_LR1, marker="$L$", color="black", zorder=10)
+    #plt.scatter(xvals, LCA_LR1_REF/LCA_LR1, marker="$L$", color="black", zorder=10)
+    plt.scatter(xvals, LCA_LR1_REF/LCA_LR1, marker="$L$", color=LCAM, zorder=10)
 
     plt.plot(xvals, LCA_LR2_REF/LCA_LR2, linestyle='-', color=colors[2], lw=width)
-    plt.scatter(xvals, LCA_LR2_REF/LCA_LR2, marker="$M$", color="black", zorder=10)
+    #plt.scatter(xvals, LCA_LR2_REF/LCA_LR2, marker="$M$", color="black", zorder=10)
+    plt.scatter(xvals, LCA_LR2_REF/LCA_LR2, marker="$M$", color=LCAM, zorder=10)
 
     plt.plot(xvals, LCA_LR3_REF/LCA_LR3, linestyle='-', color=colors[2], lw=width)
-    plt.scatter(xvals, LCA_LR3_REF/LCA_LR3, marker="$S$", color="black", zorder=10)
+    #plt.scatter(xvals, LCA_LR3_REF/LCA_LR3, marker="$S$", color="black", zorder=10)
+    plt.scatter(xvals, LCA_LR3_REF/LCA_LR3, marker="$S$", color=LCAM, zorder=10)
 
     #RTXRMQ experimental
     plt.plot(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, label="RTXRMQ", color=colors[1], lw=width)
-    plt.scatter(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, marker="$L$", color="black", zorder=10)
+    #plt.scatter(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, marker="$L$", color="black", zorder=10)
+    plt.scatter(xvals, RTXRMQ_LR1_REF/RTXRMQ_LR1, marker="$L$", color=RTXM, zorder=10)
 
     plt.plot(xvals, RTXRMQ_LR2_REF/RTXRMQ_LR2, color=colors[1], lw=width)
-    plt.scatter(xvals, RTXRMQ_LR2_REF/RTXRMQ_LR2, marker="$M$", color="black", zorder=10)
+    #plt.scatter(xvals, RTXRMQ_LR2_REF/RTXRMQ_LR2, marker="$M$", color="black", zorder=10)
+    plt.scatter(xvals, RTXRMQ_LR2_REF/RTXRMQ_LR2, marker="$M$", color=RTXM, zorder=10)
 
     plt.plot(xvals, RTXRMQ_LR3_REF/RTXRMQ_LR3, color=colors[1], lw=width)
-    plt.scatter(xvals, RTXRMQ_LR3_REF/RTXRMQ_LR3, marker="$S$", color="black", zorder=10)
+    #plt.scatter(xvals, RTXRMQ_LR3_REF/RTXRMQ_LR3, marker="$S$", color="black", zorder=10)
+    plt.scatter(xvals, RTXRMQ_LR3_REF/RTXRMQ_LR3, marker="$S$", color=RTXM, zorder=10)
 
     plt.legend(fontsize=7, ncol=2)
     #plt.yscale('log', base=2)

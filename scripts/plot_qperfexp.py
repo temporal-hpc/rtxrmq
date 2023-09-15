@@ -32,9 +32,14 @@ plot_dir = "../plots/"
 lrLabels = ["","Large $(l,r)$ Range","Medium $(l,r)$ Range", "Small $(l,r)$ Range", "Medium $(l,r)$ Range", "Small $(l,r)$ Range"]
 linestyles=[ls['densely dotted'], ls['solid'], ls['densely dashed'], ls['densely dashdotted'], ls['densely dashdotdotted'], ls['dashed']]
 #colors=['cornflowerblue','forestgreen','darkslategrey','teal', 'lightseagreen', 'darkorange']
-colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
-orders=[10, 10, 0.0, 0.0, 5.0, 0.0]
-alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
+#colors=["#EC0B43", "darkslategrey", "#0099ff", "#44AF69", "#ECA400", "#763b82"]
+#orders=[10, 10, 0.0, 0.0, 5.0, 0.0]
+#alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.8]
+
+#         HRMQ (blue)        RTXRMQ            LCA (orange)      Ex (green)   light-orange     purple
+colors=["#0099ff",       "darkslategrey",       "darkorange",       "#44AF69",    "#ECA400",    "#763b82"]
+orders=[10, 10, 9.0, 9.0, 9.0, 9.0]
+alphas=[ 1,  1, 0.8, 0.8, 1.0, 0.4]
 
 def get_data(file):
     hc = pd.read_csv(file)
@@ -55,11 +60,11 @@ def plot_time(data_frame, lr, dev, saveFlag):
     plt.title("Parallel Saturation\n"+r"$n=2^{24}$"+f", {lrLabels[-lr]}")
     plt.xlabel("RMQ Batch size",fontsize=12)
     plt.xticks(range(0,26,5), fontsize=12)
-    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
+    plt.grid(color='#e7e7e7', linestyle='--', linewidth=1.35, axis='both', which='major')
     # Create a second y-axis on the right
     ax2 = ax.twinx()
     ax.yaxis.set_visible(False)
-    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.25, axis='both', which='major')
+    ax2.grid(True, color='#e7e7e7', linestyle='--', linewidth=1.35, axis='both', which='major')
     plt.ylabel("$\\frac{ns}{RMQ}$",fontsize=12, rotation=0)
     for i, df in enumerate(data_frame):
         df = df[df['lr'] == lr]
