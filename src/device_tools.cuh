@@ -16,6 +16,34 @@ __global__ void kernel_print_array_dev(int n, float *darray){
     }
 }
 
+__global__ void kernel_print_array_dev(int n, int2 *darray){
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    int i;
+    if(tid != 0){
+        return;
+    }
+    for(i=0; i<n && i<PRINT_LIMIT; ++i){
+        printf("tid %i --> array[%i] = %i %i\n", tid, i, darray[i].x, darray[i].y);
+    }
+    if(i < n){
+        printf("...\n");
+    }
+}
+
+__global__ void kernel_print_array_dev(int n, float2 *darray){
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    int i;
+    if(tid != 0){
+        return;
+    }
+    for(i=0; i<n && i<PRINT_LIMIT; ++i){
+        printf("tid %i --> array[%i] = %f %f\n", tid, i, darray[i].x, darray[i].y);
+    }
+    if(i < n){
+        printf("...\n");
+    }
+}
+
 __global__ void kernel_print_vertices_dev(int ntris, float3 *v){
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     int i;
@@ -53,6 +81,18 @@ void print_array_dev(int n, float *darray){
     cudaDeviceSynchronize();
 }
 
+void print_array_dev(int n, float2 *darray){
+    printf("Printing random array:\n");
+    kernel_print_array_dev<<<1,1>>>(n, darray);
+    cudaDeviceSynchronize();
+}
+
+void print_array_dev(int n, int2 *darray){
+    printf("Printing random array:\n");
+    kernel_print_array_dev<<<1,1>>>(n, darray);
+    cudaDeviceSynchronize();
+}
+
 void print_vertices_dev(int ntris, float3 *devVertices){
     printf("Printing vertices:\n");
     kernel_print_vertices_dev<<<1,1>>>(ntris, devVertices);
@@ -69,6 +109,7 @@ void print_triangles_dev(int ntris, uint3 *devTriangles){
 __device__ float transformLR(int alg, int x, int N) {
     switch (alg) {
         case ALG_GPU_RTX_CAST:
+        case ALG_GPU_RTX_CAST_IDX:
             return (float)x / N; 
         case ALG_GPU_RTX_TRANS:
             int E = x / (1<<23);

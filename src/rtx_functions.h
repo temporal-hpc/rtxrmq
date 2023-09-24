@@ -1,7 +1,7 @@
 #pragma once
 
 #define COMPACT 0
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 #define dbg(msg) do {printf(msg "\n"); fflush(stdout);} while (0)
 #else
@@ -137,6 +137,7 @@ void createProgramGroups(GASstate &state, int alg) {
       printf("Using cast rtx idx shaders\n");
       rg = "__raygen__rmq_idx";
       ch = "__closesthit__rmq_idx";
+      break;
     default:
       rg = "__raygen__rmq";
       ch = "__closesthit__rmq";

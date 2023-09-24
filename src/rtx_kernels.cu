@@ -77,6 +77,7 @@ extern "C" __global__ void  __closesthit__rmq() {
 }
 
 extern "C" __global__ void  __miss__rmq() {
+  //printf("MISS\n");
   optixSetPayload_0(__float_as_uint(INFINITY));
 }
 
@@ -310,13 +311,12 @@ extern "C" __global__ void __anyhit__rmq() {
 
 // IDX
 extern "C" __global__ void __raygen__rmq_idx() {
-  printf("Inside idx ray_gen\n");
-  return;
   const uint3 idx = optixGetLaunchIndex();
   float &min = params.min;
   float &max = params.max;
 
   float2 q = params.query[idx.x];
+
   float3 ray_origin = make_float3(min, q.x, q.y);
   float3 ray_direction = make_float3(1.0, 0.0, 0.0);
   //printf("ray %i,  (l,r)=(%f, %f)\n", idx.x, (float)q.x, (float)q.y);

@@ -127,12 +127,11 @@ int main(int argc, char *argv[]) {
             break;
         default:
             if (alg < 100)
-                out = rtx_rmq(alg, n, bs, q, dA, dQ, args);
+                out = rtx_rmq<float>(alg, n, bs, q, dA, dQ, args);
             else
-                outi = rtx_rmq_idx(alg, n, bs, q, dA, dQ, args);
+                outi = rtx_rmq<int>(alg, n, bs, q, dA, dQ, args);
             break;
     }
-
 
     if (args.check){
         printf("\nCHECKING RESULT:\n");
