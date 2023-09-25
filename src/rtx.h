@@ -1,5 +1,26 @@
 #pragma once
 
+int* compute_min_blocks(int n, float* d_array, int num_blocks, int block_size) {
+    int2 *queries, *d_queries;
+    queries = (int2*)malloc(num_blocks * sizeof(int2));
+    for (int i = 0; i < num_blocks; ++i) {
+        queries[i] = make_int2(i*block_size, (i+1)*block_size-1);
+    }
+    CUDA_CHECK( cudaMalloc(&d_queries, num_blocks * sizeof(int2)) );
+    CUDA_CHECK( cudaMemcpy(d_queries, queries, num_blocks * sizeof(int2), cudaMemcpyHostToDevice) );
+
+    int* min_blocks;
+    CUDA_CHECK( cudaMalloc(&min_blocks, num_blocks * sizeof(int)) );
+
+    dim3 block(BSIZE, 1, 1);
+    dim3 grid((num_blocks+BSIZE-1)/BSIZE, 1, 1);
+
+    kernel_rmq_basic_idx<<<grid, block>>>(n, num_blocks, d_array, d_queries, min_blocks);
+    CUDA_CHECK( cudaDeviceSynchronize() );
+
+    return min_blocks;
+}
+
 template <typename T>
 T* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs args) {
     int dev = args.dev;
@@ -16,13 +37,12 @@ T* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs a
     //int orig_n;
     float *LUP = nullptr;
     int num_blocks;
-    if (alg == ALG_GPU_RTX_BLOCKS) {
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_BLOCKS_IDX) {
         devVertices = gen_vertices_blocks_dev(n, bs, darray);
         num_blocks = (n+bs-1) / bs;
         //orig_n = n;
         n += num_blocks;
-    }
-    else if (alg == ALG_GPU_RTX_IAS) {
+    } else if (alg == ALG_GPU_RTX_IAS) {
         devVertices = gen_vertices_blocks_dev(n, bs, darray);
         num_blocks = (n+bs-1) / bs;
         //orig_n = n;
@@ -42,7 +62,11 @@ T* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs a
     //print_vertices_dev(n, devVertices);
     timer.stop();
     float geom_time = timer.get_elapsed_ms();
-    printf("done: %f ms\n",geom_time);
+    printf("done: %f ms\n",geom_time); fflush(stdout);
+
+    int *min_blocks;
+    if (alg == ALG_GPU_RTX_BLOCKS_IDX)
+        min_blocks = compute_min_blocks(n, darray, num_blocks, bs);
 
     // 2) RTX OptiX Config (ONCE)
     printf("RTX Config................................"); fflush(stdout);
@@ -83,15 +107,18 @@ T* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs a
 
     params.handle = state.gas_handle;
     params.min = -1.0f;
-    params.max = 2.0f;
+    params.max = 10.0f;
     params.output = alg < 100 ? (float*)d_output : nullptr;
     params.idx_output = alg < 100 ? nullptr : (int*)d_output;
 
-    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS) {
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS || alg == ALG_GPU_RTX_BLOCKS_IDX) {
         params.query = nullptr;
         params.iquery = dquery;
         params.num_blocks = ceil(sqrt(num_blocks + 1));
         params.block_size = bs;
+        params.nb = num_blocks;
+        if (alg == ALG_GPU_RTX_BLOCKS_IDX)
+            params.min_block = min_blocks;
     } else if (alg == ALG_GPU_RTX_LUP) {
         params.query = nullptr;
         params.iquery = dquery;
@@ -123,8 +150,8 @@ T* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs a
     timer.restart();
     for (int i = 0; i < reps; ++i) {
         OPTIX_CHECK(optixLaunch(state.pipeline, 0, reinterpret_cast<CUdeviceptr>(device_params), sizeof(Params), &state.sbt, q, 1, 1));
+        CUDA_CHECK(cudaDeviceSynchronize());
     }
-    CUDA_CHECK(cudaDeviceSynchronize());
     timer.stop();
     if (args.save_power)
         GPUPowerEnd();

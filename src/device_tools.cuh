@@ -262,9 +262,11 @@ __global__ void print_darray(float* A, int n) {
 }
 
 float3* gen_vertices_blocks_dev(int N, int bs, float *darray){
+    printf("inside genvertices blocks\n"); fflush(stdout);
     // create array with mins of each block
     int num_blocks = (N+bs-1) / bs;
     int ntris = N + num_blocks;
+    printf("inside genvertices blocks\n"); fflush(stdout);
 
     float *min_blocks;
     cudaMalloc(&min_blocks, sizeof(float)*num_blocks);

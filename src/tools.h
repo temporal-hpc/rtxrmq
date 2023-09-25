@@ -44,7 +44,9 @@ void print_help(){
                     "   6 -> %s\n"
                     "   7 -> %s\n"
                     "   8 -> %s\n"
-                    "   9 -> %s\n\n"
+                    "   9 -> %s\n"
+                    "   100, 101, 102, 103, 105 -> algs 1 2 3 5 returning indices\n"
+                    "\n"
                     "Options:\n"
                     "   --bs <block size>         block size for RTX_blocks (default: 2^15)\n"
                     "   --nb <#blocks>            number of blocks for RTX_blocks (overrides --bs)\n"
@@ -159,6 +161,7 @@ CmdArgs get_args(int argc, char *argv[]) {
     if (args.alg != ALG_GPU_RTX_CAST &&
             args.alg != ALG_GPU_RTX_TRANS &&
             args.alg != ALG_GPU_RTX_BLOCKS &&
+            args.alg != ALG_GPU_RTX_BLOCKS_IDX &&
             args.alg != ALG_GPU_RTX_LUP &&
             args.alg != ALG_GPU_RTX_IAS &&
 	    args.alg != ALG_GPU_RTX_IAS_TRANS) {
@@ -230,6 +233,7 @@ bool check_result_idx(float *hA, int2 *hQ, int q, int *expected, int *result){
         if (expected[i] !=  result[i]) {
             printf("Error on %i-th query: got %i, expected %i\n", i, result[i], expected[i]);
             printf("  [%i,%i]\n", hQ[i].x, hQ[i].y);
+            printf("  got min %.7f, expected %.7f\n", hA[result[i]], hA[expected[i]]);
             pass = false;
             //for (int j = hQ[i].x; j <= hQ[i].y; ++j) {
             //    printf("%f ", hA[j]);

@@ -27,6 +27,7 @@ struct Params {
   int2 *iquery;
   float *LUP;
   int *idx_output;
+  int *min_block;
   float min;
   float max;
   int num_blocks;
@@ -107,7 +108,7 @@ void loadAppModule(GASstate &state, CmdArgs args) {
     state.pipeline_compile_options.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_LEVEL_INSTANCING;
     //state.pipeline_compile_options.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_ANY;
   }
-  state.pipeline_compile_options.numPayloadValues = 1;
+  state.pipeline_compile_options.numPayloadValues = 2;
   state.pipeline_compile_options.numAttributeValues = 2; // 2 is the minimum
   state.pipeline_compile_options.exceptionFlags = OPTIX_EXCEPTION_FLAG_NONE;
   state.pipeline_compile_options.pipelineLaunchParamsVariableName = "params";
