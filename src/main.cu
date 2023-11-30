@@ -23,6 +23,7 @@
 #define ALG_GPU_RTX_LUP           6
 #define ALG_GPU_RTX_IAS           8
 #define ALG_GPU_RTX_IAS_TRANS     9
+#define ALG_GPU_RTX_SER           10
 
 #define ALG_CPU_BASE_IDX        100
 #define ALG_CPU_HRMQ_IDX        101
@@ -31,7 +32,7 @@
 #define ALG_GPU_RTX_BLOCKS_IDX  105
 
 // TODO add other state-of-the-art GPU rmq algs
-const char *algStr[10] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks", "[GPU] RTX_lup", "[GPU] LCA (TODO)", "[GPU] RTX_ias", "[GPU] RTX_ias_trans"}; 
+const char *algStr[11] = { "[CPU] BASE", "[CPU] HRMQ", "[GPU] BASE", "[GPU] RTX_cast", "[GPU] RTX_trans", "[GPU] RTX_blocks", "[GPU] RTX_lup", "[GPU] LCA (TODO)", "[GPU] RTX_ias", "[GPU] RTX_ias_trans", "[GPU] RTX_ser"}; 
 
 
 #include "common/common.h"
@@ -83,8 +84,8 @@ int main(int argc, char *argv[]) {
     //dQ = qs.first;
     //hQ = random_queries(q, lr, n, seed);
     hQ = random_queries_par_cpu(q, lr, n, nt, seed);
-    cudaMalloc(&dQ, sizeof(int2)*q);
-    cudaMemcpy(dQ, hQ, sizeof(int2)*q, cudaMemcpyHostToDevice);
+    CUDA_CHECK( cudaMalloc(&dQ, sizeof(int2)*q) );
+    CUDA_CHECK( cudaMemcpy(dQ, hQ, sizeof(int2)*q, cudaMemcpyHostToDevice) );
     printf("done: %f secs\n" AC_RESET, timer.get_elapsed_ms()/1000.0f);
 
 
@@ -92,11 +93,14 @@ int main(int argc, char *argv[]) {
     if (args.check || alg == ALG_CPU_BASE || alg == ALG_CPU_HRMQ || alg == ALG_CPU_BASE_IDX || alg == ALG_CPU_HRMQ_IDX) {
         hA = new float[n];
         //hQ = new int2[q];
-        cudaMemcpy(hA, p.first, sizeof(float)*n, cudaMemcpyDeviceToHost);
+        CUDA_CHECK( cudaMemcpy(hA, p.first, sizeof(float)*n, cudaMemcpyDeviceToHost) );
         //cudaMemcpy(hQ, qs.first, sizeof(int2)*q, cudaMemcpyDeviceToHost);
     }
 
-    cudaDeviceSynchronize();
+    //print_array_dev(n, dA);
+    //print_array_dev(q, dQ);
+
+    CUDA_CHECK( cudaDeviceSynchronize() );
 
     write_results(dev, alg, n, bs, q, lr, reps, args);
     // 2) computation

@@ -266,7 +266,6 @@ float3* gen_vertices_blocks_dev(int N, int bs, float *darray){
     // create array with mins of each block
     int num_blocks = (N+bs-1) / bs;
     int ntris = N + num_blocks;
-    printf("inside genvertices blocks\n"); fflush(stdout);
 
     float *min_blocks;
     cudaMalloc(&min_blocks, sizeof(float)*num_blocks);
@@ -299,14 +298,11 @@ float3* gen_vertices_blocks_dev_ias(int N, int bs, float *darray){
     dim3 grid_mins((num_blocks+BSIZE-1)/BSIZE,1,1);
     kernel_min_blocks<<<grid_mins, block>>>(min_blocks, darray, num_blocks, N, bs);
     CUDA_CHECK( cudaDeviceSynchronize() );
-    //printf("hola 2\n"); fflush(stdout);
     //print_darray<<<1,1>>>(min_blocks, num_blocks);
-    //printf("inside gen bl 2\n");
 
     // vertices data
     float3 *devVertices;
     cudaMalloc(&devVertices, sizeof(float3)*3*ntris);
-    //printf("inside gen bl 3\n");
 
     // setup states
     dim3 grid((ntris+BSIZE-1)/BSIZE, 1, 1); 

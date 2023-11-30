@@ -37,7 +37,7 @@ T* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs a
     //int orig_n;
     float *LUP = nullptr;
     int num_blocks;
-    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_BLOCKS_IDX) {
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_BLOCKS_IDX || alg == ALG_GPU_RTX_SER) {
         devVertices = gen_vertices_blocks_dev(n, bs, darray);
         num_blocks = (n+bs-1) / bs;
         //orig_n = n;
@@ -111,7 +111,7 @@ T* rtx_rmq(int alg, int n, int bs, int q, float *darray, int2 *dquery, CmdArgs a
     params.output = alg < 100 ? (float*)d_output : nullptr;
     params.idx_output = alg < 100 ? nullptr : (int*)d_output;
 
-    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS || alg == ALG_GPU_RTX_BLOCKS_IDX) {
+    if (alg == ALG_GPU_RTX_BLOCKS || alg == ALG_GPU_RTX_IAS || alg == ALG_GPU_RTX_IAS_TRANS || alg == ALG_GPU_RTX_BLOCKS_IDX || alg == ALG_GPU_RTX_SER) {
         params.query = nullptr;
         params.iquery = dquery;
         params.num_blocks = ceil(sqrt(num_blocks + 1));

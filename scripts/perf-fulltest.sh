@@ -30,7 +30,7 @@ echo "START #DATE = ${DATEBEGIN}"
 
 printf "args dev=${dev} nt=${nt} alg=${alg} name=${name}, N1=${N1}, N2=${N2}, N2A3=${N2A3}, DN=${DN}, Q1=${Q1}, Q2=${Q2}, DQ=${DQ}\n\n"
 
-if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ]; then
+if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ] && [ "$alg" -ne 10 ]; then
 	for lr in {-1..-3}
 	do
 		if [ "$alg" -eq 2 ]; then
@@ -42,7 +42,7 @@ if [ "$alg" -ne 5 ] && [ "$alg" -ne 8 ]; then
 			./perf-benchmark.sh     ${dev} ${nt} ${alg}  16     16    ${N1} ${N2}    ${DN}      ${Q1} ${Q2}  ${DQ}   nb       1   ${lr}  ${name}
 		fi
 	done
-elif [ "$alg" -eq 5 ]; then
+elif [ "$alg" -eq 5 ] || [ "$alg" -eq 10 ]; then
 	#./perf-benchmark.sh     <dev>  <nt>  <alg> <rea> <reps>       <n1>         <n2>          <dn>    <q1>   <q2>   <dq>   <bs|nb> <block>    <lr>   <name>
 	# LR=-1  UNIFORM DISTRIBUTION (large values)
     ./perf-benchmark.sh      ${dev} ${nt} ${alg}  16    16    $(( 1*${N1}))  $(( 3*${N1}))    ${DN}   ${Q1} ${Q2}   ${DQ}     nb  $((2**14))  -1   ${name}

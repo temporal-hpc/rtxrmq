@@ -45,6 +45,7 @@ void print_help(){
                     "   7 -> %s\n"
                     "   8 -> %s\n"
                     "   9 -> %s\n"
+                    "   10 -> %s\n"
                     "   100, 101, 102, 103, 105 -> algs 1 2 3 5 returning indices\n"
                     "\n"
                     "Options:\n"
@@ -66,7 +67,8 @@ void print_help(){
                     algStr[6],
                     algStr[7],
                     algStr[8],
-                    algStr[9]
+                    algStr[9],
+                    algStr[10]
                 );
 }
 
@@ -162,6 +164,7 @@ CmdArgs get_args(int argc, char *argv[]) {
             args.alg != ALG_GPU_RTX_TRANS &&
             args.alg != ALG_GPU_RTX_BLOCKS &&
             args.alg != ALG_GPU_RTX_BLOCKS_IDX &&
+            args.alg != ALG_GPU_RTX_SER &&
             args.alg != ALG_GPU_RTX_LUP &&
             args.alg != ALG_GPU_RTX_IAS &&
 	    args.alg != ALG_GPU_RTX_IAS_TRANS) {
@@ -194,6 +197,7 @@ bool check_result(float *hA, int2 *hQ, int q, float *expected, float *result, in
     bool pass = true;
     for (int i = 0; i < q; ++i) {
         //if (expected[i] != result[i]) { // RT-cores don't introduce floating point errors
+	//printf("expected %f   got %f\n", expected[i], result[i]);
         if (!is_equal(expected[i], result[i])) {
             printf("Error on %i-th query: got %f, expected %f at idx %i\n", i, result[i], expected[i], indices[i]);
             printf("  [%i,%i]\n", hQ[i].x, hQ[i].y);

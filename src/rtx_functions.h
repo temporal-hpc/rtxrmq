@@ -126,6 +126,10 @@ void createProgramGroups(GASstate &state, int alg) {
       rg = "__raygen__rmq_blocks";
       ch = "__closesthit__rmq_blocks";
       break;
+    case ALG_GPU_RTX_SER:
+      rg = "__raygen__rmq_blocks_ser";
+      ch = "__closesthit__rmq_blocks";
+      break;
     case ALG_GPU_RTX_LUP:
       rg = "__raygen__rmq_lup";
       ch = "__closesthit__rmq_blocks";
