@@ -53,7 +53,7 @@ rtxrun ./rtxrmq $((10**7)) $((10**7)) -3 5
 
 
 ## References
-[1] E.Meneses, C. Navarro, H. Ferrada, F. Quezada, Accelerating range minimum queries with ray tracing cores, Future Generation Computer Systems 157 (2024) 98-111
+[1] E. Meneses, C. Navarro, H. Ferrada, F. Quezada, Accelerating range minimum queries with ray tracing cores, Future Generation Computer Systems 157 (2024) 98-111
 
 [2] H. Ferrada, G. Navarro, Improved range minimum queries, J. Discrete Algorithms 43 (2017) 72–80
 
