@@ -48,6 +48,8 @@ Options:
 
 ## Example compilation and execution
 ```
+cmake .. -DOPTIX_HOME=~/opt/optix/NVIDIA-OptiX-SDK-8.0.0-linux64-x86_64
+make
 rtxrun ./rtxrmq $((10**7)) $((10**7)) -3 5
 ```
 
