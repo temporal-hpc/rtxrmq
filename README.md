@@ -1,5 +1,8 @@
 # RTXRMQ - Batch Range Minimum Queries Accelerated by RTX
-RMQ implementation using Nvidia OptiX and RT cores.
+RMQ implementation using Nvidia OptiX and RT cores. This repository is part of our work `Accelerating range minimum queries with ray tracing cores` published on Elsevier's FGCS Journal. 
+
+DOI: https://doi.org/10.1016/j.future.2024.03.040
+
 The results in the paper correspond to algorithm 5 (RTX_blocks).
 
 ## Dependencies
